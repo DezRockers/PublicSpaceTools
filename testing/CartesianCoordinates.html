@@ -1,0 +1,84 @@
+<html>
+<head>
+<script type="text/javascript">
+var pi = 3.1415926535897932384626433832795;
+
+// function to display Keplerian elements
+function DisplayKeplerian()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=document.getElementById("i").value;
+var Omega=document.getElementById("Omega").value;
+var w=document.getElementById("w").value;
+var f=document.getElementById("f").value;
+var txt = "a = " + a + " km\n";
+txt = txt + "e = " + e + "\n";
+txt = txt + "i = " + i + " degrees\n";
+txt = txt + "Omega = " + Omega + " degrees\n";
+txt = txt + "w = " + w + " degrees\n";
+txt = txt + "f = " + f + " degrees\n";
+alert(txt);
+}
+
+// function to convert degrees to radians
+function DegreesToRadians(x)
+{
+	return x * pi / 180;
+}
+
+// function to convert radians to degrees
+function RadiansToDegrees(x)
+{
+	return x * 180 / pi;
+}
+// function to compute R
+function ComputeR()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var R = a*(1-e)*(1-e)/(1+e*Math.cos(f));
+return R;
+}
+// function to display the range in km
+function DisplayR()
+{
+alert(ComputeR());
+}
+
+</script>
+</head>
+<body>
+
+<table border="1">
+<tr id="tr1">
+<th>Coordinate</th>
+<th>Value</th>
+</tr>
+<tr id="tr2">
+<td>X (km)</td>
+</tr>
+<tr id="tr3">
+<td>Y (km)</td>
+</tr>
+<tr id="tr4">
+<td>Z (km)</td>
+</tr>
+<tr id="tr5">
+<td>Xdot (km/s)</td>
+</tr>
+<tr id="tr6">
+<td>Ydot (km/s)</td>
+</tr>
+<tr id="tr7">
+<td>Zdot (km/s)</td>
+</tr>
+</table>
+<br />
+
+</body>
+</html> 

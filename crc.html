@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+// set the initialisation state to all ones
+function AllOnes()
+{
+	document.getElementById("r1").value=1;
+	document.getElementById("r2").value=1;
+	document.getElementById("r3").value=1;
+	document.getElementById("r4").value=1;
+	document.getElementById("r5").value=1;
+	document.getElementById("r6").value=1;
+	document.getElementById("r7").value=1;
+	document.getElementById("r8").value=1;
+	document.getElementById("r9").value=1;
+	document.getElementById("r10").value=1;
+	document.getElementById("r11").value=1;
+	document.getElementById("r12").value=1;
+	document.getElementById("r13").value=1;
+	document.getElementById("r14").value=1;
+	document.getElementById("r15").value=1;
+	document.getElementById("r16").value=1;
+}
+
+// set the initialisation state to all zeroes
+function AllZeroes()
+{
+	document.getElementById("r1").value=0;
+	document.getElementById("r2").value=0;
+	document.getElementById("r3").value=0;
+	document.getElementById("r4").value=0;
+	document.getElementById("r5").value=0;
+	document.getElementById("r6").value=0;
+	document.getElementById("r7").value=0;
+	document.getElementById("r8").value=0;
+	document.getElementById("r9").value=0;
+	document.getElementById("r10").value=0;
+	document.getElementById("r11").value=0;
+	document.getElementById("r12").value=0;
+	document.getElementById("r13").value=0;
+	document.getElementById("r14").value=0;
+	document.getElementById("r15").value=0;
+	document.getElementById("r16").value=0;
+}
+
+function DisplayCrc()
+{	
+	var str = document.getElementById("inputString").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16)
+	}
+	var crc = CalculateCrc(bytes);
+	var msb = (crc >> 8) & 0xff;
+	var lsb = crc & 0xff;
+	//alert ("CRC = 0x" + msb.toString(16) + " 0x" + lsb.toString(16));
+	document.getElementById("crc").value = msb.toString(16) + " " + lsb.toString(16);
+}
+
+// remove multiple, leading or trailing spaces
+function trim(s) {
+	s = s.replace(/(^\s*)|(\s*$)/gi,"");
+	s = s.replace(/[ ]{2,}/gi," ");
+	s = s.replace(/\n /,"\n");
+	return s;
+}
+
+// Calculates the CRC based on the passed in bytes
+function CalculateCrc(bytes)
+{
+	var r = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	r[0] = document.getElementById("r1").value;
+	r[1] = document.getElementById("r2").value;
+	r[2] = document.getElementById("r3").value;
+	r[3] = document.getElementById("r4").value;
+	r[4] = document.getElementById("r5").value;
+	r[5] = document.getElementById("r6").value;
+	r[6] = document.getElementById("r7").value;
+	r[7] = document.getElementById("r8").value;
+	r[8] = document.getElementById("r9").value;
+	r[9] = document.getElementById("r10").value;
+	r[10] = document.getElementById("r11").value;
+	r[11] = document.getElementById("r12").value;
+	r[12] = document.getElementById("r13").value;
+	r[13] = document.getElementById("r14").value;
+	r[14] = document.getElementById("r15").value;
+	r[15] = document.getElementById("r16").value;
+	var x = new Array(0 , 0, 0, 0, 0 , 0, 0, 0);
+	var m = new Array(0 , 0, 0, 0, 0 , 0, 0, 0);
+	var len = bytes.length;
+	var msb;
+	var lsb;
+        for (i = 0; i < len; i++ )
+        {
+		m[7] = ((bytes[i] & 0x00000001));
+                m[6] = ((bytes[i] & 0x00000002) >> 1);
+                m[5] = ((bytes[i] & 0x00000004) >> 2);
+                m[4] = ((bytes[i] & 0x00000008) >> 3);
+                m[3] = ((bytes[i] & 0x00000010) >> 4);
+                m[2] = ((bytes[i] & 0x00000020) >> 5);
+                m[1] = ((bytes[i] & 0x00000040) >> 6);
+                m[0] = ((bytes[i] & 0x00000080) >> 7);
+
+                x[0] = (r[0] ^ m[0]);
+                x[1] = (r[1] ^ m[1]);
+                x[2] = (r[2] ^ m[2]);
+                x[3] = (r[3] ^ m[3]);
+                x[4] = (r[4] ^ m[4]);
+                x[5] = (r[5] ^ m[5]);
+                x[6] = (r[6] ^ m[6]);
+                x[7] = (r[7] ^ m[7]);
+
+                r[0] = ((r[8] ^ x[4]) ^ x[0]);
+                r[1] = ((r[9] ^ x[5]) ^ x[1]);
+                r[2] = ((r[10] ^ x[6]) ^ x[2]);
+                r[3] = (((r[11] ^ x[0]) ^ x[7]) ^ x[3]);
+                r[4] = (r[12] ^ x[1]);
+                r[5] = (r[13] ^ x[2]);
+                r[6] = (r[14] ^ x[3]);
+                r[7] = ((r[15] ^ x[4]) ^ x[0]);
+                r[8] = ((x[0] ^ x[5]) ^ x[1]);
+                r[9] = ((x[1] ^ x[6]) ^ x[2]);
+                r[10] = ((x[2] ^ x[7]) ^ x[3]);
+                r[11] = (x[3]);
+                r[12] = (x[4] ^ x[0]);
+                r[13] = (x[5] ^ x[1]);
+                r[14] = (x[6] ^ x[2]);
+                r[15] = (x[7] ^ x[3]);
+	}
+	msb = (r[ 0] << 7) + (r[ 1] << 6) + (r[ 2] << 5) + (r[ 3] << 4)
+                           + (r[ 4] << 3) + (r[ 5] << 2) + (r[ 6] << 1) +  r[ 7];
+
+        lsb = (r[ 8] << 7) + (r[ 9] << 6) + (r[10] << 5) + (r[11] << 4)
+                           + (r[12] << 3) + (r[13] << 2) + (r[14] << 1) +  r[15];
+	var word = (msb << 8) + lsb;
+	return word;
+}
+
+function ClearString()
+{
+	document.getElementById("getString").reset();
+}
+
+</script>
+</head>
+
+<body>
+<p>
+This function computes the 16 bit CRC for a string of hexadecimal bytes based on the specified initialisation state.
+</p>
+
+<table>
+<tr id="tr1">
+Initialisation state<br />
+<td>
+<form id = "initState1">
+<input type="text" id="r1" maxLength=1 size=1  />
+</form>
+</td>
+<td>
+<form id = "initState2">
+<input type="text" id="r2" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState3">
+<input type="text" id="r3" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState4">
+<input type="text" id="r4" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState5">
+<input type="text" id="r5" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState6">
+<input type="text" id="r6" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState7">
+<input type="text" id="r7" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState8">
+<input type="text" id="r8" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState9">
+<input type="text" id="r9" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState10">
+<input type="text" id="r10" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState11">
+<input type="text" id="r11" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState12">
+<input type="text" id="r12" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState13">
+<input type="text" id="r13" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState14">
+<input type="text" id="r14" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState15">
+<input type="text" id="r15" maxLength=1 size=1 />
+</form>
+</td>
+<td>
+<form id = "initState16">
+<input type="text" id="r16" maxLength=1 size=1 />
+</form>
+</td>
+
+</tr>
+</table>
+
+<script type="text/javascript">
+AllOnes();
+</script>
+
+<button type="button" onclick="AllOnes()">Set Init State to all ones</button><br />
+<button type="button" onclick="AllZeroes()">Set Init State to all zeroes</button><br />
+
+<form id = "getString">
+Input string of space delimited hexadecimal bytes e.g. A1 B2 C3 D4 E5 F6 07 18<br />
+<input type="text" id="inputString" maxLength=375 size=125/><br />
+Computed CRC<br />
+<input type="text" id="crc"/>
+</form>
+
+<button type="button" onclick="DisplayCrc()">Calculate CRC</button><br />
+<button type="button" onclick="ClearString()">Clear String</button><br />
+
+</body>
+</html>

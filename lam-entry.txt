@@ -1,0 +1,29 @@
+From the MCS TC History:
+
+Name       Description              Sequence Domain    Release Time       Execution Time        Sub PID TT S13 S D C C G B IL ST Source   FC TC Q R GTO A C C 
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+ZSY50003   Write SGM group                   GAIA      2011.143.08.32.06  2011.143.08.32.07.031 100 10  0  0   E E E E        MS ws130    08 01   S SSS S   S        
+  PDW00003 SGM group identifier     Raw      Dec                33                                                    
+  PDW00005 SGM offset from start ad Raw      Dec                76                                                    
+  PDW00062 Length data              Raw      Hex                4                                                     
+  PDW00007 Data to write            Raw      Dec                1                                                     
+  PDW00007 Data to write            Raw      Dec                1                                                     
+  PDW00007 Data to write            Raw      Dec                10                                                    
+  PDW00007 Data to write            Raw      Dec                0                                                     
+ZSY12810   SYS Change 1 byte param           GAIA      2011.143.08.32.20  2011.143.08.32.20.653 100 14  0  0   E E E E        MS ws130    09 01   S SSS S   S        
+  PDW00122 Number of Repetitions    Raw      Dec                3                                                     
+  PDW00133 Parameter ID             Raw      Dec                192510074                                             
+  PDW00008 Byte data to write       Raw      Dec                1                                                     
+  PDW00133 Parameter ID             Raw      Dec                192510075                                             
+  PDW00008 Byte data to write       Raw      Dec                1                                                     
+  PDW00133 Parameter ID             Raw      Dec                192510076                                             
+  PDW00008 Byte data to write       Raw      Dec                10                                                    
+ZSY39004   Switch from GOM to LAM            GAIA      2011.143.08.33.00  2011.143.08.33.01.063 100 14  0  0   E E E E        MS ws130    0A 01   S SSS S   S        
+
+From the sim logs:
+
+TC frame received:  03 15 04 20 08 C1 18 AC DE E4 00 12 19 96 03 00 21 00 00 00 4C 00 00 00 04 01 01 0A 00 86 4B D9 74	
+TC frame received:  03 15 04 23 09 C1 18 EC CA 44 00 15 19 80 01 00 03 0B 79 78 7A 01 0B 79 78 7B 01 0B 79 78 7C 0A 75 B2 B4 DD	
+TC frame received:  03 15 04 13 0A C1 18 EC CA 45 00 05 19 8B 04 00 3F ED 16 8C	
+=

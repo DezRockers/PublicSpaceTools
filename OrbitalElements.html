@@ -1,0 +1,455 @@
+<html>
+<head>
+<script type="text/javascript">
+
+// the following JavaScript functions are taken from my document DDDAPP1.doc
+// which is downloaded by the link AOCS Math Models
+
+var pi = 3.1415926535897932384626433832795;
+var mu = 398600.4418;	// km3/s2
+
+// function to display Keplerian elements
+function DisplayKeplerian()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=document.getElementById("i").value;
+var Omega=document.getElementById("Omega").value;
+var w=document.getElementById("w").value;
+var f=document.getElementById("f").value;
+var txt = "a = " + a + " km\n";
+txt = txt + "e = " + e + "\n";
+txt = txt + "i = " + i + " degrees\n";
+txt = txt + "Omega = " + Omega + " degrees\n";
+txt = txt + "w = " + w + " degrees\n";
+txt = txt + "f = " + f + " degrees\n";
+alert(txt);
+}
+
+// function to convert degrees to radians
+function DegreesToRadians(x)
+{
+	return x * pi / 180;
+}
+
+// function to convert radians to degrees
+function RadiansToDegrees(x)
+{
+	return x * 180 / pi;
+}
+
+// function to compute R
+function ComputeR()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var R = a*(1-e*e)/(1+e*Math.cos(f));
+return R;
+}
+
+// function to display the range in km
+function DisplayR()
+{
+alert(ComputeR());
+}
+
+// function to compute X
+function ComputeX()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var R = ComputeR();
+var X = R*(Math.cos(w+f)*Math.cos(Omega)-Math.sin(w+f)*Math.cos(i)*Math.sin(Omega));
+document.getElementById("x").value = X;
+return X;
+}
+
+// function to compute Y
+function ComputeY()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var R = ComputeR();
+var Y = R*(Math.cos(w+f)*Math.sin(Omega)+Math.sin(w+f)*Math.cos(i)*Math.cos(Omega));
+document.getElementById("y").value = Y;
+return Y;
+}
+
+// function to compute Z
+function ComputeZ()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var R = ComputeR();
+var Z = R*(Math.sin(w+f)*Math.sin(i));
+document.getElementById("z").value = Z;
+return Z;
+}
+
+// function to display X, Y ,Z
+function DisplayXYZ()
+{
+var X = ComputeX();
+var Y = ComputeY();
+var Z = ComputeZ();
+var txt = "X = " + X + " km\n";
+txt = txt + "Y = " + Y + " km\n";
+txt = txt + "Z = " + Z + " km\n";
+alert(txt);
+}
+
+
+// function to compute A
+function ComputeA()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var A = -Math.sin(w+f)*Math.cos(Omega) - Math.cos(w+f)*Math.cos(i)*Math.sin(Omega);
+return A;
+}
+
+// function to compute B
+function ComputeB()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var B = -Math.sin(w+f)*Math.sin(Omega) + Math.cos(w+f)*Math.cos(i)*Math.cos(Omega);
+return B;
+}
+
+// function to compute C
+function ComputeC()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var C = Math.cos(w+f)*Math.sin(i);
+return C;
+}
+
+// function to compute the vecloity magnitude in km/s
+function VelocityMagnitude()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var V = Math.sqrt((mu/a)*(1+e*e+2*e*Math.cos(f))/(1-e*e));
+return V;
+}
+
+// function to normalise a vector
+function Normalise(V)
+{
+	var N = new Array(0, 0, 0);
+	var R = Math.sqrt(DotProduct(V,V));
+	if (R != 0)
+	{
+		N[0] = V[0]/R;
+		N[1] = V[1]/R;
+		N[2] = V[2]/R;
+	}
+	return N;
+}
+
+// function to compute velocity components
+function ComputeVelocity()
+{
+var a=document.getElementById("a").value;
+var e=document.getElementById("e").value;
+var i=DegreesToRadians(document.getElementById("i").value);
+var Omega=DegreesToRadians(document.getElementById("Omega").value);
+var w=DegreesToRadians(document.getElementById("w").value);
+var f=DegreesToRadians(document.getElementById("f").value);
+var esinf = e*Math.sin(f);
+var ecosfplus1 = 1 + e*Math.cos(f);
+var V = new Array();
+V[0] = esinf*ComputeX()/ComputeR()+ecosfplus1*ComputeA();
+V[1] = esinf*ComputeY()/ComputeR()+ecosfplus1*ComputeB();
+V[2] = esinf*ComputeZ()/ComputeR()+ecosfplus1*ComputeC();
+V = Normalise(V);
+V[0] = V[0]*VelocityMagnitude();
+V[1] = V[1]*VelocityMagnitude();
+V[2] = V[2]*VelocityMagnitude();
+
+return V;
+
+}
+
+// function to display velocity components
+function DisplayVelocity()
+{
+var V = new Array();
+V = ComputeVelocity();
+document.getElementById("xdot").value = V[0];
+document.getElementById("ydot").value = V[1];
+document.getElementById("zdot").value = V[2];
+}
+
+function ClearElements()
+{
+document.getElementById("keplerian").reset();
+}
+
+function ClearCartesians()
+{
+document.getElementById("cartesian").reset();
+}
+
+// function to compute the Cartesain coordinates given the Keplerian elements
+function ComputeCartesians()
+{
+	var a=document.getElementById("a").value;
+	if (a < 6378) 
+	{
+		alert("a is less than 6378km, the radius of the Earth. Try again");
+		return;
+	} 
+	var e=document.getElementById("e").value;
+	if ((e < 0) || (e >= 1)) 
+	{
+		alert("e is not between 0 and 1. Try again");
+		return;
+	} 
+	var i=document.getElementById("i").value;
+	if ((i < 0) || (i > 180)) 
+	{
+		alert("i is not between 0 and 180. Try again");
+		return;
+	} 
+	var X = ComputeX();
+	var Y = ComputeY();
+	var Z = ComputeZ();
+	DisplayVelocity();
+}
+
+// function to compute the Keplerian elements given the Cartesain coordinates 
+function ComputeKeplerians()
+{
+	var a = ComputeSemiMajorAxis();
+	var e = ComputeEccentricity();
+	var i = ComputeInclination();
+	var Omega = 0;
+	if (i != 0)
+	{
+		Omega = ComputeOmega();
+	}
+	var w = ComputeArgumentOfPerigee();
+	var f = ComputeTrueAnomaly();
+
+	var txt = "a = " + a + " km\n";
+	txt = txt + "e = " + e + "\n";
+	txt = txt + "i = " + i + " degrees\n";
+	txt = txt + "Omega = " + Omega + " degrees\n";
+	txt = txt + "w = " + w + " degrees\n";
+	txt = txt + "f = " + f + " degrees\n";
+	alert(txt);
+}
+
+// function to compute Omega in degrees
+function ComputeOmega()
+{
+	var R = new Array();
+	var V = new Array();
+	R[0] = document.getElementById("x").value;
+	R[1] = document.getElementById("y").value;
+	R[2] = document.getElementById("z").value;
+	V[0] = document.getElementById("xdot").value;
+	V[1] = document.getElementById("ydot").value;
+	V[2] = document.getElementById("zdot").value;
+	var h = CrossProduct(R,V);
+	var Omega = Math.atan2(h[0],-h[1]);
+	Omega = RadiansToDegrees(Omega);
+	return Omega;
+}
+
+function CrossProduct(V1, V2)
+{
+	var V = new Array();
+
+	// cross product
+	V[0] = V1[1]*V2[2] - V1[2]*V2[1];
+	V[1] = - V1[0]*V2[2] + V1[2]*V2[0];
+	V[2] = V1[0]*V2[1] - V1[1]*V2[0];
+
+	return V;
+}
+
+function DotProduct(V1, V2)
+{
+	var R;
+
+	// dot product
+	R = V1[0]*V2[0] + V1[1]*V2[1] + V1[2]*V2[2];
+
+	return R;
+}
+
+function VectorMagnitude(V)
+{
+	var R = Math.sqrt(DotProduct(V, V));
+
+	return R;
+}
+
+// function to compute the semi-major axis
+function ComputeSemiMajorAxis()
+{
+	var V = VelocityMagnitude();
+	var R= ComputeR();
+	var a = R / (2 - V*V*R/mu);
+	return a;
+}
+
+// function to compute the eccentricity
+function ComputeEccentricity()
+{
+	var R = new Array();
+	var V = new Array();
+	R[0] = document.getElementById("x").value;
+	R[1] = document.getElementById("y").value;
+	R[2] = document.getElementById("z").value;
+	V[0] = document.getElementById("xdot").value;
+	V[1] = document.getElementById("ydot").value;
+	V[2] = document.getElementById("zdot").value;
+	var h = VectorMagnitude(CrossProduct(R,V));
+	var s= DotProduct(R,V)*h/(VectorMagnitude(R)*mu);
+	var c = h*h/(VectorMagnitude(R)*mu) - 1;
+	var e = Math.sqrt(s*s + c*c);
+	return e;
+}
+
+// function to compute the true anomaly in degrees
+function ComputeTrueAnomaly()
+{
+	var R = new Array();
+	var V = new Array();
+	R[0] = document.getElementById("x").value;
+	R[1] = document.getElementById("y").value;
+	R[2] = document.getElementById("z").value;
+	V[0] = document.getElementById("xdot").value;
+	V[1] = document.getElementById("ydot").value;
+	V[2] = document.getElementById("zdot").value;
+	var h = VectorMagnitude(CrossProduct(R,V));
+	var s= DotProduct(R,V)*h/(VectorMagnitude(R)*mu);
+	var c = h*h/(VectorMagnitude(R)*mu) - 1;
+	var f = Math.atan2(s, c);
+	f = RadiansToDegrees(f);
+	return f;
+}
+
+// function to compute the argument of perigee in degrees
+function ComputeArgumentOfPerigee()
+{
+	var i = DegreesToRadians(ComputeInclination());
+	var Omega = DegreesToRadians(ComputeOmega());
+	var R = new Array();
+	R[0] = document.getElementById("x").value;
+	R[1] = document.getElementById("y").value;
+	R[2] = document.getElementById("z").value;
+	var wpf = 0;
+	if (i != 0) wpf = Math.atan2((R[2]/Math.sin(i)), (R[0]*Math.cos(Omega)+R[1]*Math.sin(Omega)));
+	wpf = RadiansToDegrees(wpf);
+	var f = ComputeTrueAnomaly();
+	var w = wpf - f;
+	return w;
+}
+
+// function to compute the inclination
+function ComputeInclination()
+{
+	var h = new Array();
+	var R = new Array();
+	var V = new Array();
+	R[0] = document.getElementById("x").value;
+	R[1] = document.getElementById("y").value;
+	R[2] = document.getElementById("z").value;
+	V[0] = document.getElementById("xdot").value;
+	V[1] = document.getElementById("ydot").value;
+	V[2] = document.getElementById("zdot").value;
+	h = CrossProduct(R,V);
+	var i = Math.atan(Math.sqrt(h[0]*h[0]+h[1]*h[1])/h[2]);
+	i = RadiansToDegrees(i);
+	if (i < 0) i = i + 180;
+	if (i > 180) i = i - 180;
+	return i;
+}
+
+
+</script>
+</head>
+<body>
+
+<table border="1">
+  <col valign="top" />
+  <col valign="top" />
+<tr id="tr1">
+<td>
+<H4>Convert Keplerian Elements to Cartesian Coordinates</H4>
+
+<form id = "keplerian">
+Keplerian Elements<br />
+<input type="text" id="a" />a in km<br />
+<input type="text" id="e" />e<br />
+<input type="text" id="i" />i in degrees<br />
+<input type="text" id="Omega" />Omega in degrees<br />
+<input type="text" id="w" />w in degrees<br />
+<input type="text" id="f" />f in degrees<br />
+</form>
+
+<button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
+<button type="button" onclick="DisplayR()">Display Range in km</button><br />
+<button type="button" onclick="ClearElements()">Clear elements</button><br />
+</td>
+
+<td>
+<H4>Convert Cartesian Coordinates to Keplerian Elements</H4>
+
+<form id = "cartesian">
+Cartesian Coordinates<br />
+<input type="text" id="x" />x in km<br />
+<input type="text" id="y" />y in km<br />
+<input type="text" id="z" />z in km<br />
+<input type="text" id="xdot" />xdot in km/s<br />
+<input type="text" id="ydot" />ydot in km/s<br />
+<input type="text" id="zdot" />zdot in km/s<br />
+</form>
+
+<button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
+<button type="button" onclick="ClearCartesians()">Clear cartesian coordinates</button><br />
+
+</td>
+</tr>
+</table>
+
+</body>
+</html> 

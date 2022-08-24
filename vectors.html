@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+function VectorMagnitude(V)
+{
+	return Math.sqrt(DotProduct(V, V));
+}
+
+function Normalise(V)
+{
+	var R = VectorMagnitude(V);
+	if (R != 0)
+	{
+		V[0] = V[0] / R;	
+		V[1] = V[1] / R;	
+		V[2] = V[2] / R;
+	}
+	return V;	
+}
+
+function Denormalise(R,V)
+{
+	V[0] = R * V[0];
+	V[1] = R * V[1];
+	V[2] = R * V[2];
+	return V;
+}
+
+function NormaliseV1()
+{
+	var V1 = new Array();
+	V1[0] = document.getElementById("x1").value;
+	V1[1] = document.getElementById("y1").value;
+	V1[2] = document.getElementById("z1").value;
+	var R = VectorMagnitude(V1);
+	V1 = Normalise(V1);
+	document.getElementById("x1").value = V1[0];
+	document.getElementById("y1").value = V1[1];
+	document.getElementById("z1").value = V1[2];
+	document.getElementById("magnitude1").value = R;
+}
+
+function NormaliseV2()
+{
+	var V2 = new Array();
+	V2[0] = document.getElementById("x2").value;
+	V2[1] = document.getElementById("y2").value;
+	V2[2] = document.getElementById("z2").value;
+	var R = VectorMagnitude(V2);
+	V2 = Normalise(V2);
+	document.getElementById("x2").value = V2[0];
+	document.getElementById("y2").value = V2[1];
+	document.getElementById("z2").value = V2[2];
+	document.getElementById("magnitude2").value = R;
+}
+
+function NormaliseV()
+{
+	var V = new Array();
+	V[0] = document.getElementById("x").value;
+	V[1] = document.getElementById("y").value;
+	V[2] = document.getElementById("z").value;
+	var R = VectorMagnitude(V);
+	V = Normalise(V);
+	document.getElementById("x").value = V[0];
+	document.getElementById("y").value = V[1];
+	document.getElementById("z").value = V[2];
+	document.getElementById("magnitude").value = R;
+}
+
+function DenormaliseV1()
+{
+	var V1 = new Array();
+	V1[0] = document.getElementById("x1").value;
+	V1[1] = document.getElementById("y1").value;
+	V1[2] = document.getElementById("z1").value;
+	var R = document.getElementById("magnitude1").value;
+	V1 = Denormalise(R, V1);
+	document.getElementById("x1").value = V1[0];
+	document.getElementById("y1").value = V1[1];
+	document.getElementById("z1").value = V1[2];
+	document.getElementById("magnitude1").value = 0;
+}
+
+function DenormaliseV2()
+{
+	var V2 = new Array();
+	V2[0] = document.getElementById("x2").value;
+	V2[1] = document.getElementById("y2").value;
+	V2[2] = document.getElementById("z2").value;
+	var R = document.getElementById("magnitude2").value;
+	V2 = Denormalise(R, V2);
+	document.getElementById("x2").value = V2[0];
+	document.getElementById("y2").value = V2[1];
+	document.getElementById("z2").value = V2[2];
+	document.getElementById("magnitude2").value = 0;
+}
+
+function DenormaliseV()
+{
+	var V = new Array();
+	V[0] = document.getElementById("x").value;
+	V[1] = document.getElementById("y").value;
+	V[2] = document.getElementById("z").value;
+	var R = document.getElementById("magnitude").value;
+	V = Denormalise(R, V);
+	document.getElementById("x").value = V[0];
+	document.getElementById("y").value = V[1];
+	document.getElementById("z").value = V[2];
+	document.getElementById("magnitude").value = 0;
+}
+
+function CrossProduct(V1, V2)
+{
+	var V = new Array();
+
+	// cross product
+	V[0] = V1[1]*V2[2] - V1[2]*V2[1];
+	V[1] = - V1[0]*V2[2] + V1[2]*V2[0];
+	V[2] = V1[0]*V2[1] - V1[1]*V2[0];
+
+	return V;
+}
+
+function DotProduct(V1, V2)
+{
+	return V1[0]*V2[0] + V1[1]*V2[1] + V1[2]*V2[2];
+}
+
+function DisplayCrossProduct()
+{
+	document.getElementById("OutputVector").reset();
+	var V1 = new Array();
+	var V2 = new Array();
+
+	V1[0] = document.getElementById("x1").value;
+	V1[1] = document.getElementById("y1").value;
+	V1[2] = document.getElementById("z1").value;
+
+	V2[0] = document.getElementById("x2").value;
+	V2[1] = document.getElementById("y2").value;
+	V2[2] = document.getElementById("z2").value;
+
+	var V = CrossProduct(V1, V2);
+	document.getElementById("x").value = V[0];
+	document.getElementById("y").value = V[1];
+	document.getElementById("z").value = V[2];
+}
+
+function DisplayDotProduct()
+{
+	document.getElementById("OutputVector").reset();
+	var V1 = new Array();
+	var V2 = new Array();
+
+	V1[0] = document.getElementById("x1").value;
+	V1[1] = document.getElementById("y1").value;
+	V1[2] = document.getElementById("z1").value;
+
+	V2[0] = document.getElementById("x2").value;
+	V2[1] = document.getElementById("y2").value;
+	V2[2] = document.getElementById("z2").value;
+
+	var R = DotProduct(V1, V2);
+	document.getElementById("magnitude").value = R;
+}
+
+function ClearVectors()
+{
+document.getElementById("vector1").reset();
+document.getElementById("vector2").reset();
+document.getElementById("OutputVector").reset();
+}
+
+</script>
+</head>
+
+<body>
+<H4>Vector Products</H4>
+<table border="1">
+  <col valign="top" />
+  <col valign="top" />
+  <col valign="top" />
+<tr id="tr1">
+
+<td>
+<form id = "vector1">
+Vector 1<br />
+<input type="text" id="x1" />x1<br />
+<input type="text" id="y1" />y1<br />
+<input type="text" id="z1" />z1<br />
+<input type="text" id="magnitude1" /><u><b>|v1|</b></u><br />
+</form>
+<button type="button" onclick="NormaliseV1()">Normalise V1</button><br />
+<button type="button" onclick="DenormaliseV1()">Denormalise V1</button><br />
+</td>
+
+<td>
+<form id = "vector2">
+Vector 2<br />
+<input type="text" id="x2" />x2<br />
+<input type="text" id="y2" />y2<br />
+<input type="text" id="z2" />z2<br />
+<input type="text" id="magnitude2" /><u><b>|v2|</b></u><br />
+</form>
+<button type="button" onclick="NormaliseV2()">Normalise V2</button><br />
+<button type="button" onclick="DenormaliseV2()">Denormalise V2</button><br />
+</td>
+
+<td>
+<form id = "OutputVector">
+Output Vector<br />
+<input type="text" id="x" />x<br />
+<input type="text" id="y" />y<br />
+<input type="text" id="z" />z<br />
+<input type="text" id="magnitude" /><u><b>|v|</b></u><br />
+</form>
+<button type="button" onclick="NormaliseV()">Normalise V</button><br />
+<button type="button" onclick="DenormaliseV()">Denormalise V</button><br />
+<button type="button" onclick="DisplayCrossProduct()">Vector Cross Product</button><br />
+<button type="button" onclick="DisplayDotProduct()">Scalar Dot Product</button><br />
+<button type="button" onclick="ClearVectors()">Clear vectors</button><br />
+</td>
+
+</tr>
+
+</table>
+
+</body>
+</html>
