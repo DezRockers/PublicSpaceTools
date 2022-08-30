@@ -422,14 +422,17 @@ Keplerian Elements<br />
 <input type="text" id="a" />a in km<br />
 <input type="text" id="e" />e<br />
 <input type="text" id="i" />i in degrees<br />
-<input type="text" id="Omega" />Omega in degrees<br />
-<input type="text" id="w" />w in degrees<br />
-<input type="text" id="f" />f in degrees<br />
+<input type="text" id="Omega" />&Omega; in degrees<br />
+<input type="text" id="w" />&omega; in degrees<br />
+<input type="text" id="f" />&nu; in degrees<br />
 </form>
 
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="DisplayR()">Display Range in km</button><br />
 <button type="button" onclick="ClearElements()">Clear elements</button><br />
+
+<button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
+
 </td>
 
 <td>
@@ -441,9 +444,9 @@ Cartesian Coordinates<br />
 <input type="text" id="x" />x in km<br />
 <input type="text" id="y" />y in km<br />
 <input type="text" id="z" />z in km<br />
-<input type="text" id="xdot" />xdot in km/s<br />
-<input type="text" id="ydot" />ydot in km/s<br />
-<input type="text" id="zdot" />zdot in km/s<br />
+<input type="text" id="xdot" />x&#775; in km/s<br />
+<input type="text" id="ydot" />y&#775; in km/s<br />
+<input type="text" id="zdot" />z&#775; in km/s<br />
 </form>
 
 <button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
