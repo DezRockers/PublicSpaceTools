@@ -72,7 +72,7 @@ function DisplayCrc()
 	var msb = (crc >> 8) & 0xff;
 	var lsb = crc & 0xff;
 	//alert ("CRC = 0x" + msb.toString(16) + " 0x" + lsb.toString(16));
-	document.getElementById("crc").value = msb.toString(16) + " " + lsb.toString(16);
+	document.getElementById("crc").value = msb.toString(16).toUpperCase() + " " + lsb.toString(16).toUpperCase();
 }
 
 // remove multiple, leading or trailing spaces
@@ -83,7 +83,7 @@ function trim(s) {
 	return s;
 }
 
-// Calculates the CRC based on the passed in bytes
+// Calculates the CRC based on the passed in bytes using the standard 16-bit ESA CRC algorithm
 function CalculateCrc(bytes)
 {
 	var r = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -154,10 +154,69 @@ function CalculateCrc(bytes)
 	return word;
 }
 
+// Calculates the CRC based on the passed in bytes based on the generator polynomial x16 + x15 + x2 + 1
+function CalculateCrc2(bytes)
+{
+	var r = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	r[0] = document.getElementById("r1").value;
+	r[1] = document.getElementById("r2").value;
+	r[2] = document.getElementById("r3").value;
+	r[3] = document.getElementById("r4").value;
+	r[4] = document.getElementById("r5").value;
+	r[5] = document.getElementById("r6").value;
+	r[6] = document.getElementById("r7").value;
+	r[7] = document.getElementById("r8").value;
+	r[8] = document.getElementById("r9").value;
+	r[9] = document.getElementById("r10").value;
+	r[10] = document.getElementById("r11").value;
+	r[11] = document.getElementById("r12").value;
+	r[12] = document.getElementById("r13").value;
+	r[13] = document.getElementById("r14").value;
+	r[14] = document.getElementById("r15").value;
+	r[15] = document.getElementById("r16").value;
+	var len = bytes.length;
+
+	var crc = 0x0;
+	var i = 0;
+	var j = 0;
+
+	for (i = 0; i < 16; i++)
+	{
+		crc = crc + (r[i] << (15-i));
+	}
+	
+	for (i = 0; i < len; i++)
+	{
+		crc ^= bytes[i];
+		for (j = 0; j < 8; ++j)
+		{
+			if (crc & 1)
+			{
+				crc = (crc >> 1) ^ 0xA001;
+			}
+			else
+			{
+				crc = (crc >> 1);
+			}
+		}
+	}
+
+	return crc;
+}
+
+
 function ClearString()
 {
 	document.getElementById("getString").reset();
 }
+
+// function to display CRC help message
+function DisplayCrcHelp()
+{
+var txt = "This tool computes the 16 bit Cyclic Redundancy Code (CRC) for a series of input bytes based on the standard ESA CRC algorithm. The default initialisation state is all ones but any other state can be set.";
+alert(txt);
+}
+
 
 </script>
 </head>
@@ -263,7 +322,7 @@ AllOnes();
 <button type="button" onclick="AllZeroes()">Set Init State to all zeroes</button><br />
 
 <form id = "getString" style="color:Silver;">
-Input string of space delimited hexadecimal bytes e.g. A1 B2 C3 D4 E5 F6 07 18<br />
+Input string of space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 will produce CRC of AB 89<br />
 <input type="text" id="inputString" maxLength=375 size=125/><br />
 Computed CRC<br />
 <input type="text" id="crc"/>
@@ -271,6 +330,7 @@ Computed CRC<br />
 
 <button type="button" onclick="DisplayCrc()">Calculate CRC</button><br />
 <button type="button" onclick="ClearString()">Clear String</button><br />
+<button type="button" onclick="DisplayCrcHelp()">Help</button><br />
 
 </body>
 </html>
