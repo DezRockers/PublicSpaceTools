@@ -606,11 +606,12 @@ Quaternion In<br />
 </form>
 <button type="button" onclick="ComputeMatrix()">Compute All</button><br />
 <button type="button" onclick="ClearAll()">Clear All</button><br />
+<button type="button" onclick="window.open('rotation.html', '_blank');">Help</button><br />
 </td>
 
 <td>
 <form id = "rotationMatrix" style="color:Silver;">
-Rotation Matrix<br />
+Rotation (or Attitude) Matrix<br />
 <input type="text" id="a11" maxLength=10 size=7  />
 <input type="text" id="a12" maxLength=10 size=7  />
 <input type="text" id="a13" maxLength=10 size=7  /><br />
@@ -628,9 +629,9 @@ Rotation Matrix<br />
 <td>
 <form id = "eulerAngles" style="color:Silver;">
 3-1-3 Euler Angles<br />
-<input type="text" id="phi" size=21/>phi (degs)<br />
-<input type="text" id="theta" size=21/>theta (degs)<br />
-<input type="text" id="psi" size=21/>psi (degs)<br />
+<input type="text" id="phi" size=21/>&phi; (degs)<br />
+<input type="text" id="theta" size=21/>&theta; (degs)<br />
+<input type="text" id="psi" size=21/>&psi; (degs)<br />
 </form>
 <br /><button type="button" onclick="ComputeQuaternion()">Compute All</button><br />
 </td>
@@ -685,6 +686,8 @@ Quaternion Result = q2 x q1<br />
 <input type="text" id="q3_result" size=21/>q3<br />
 </form>
 <button type="button" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
+<button type="button" onclick="ClearAllTable2()">Clear All</button><br />
+
 </td>
 
 </tr>
