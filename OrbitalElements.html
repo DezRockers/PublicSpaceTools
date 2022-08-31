@@ -54,7 +54,12 @@ return R;
 // function to display the range in km
 function DisplayR()
 {
-alert(ComputeR());
+alert("R = " + ComputeR() + " km");
+}
+
+function DisplayV()
+{
+alert("V = " + VelocityMagnitude() + " km/s");
 }
 
 // function to compute X
@@ -404,6 +409,44 @@ function ComputeInclination()
 	return i;
 }
 
+// function to compute the Eccentric anomaly from the true anomaly and the eccentricity
+function ComputeEccentricAnomaly()
+{
+	var e = Number(document.getElementById("e").value);
+	var f=DegreesToRadians(document.getElementById("f").value);
+	var tan_f_over_2 = Math.tan(f/2.0);
+	var one_minus_e = 1.0 - e;
+	var one_plus_e = 1.0 + e;
+	var scale = one_minus_e / one_plus_e;
+	var tan_E_over_2 = Math.sqrt(scale)*tan_f_over_2;
+	var E = 2*Math.atan(tan_E_over_2);
+
+	var txt = "e = " + e + "\n";
+	txt = txt + "f = " + f + "\n";
+	txt = txt + "tan_f_over_2 = " + tan_f_over_2 + "\n";
+	txt = txt + "one_minus_e = " + one_minus_e + "\n";
+	txt = txt + "one_plus_e = " + one_plus_e + "\n";
+	txt = txt + "scale = " + scale + "\n";
+	txt = txt + "tan_E_over_2 = " + tan_E_over_2 + "\n";
+	txt = txt + "E in radians = " + E;
+	//alert(txt);
+	return RadiansToDegrees(E);
+}
+
+// function to compute the Mean anomaly from the eccentric anomaly and the eccentricity
+function ComputeMeanAnomaly()
+{
+	var e = Number(document.getElementById("e").value);
+	var E = DegreesToRadians(ComputeEccentricAnomaly());
+	var M = E - e*Math.sin(E);
+	return RadiansToDegrees(M);
+}
+
+
+function DisplayAnomalies()
+{
+alert("Eccentric Anomaly = " + ComputeEccentricAnomaly() + " degrees\n" + "Mean Anomaly = " + ComputeMeanAnomaly() + " degrees");
+}
 
 </script>
 </head>
@@ -429,6 +472,8 @@ Keplerian Elements<br />
 
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="DisplayR()">Display Range in km</button><br />
+<button type="button" onclick="DisplayV()">Display Velocity in km/s</button><br />
+<button type="button" onclick="DisplayAnomalies()">Display Anomalies in degrees</button><br />
 <button type="button" onclick="ClearElements()">Clear elements</button><br />
 
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
