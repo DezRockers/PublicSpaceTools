@@ -38,7 +38,7 @@ function DisplayChecksum()
 		bytes[i] = parseInt(bytes[i],16)
 	}
 	var checksum = CalculateChecksum(bytes);
-	document.getElementById("checksum").value = checksum.toString(16);
+	document.getElementById("checksum").value = checksum.toString(16).toUpperCase().padStart(2,'0');
 }
 
 // remove multiple, leading or trailing spaces

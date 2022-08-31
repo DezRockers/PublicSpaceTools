@@ -68,11 +68,11 @@ function DisplayCrc()
 		// convert each 2 character string to hexadecimal integer
 		bytes[i] = parseInt(bytes[i],16)
 	}
-	var crc = CalculateCrc(bytes);
+	var crc = CalculateCrc2(bytes);
 	var msb = (crc >> 8) & 0xff;
 	var lsb = crc & 0xff;
 	//alert ("CRC = 0x" + msb.toString(16) + " 0x" + lsb.toString(16));
-	document.getElementById("crc").value = msb.toString(16).toUpperCase() + " " + lsb.toString(16).toUpperCase();
+	document.getElementById("crc").value = msb.toString(16).toUpperCase().padStart(2,'0') + " " + lsb.toString(16).toUpperCase().padStart(2,'0');
 }
 
 // remove multiple, leading or trailing spaces
@@ -154,7 +154,7 @@ function CalculateCrc(bytes)
 	return word;
 }
 
-// Calculates the CRC based on the passed in bytes based on the generator polynomial x16 + x15 + x2 + 1
+// Calculates the CRC based on the passed in bytes based on the generator polynomial x16 + x12 + x5 + 1
 function CalculateCrc2(bytes)
 {
 	var r = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
@@ -187,23 +187,22 @@ function CalculateCrc2(bytes)
 	
 	for (i = 0; i < len; i++)
 	{
-		crc ^= bytes[i];
-		for (j = 0; j < 8; ++j)
+		for (j = 0; j < 8; j++)
 		{
-			if (crc & 1)
-			{
-				crc = (crc >> 1) ^ 0xA001;
-			}
-			else
-			{
-				crc = (crc >> 1);
-			}
+		if ((bytes[i] & 0x80) ^ ((crc & 0x8000) >> 8))
+		{
+			crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+		}
+		else
+		{
+			crc = (crc << 1) & 0xFFFF;
+		}
+			bytes[i] = bytes[i] << 1;
 		}
 	}
-
+	
 	return crc;
 }
-
 
 function ClearString()
 {
@@ -213,7 +212,7 @@ function ClearString()
 // function to display CRC help message
 function DisplayCrcHelp()
 {
-var txt = "This tool computes the 16 bit Cyclic Redundancy Code (CRC) for a series of input bytes based on the standard ESA CRC algorithm. The default initialisation state is all ones but any other state can be set.";
+var txt = "This tool computes the 16 bit Cyclic Redundancy Check (CRC) for a series of input bytes based on the standard ESA CRC algorithm. This is CRC-16-CCITT with generator polynomial x16 + x12 + x5 + 1. The default initialisation state is all ones but any other state can be set.";
 alert(txt);
 }
 
