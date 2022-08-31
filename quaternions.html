@@ -417,8 +417,10 @@ function ComputeEulerAngles()
 	M[2][2] = Math.round(document.getElementById("a33").value*1000000)/1000000;
 
 	// convert attitude matrix to 3-1-3 Euler angles in radians
+	// note that the attitude matrix is the transpose of the DCM
+	// that is needed by the EulerAnglesFromMatrix function
 	var E = new Array();
-	E = EulerAnglesFromMatrix(M);
+	E = EulerAnglesFromMatrix(Transpose(M));
 
 	// convert angles in radians to degrees for output to text boxes
 	document.getElementById("phi").value = Math.round(RadiansToDegrees(E[0])*1000000)/1000000;
