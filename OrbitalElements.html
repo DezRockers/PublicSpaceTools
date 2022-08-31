@@ -282,7 +282,7 @@ function ComputeKeplerians()
 	txt = txt + "Omega = " + Omega + " degrees\n";
 	txt = txt + "w = " + w + " degrees\n";
 	txt = txt + "f = " + f + " degrees\n";
-	alert(txt);
+	//alert(txt);
 
 	document.getElementById("a").value = a;
 	document.getElementById("e").value = e;
@@ -534,19 +534,10 @@ Keplerian Elements<br />
 
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="UpdateOtherCharacteristics()">Update Other Characteristics</button><br />
-<button type="button" onclick="DisplayR()">Display Range in km</button><br />
-<button type="button" onclick="DisplayV()">Display Velocity in km/s</button><br />
-<button type="button" onclick="DisplayAnomalies()">Display Anomalies in degrees</button><br />
-<button type="button" onclick="DisplayMeanMotion()">Display Mean Motion in degrees/second</button><br />
-<button type="button" onclick="DisplayOrbitalPeriod()">Display Orbital Period in seconds</button><br />
 <button type="button" onclick="ClearElements()">Clear elements</button><br />
-
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
 
 </td>
-
-
-
 
 <td>
 <H4 style="color:Silver;">Other Orbital Characteristics</H4>
@@ -563,13 +554,11 @@ Other Orbital Characteristics<br />
 </form>
 
 <button type="button" onclick="ClearOtherCharacteristics()">Clear other characteristics</button><br />
+<br />
+<br />
+<br />
 
 </td>
-
-
-
-
-
 
 <td>
 <H4 style="color:Silver;">Convert Cartesian Coordinates to Keplerian Elements</H4>
@@ -587,6 +576,8 @@ Cartesian Coordinates<br />
 
 <button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
 <button type="button" onclick="ClearCartesians()">Clear cartesian coordinates</button><br />
+<br />
+<br />
 
 </td>
 </tr>
