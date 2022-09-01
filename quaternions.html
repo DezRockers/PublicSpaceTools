@@ -156,7 +156,7 @@ function MultiplyQuaternions()
 	document.getElementById("a32_2").value = Math.round(M2[2][1]*1000000)/1000000;
 	document.getElementById("a33_2").value = Math.round(M2[2][2]*1000000)/1000000;
 
-	q = QuaternionProduct(q2, q1);
+	q = QuaternionProduct(q1, q2);
 
 	document.getElementById("q0_result").value = Math.round(q[0]*1000000)/1000000;
 	document.getElementById("q1_result").value = Math.round(q[1]*1000000)/1000000;
@@ -689,7 +689,7 @@ Quaternion 2<br />
 
 <td>
 <form id = "quaternionResult" style="color:Silver;">
-Quaternion Result = q2 x q1<br />
+Quaternion Result = q1 x q2<br />
 <input type="text" id="q0_result" size=21/>q0 (scalar)<br />
 <input type="text" id="q1_result" size=21/>q1<br />
 <input type="text" id="q2_result" size=21/>q2<br />
