@@ -545,16 +545,16 @@ Keplerian Elements<br />
 <form id = "characteristics" style="color:Silver;">
 Other Orbital Characteristics<br />
 
-<input type="text" id="R" />range in km<br />
-<input type="text" id="V" />velocity in km/s<br />
-<input type="text" id="E" />Eccentric Anomaly in degrees<br />
-<input type="text" id="M" />Mean Anomaly in degrees<br />
-<input type="text" id="n" />Mean Motion in degrees/second<br />
-<input type="text" id="P" />Orbital Period in seconds<br />
+<input type="text" id="R" />R in km<br />
+<input type="text" id="V" />V in km/s<br />
+<input type="text" id="E" />E in degrees<br />
+<input type="text" id="M" />M in degrees<br />
+<input type="text" id="n" />n in degrees/second<br />
+<input type="text" id="P" />P in seconds<br />
 </form>
 
 <button type="button" onclick="ClearOtherCharacteristics()">Clear other characteristics</button><br />
-<br />
+<button type="button" onclick="window.open('Anomalies.html', '_blank');">Help</button><br />
 <br />
 <br />
 
@@ -576,7 +576,7 @@ Cartesian Coordinates<br />
 
 <button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
 <button type="button" onclick="ClearCartesians()">Clear cartesian coordinates</button><br />
-<br />
+<button type="button" onclick="window.open('OrbEl.html', '_blank');">Help</button><br />
 <br />
 
 </td>
