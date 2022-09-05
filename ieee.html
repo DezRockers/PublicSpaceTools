@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+/// Determins if the passed in bit is set or not
+/// @param      Bit The data bit to test
+/// @param      Value The value to test against
+/// @return     True if it is set, otherwise false
+function BitSet( Bit, Value )
+{
+	// note we cannot use bit shifting in JavaScript
+	var bit = Value / Math.pow(2.0, Bit);
+	return (bit & 1);
+}
+
+/// returns the IEEE integer representation of the passed in float
+
+function GetIeeeIntegerFromFloat()
+{
+
+	var float = document.getElementById("floatingPoint").value;
+	var SizeInBits = Number(document.getElementById("bitLength").value);
+
+	switch (SizeInBits)
+	{
+		case 32:
+			var buf = new ArrayBuffer(4);
+			(new Float32Array(buf))[0] = float;
+//			alert((new Uint32Array(buf))[0].toString(16));
+			document.getElementById("integerIn").value = "0x" + (new Uint32Array(buf))[0].toString(16).toUpperCase().padStart(8,'0');
+			break;
+		case 64:
+			var buf = new ArrayBuffer(8);
+			(new Float64Array(buf))[0] = float;
+//			alert(new Uint32Array(buf))[1].toString(16) + (new Uint32Array(buf))[0].toString(16));
+			document.getElementById("integerIn").value = "0x" + (new Uint32Array(buf))[1].toString(16).toUpperCase().padStart(8,'0') + (new Uint32Array(buf))[0].toString(16).toUpperCase().padStart(8,'0');
+			break;
+		default:
+			break;
+	}
+}
+
+
+/// returns an IEEE float from the integer passed in
+function GetIeeeFloatFromInteger()
+{
+
+	var pData = document.getElementById("integerIn").value;
+	var SizeInBits = Number(document.getElementById("bitLength").value);
+
+	var Value = 0.0;
+	var Sign = 1.0;
+	var Exponent = 0;
+	var Fraction = 0;
+	var ExponentFactor = 127;   // for 32 bit IEEE
+	var FractionStartBit = 22;  // for 32 bit IEEE
+	var ExponentRange = 255;    // for 32 bit IEEE
+
+	
+	if( SizeInBits == 64 )
+	{
+		FractionStartBit = 51;  // for 64 bit IEEE
+		ExponentFactor = 1023;  // for 64 bit IEEE
+		ExponentRange = 2047;   // for 64 bit IEEE
+	}
+			
+	//kernel.AddComment("SizeInBits = " + SizeInBits);
+	//kernel.AddComment("pData = " + pData.toString(16));
+	//kernel.AddComment("FractionStartBit = " + FractionStartBit);
+
+	var LsbBitIndex = FractionStartBit;
+	var fBitWeightFactor = 0.5;
+	var Finished = false;
+	
+	// get the fraction part out of the bits
+	// i.e. bits 0 to 22 (32 bit precision), bits 0 - 51 (64 bit precision)
+	var count = 0;
+	do
+	{
+		//kernel.AddComment("LsbBitIndex = " + LsbBitIndex);
+		//kernel.AddComment("fBitWeightFactor = " + fBitWeightFactor);
+		//kernel.AddComment("Fraction = " + Fraction);
+		//kernel.AddComment("Finished = " + Finished);
+		//kernel.AddComment("count = " + count);
+		if( BitSet(LsbBitIndex, pData) ) Fraction += fBitWeightFactor;
+		fBitWeightFactor /= 2;
+	
+		if( LsbBitIndex > 0 )
+		{
+			LsbBitIndex -= 1;
+		}
+		else
+		{
+			Finished = true;
+		}
+		count++;
+	}
+	while (( LsbBitIndex > 0 && !Finished ) && (count < SizeInBits));
+			
+	LsbBitIndex = SizeInBits - 1;
+	var iBitWeightFactor = 256;
+	if (SizeInBits == 64)
+	{
+		iBitWeightFactor = 2048;
+	}
+	Finished = false;
+			
+	// get the exponent part and the sign out of the bits
+	// i.e. bits 23 to 30 (32 bit precision), bits 52 - 62 (64 bit precision)
+	count = 0;
+	do
+	{
+		//kernel.AddComment("LsbBitIndex = " + LsbBitIndex);
+		//kernel.AddComment("Sign = " + Sign);
+		//kernel.AddComment("Exponent = " + Exponent);
+		//kernel.AddComment("iBitWeightFactor = " + iBitWeightFactor);
+		//kernel.AddComment("Finished = " + Finished);
+		//kernel.AddComment("count = " + count);
+		if( BitSet(LsbBitIndex, pData) )
+		{
+			//kernel.AddComment("LsbBitIndex = is set" + LsbBitIndex);
+			// get the highest bit that represents the sign;
+			// if the first highest bit == 0, it is positive, therefore add the last bit
+			// if the first highest bit == 1, it is negative, therefore subtract the last bit
+			if( LsbBitIndex == SizeInBits - 1 )
+			{
+				//kernel.AddComment("LsbBitIndex = is set to SizeInBits - 1" + LsbBitIndex);
+				Sign = -1.0;
+			}
+			else
+			{
+				Exponent += iBitWeightFactor;
+				
+			}
+		}
+		iBitWeightFactor /= 2;
+			
+		LsbBitIndex -= 1;
+		if( LsbBitIndex == FractionStartBit )
+		{
+			Finished = true;
+		}
+		count++;
+	}
+	while( !Finished && (count < SizeInBits) );
+			
+	// if Exponent is 255 and Fraction is nonzero, then we have NaN (not a number)
+	if( Exponent == ExponentRange && Fraction > 0.0 ) Value = 0.0;
+			
+	// If Exponent is 255 and Fraction is zero, then we have +/- Infinity
+	if( Exponent == ExponentRange && Fraction == 0.0 ) Value = 0.0;
+			
+	// If Exponent is 0 and Fraction is non zero, then we have +/- 0
+	if( Exponent == 0 && Fraction > 0.0 ) Value = 0.0;
+			
+	// if 0 < Exponent < ExponentRange
+	if( Exponent > 0 && Exponent < ExponentRange ) 
+	{
+		//kernel.AddComment("Exponent = " + Exponent);
+		//kernel.AddComment("ExponentRange = " + ExponentRange);
+		//kernel.AddComment("ExponentFactor = " + ExponentFactor);
+		//kernel.AddComment("Sign = " + Sign);
+		//kernel.AddComment("Fraction = " + Fraction);
+		Value = Sign * Math.pow(2.0, (Exponent - ExponentFactor)) * (1.0 + Fraction);
+	}
+			
+	// if Exponent  is zero and Fraction is greater than 0
+	if( Exponent == 0 && Fraction > 0.0 ) 
+	{
+		//kernel.AddComment("Exponent = " + Exponent);
+		//kernel.AddComment("ExponentFactor = " + ExponentFactor);
+		//kernel.AddComment("Sign = " + Sign);
+		//kernel.AddComment("Fraction = " + Fraction);
+		Value = Sign * Math.pow(2.0, (ExponentFactor - 1.0)) * Fraction;
+	}
+
+	document.getElementById("floatingPoint").value = Value;
+}
+
+function ClearAll()
+{
+document.getElementById("IntegerIn").reset();
+document.getElementById("FloatOut").reset();
+}
+
+function Help()
+{
+	var txt = "This tool converts between IEEE 754 representations of floating point numbers and integers.\n";
+	txt = txt + "The representations can be either 32 bits (4 bytes single precision) or 64 bits (8 bytes double precision).\n";
+	txt = txt + "The integers need to be input in hexadecimal format with correct string length for the respective cases e.g.\n";
+	txt = txt + "0x3F800000 would be converted to 1.0 for the 32 bit case \n";
+	txt = txt + "0x3FF0000000000000 would be converted to 1.0 for the 64 bit case \n";
+
+	alert(txt);
+}
+
+</script>
+</head>
+
+<body>
+<H4 style="color:Silver;">IEEE Floating Point Conversions</H4>
+<table border="1">
+  <col valign="top" />
+  <col valign="top" />
+<tr id="tr1">
+
+<td>
+<form id = "IntegerIn" style="color:Silver;">
+Integer Representation (hex format)<br />
+<input type="text" id="integerIn" size=21/>integer<br />
+<select name="bitLength" id="bitLength">
+	<option value=32>32 bits</option>
+	<option value=64>64 bits</option>
+</select>
+<label for="bitLength">Input the bit length (32 or 64)</label>
+</form>
+<button type="button" onclick="GetIeeeFloatFromInteger()">Convert to IEEE Float</button><br />
+<button type="button" onclick="ClearAll()">Clear All</button><br />
+<button type="button" onclick="Help()">Help</button><br />
+</td>
+
+<td>
+<form id = "FloatOut" style="color:Silver;">
+Floating Point Representation<br />
+<input type="text" id="floatingPoint" maxLength=21 size=21  />float<br />
+<br />
+<br />
+<button type="button" onclick="GetIeeeIntegerFromFloat()">Convert to IEEE Integer</button><br />
+<br />
+<br />
+
+</form>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>
+
