@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+/// Determins if the passed in bit is set or not
+/// @param      Bit The data bit to test
+/// @param      Value The value to test against
+/// @return     True if it is set, otherwise false
+function BitSet( Bit, Value )
+{
+	// note we cannot use bit shifting in JavaScript
+	var bit = Value / Math.pow(2.0, Bit);
+	return (bit & 1);
+}
+
+function Convert()
+{
+	var SizeInBits = Number(document.getElementById("bitLength").value);
+	if (SizeInBits == 64)
+	{
+		Convert64();
+	}
+	else
+	{
+		ConvertMost();
+	}
+}
+
+// function to convert 64 bit numbers by splitting into 2 32 bits numbers
+function Convert64()
+{
+	// the input integer needs to be a hexadecimal string
+	var prefix = document.getElementById("integerIn").value.substring(0,2); // first 2 characters of string
+	if (prefix != "0x")
+	{
+		alert("Prefix 0x is needed for 64 bit integers. Try again");
+		return;
+	}
+
+	var integerAsString = document.getElementById("integerIn").value.substring(2).padStart(16,'0'); // all characters from element 2 to end of string
+	var MSWordAsString = "0x"+integerAsString.substring(0,8);	// first 8 chars (4 bytes)
+	var LSWordAsString = "0x"+integerAsString.substring(8);		// last 8 chars (4 bytes)
+	var MSWord = Number(MSWordAsString);
+	var LSWord = Number(LSWordAsString);
+
+	// get the sign bit
+	var sign = BitSet(31,MSWord);
+	if (sign == 1)
+	{
+		// take one's complement (bit flipping) of MSWord and LSWord
+		var MSWordOnesComplement = ~MSWord;
+		var LSWordOnesComplement = ~LSWord;
+
+		// we need to ensure these representations are not negative numbers
+		if (MSWordOnesComplement < 0)
+		{
+			MSWordOnesComplement = MSWordOnesComplement + Math.pow(2.0,32);
+		}
+		if (LSWordOnesComplement < 0)
+		{
+			LSWordOnesComplement = LSWordOnesComplement + Math.pow(2.0,32);
+		}
+
+		LSWordOnesComplement++;
+		LSWordOnesComplement = LSWordOnesComplement & 0xFFFFFFFF;
+		if ((LSWordOnesComplement >= Math.pow(2.0,32)) || (LSWordOnesComplement == 0)) // check for carry over into MSWord
+		{
+			MSWordOnesComplement++;
+		}
+		MSWordOnesComplement = MSWordOnesComplement & 0xFFFFFFFF;
+		// we need to ensure these representations are not negative numbers
+		if (MSWordOnesComplement < 0)
+		{
+			MSWordOnesComplement = MSWordOnesComplement + Math.pow(2.0,32);
+		}
+		if (LSWordOnesComplement < 0)
+		{
+			LSWordOnesComplement = LSWordOnesComplement + Math.pow(2.0,32);
+		}
+		// use BigInt instead of Number to hopefully prevent JavaScript precision problems
+		//var txt = "Number value = -" + Number("0x" + MSWordOnesComplement.toString(16).padStart(8,'0') + LSWordOnesComplement.toString(16).padStart(8,'0')).toString(10) + "\n";
+		//txt = txt + "BigInt value = -" + BigInt("0x" + MSWordOnesComplement.toString(16).padStart(8,'0') + LSWordOnesComplement.toString(16).padStart(8,'0'));
+		//alert(txt);
+		document.getElementById("decimal").value = -BigInt("0x" + MSWordOnesComplement.toString(16).padStart(8,'0') + LSWordOnesComplement.toString(16).padStart(8,'0'));
+	}
+	else
+	{
+		document.getElementById("decimal").value = BigInt("0x" + MSWord.toString(16).padStart(8,'0') + LSWord.toString(16).padStart(8,'0'));
+	}
+	document.getElementById("binary2").value = "0b" + MSWord.toString(2).padStart(32,'0') + LSWord.toString(2).padStart(32,'0');
+	document.getElementById("hex").value = "0x" + document.getElementById("integerIn").value.substring(2).padStart(16,'0');
+
+}
+
+function ConvertMost()
+{
+
+	var integerIn = Number(document.getElementById("integerIn").value);
+	var SizeInBits = Number(document.getElementById("bitLength").value);
+
+	if (integerIn >= Math.pow(2.0, SizeInBits)) 
+	{
+		alert("Input integer " + integerIn + " is too large for the number of bits " + SizeInBits + ". Try again");
+		return;
+	} 
+	if (integerIn < -Math.pow(2.0, SizeInBits-1)) 
+	{
+		alert("Input integer " + integerIn + " is below the negative threshold -" + Math.pow(2.0, SizeInBits-1) + " for the number of bits " + SizeInBits + ". Try again");
+		return;
+	} 
+
+
+	if (integerIn < 0)
+	{
+		integerIn = integerIn + Math.pow(2.0,SizeInBits);
+	}
+
+	var integerInBinary = integerIn.toString(2).padStart(SizeInBits,'0');
+
+	// sign bit weight
+	var substring1 = integerInBinary.substring(0,1);
+	var integerOut = -substring1*Math.pow(2.0,SizeInBits-1);
+	var i = 0;
+	for (i = 1; i < SizeInBits; i++)
+	{
+		substring1 = integerInBinary.substring(i,i+1);
+		integerOut = integerOut + substring1*Math.pow(2.0,SizeInBits-i-1);
+	}
+
+	if ((Number(document.getElementById("integerIn").value) < 0) && (integerOut < 0))
+	{
+		document.getElementById("decimal").value = integerIn;
+	}
+	else
+	{
+		document.getElementById("decimal").value = integerOut;
+	}
+	document.getElementById("binary2").value = "0b" + integerInBinary;
+	//document.getElementById("binary1").value = integerInBinary;
+	document.getElementById("hex").value = "0x" + integerIn.toString(16).toUpperCase().padStart(SizeInBits/4,'0');
+	
+}
+
+function ClearAll()
+{
+document.getElementById("IntegerIn").reset();
+document.getElementById("Outputs").reset();
+}
+
+function Help()
+{
+	var txt = "This tool shows the 2's complement representation of signed integers for a particular bit length.\n";
+	txt = txt + "This may be useful for interpreting representations of signed integer TM or TC parameters.\n";
+	txt = txt + "So for example the representation of +2 on 8 bits would be 2 (decimal), 0b00000010 (binary) and 0x02 (hexadecimal).\n";
+	txt = txt + "The representation of -2 on 8 bits would be 254 (decimal), 0b11111110 (binary) and 0xFE (hexadecimal).\n";
+	txt = txt + "Note that any bit length can be specified but due to JavaScript numeric precision constraints any bit length \n";
+	txt = txt + "over 52 bits is likely to yield inaccurate representations.\n";
+	txt = txt + "Note also that 64 bit integers need to be input in hexadecimal format (0x...).";
+
+	alert(txt);
+}
+
+</script>
+</head>
+
+<body>
+<H4 style="color:Silver;">2's Complement Representations</H4>
+<table border="1">
+  <col valign="top" />
+  <col valign="top" />
+<tr id="tr1">
+
+<td>
+<form id = "IntegerIn" style="color:Silver;">
+Signed Integer Representation<br />
+<input type="text" id="integerIn" size=21/>input integer<br />
+<input type="text" id="bitLength" size=21/>input bit length<br />
+</form>
+<button type="button" onclick="Convert()">Generate Representations</button><br />
+<button type="button" onclick="ClearAll()">Clear All</button><br />
+<button type="button" onclick="Help()">Help</button><br />
+</td>
+
+<td>
+<form id = "Outputs" style="color:Silver;">
+2's Complement Representation<br />
+<input type="text" id="decimal" maxLength=66 size=66  />decimal<br />
+<input type="text" id="binary2" maxLength=66 size=66  />binary<br />
+<input type="text" id="hex" maxLength=66 size=66  />hexadecimal<br />
+<br />
+<br />
+<br />
+
+</form>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>
+
