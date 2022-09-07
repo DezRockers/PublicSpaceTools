@@ -618,7 +618,7 @@ document.getElementById("matrixResult").reset();
   <col valign="top" />
 <tr id="tr1">
 
-<td>
+<td style="vertical-align:top;">
 <form id = "quaternionIn" style="color:Silver;">
 Quaternion In<br />
 <input type="text" id="q0" size=21/>q0 (scalar)<br />
@@ -635,7 +635,7 @@ Quaternion In<br />
 <br />
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "rotationMatrix" style="color:Silver;">
 Rotation (or Attitude) Matrix for point rotation<br />
 <input type="text" id="a11" maxLength=10 size=7  />
@@ -648,7 +648,6 @@ Rotation (or Attitude) Matrix for point rotation<br />
 <input type="text" id="a32" maxLength=10 size=7  />
 <input type="text" id="a33" maxLength=10 size=7  />
 </form>
-
 <form id = "transposeMatrix" style="color:Silver;">
 Rotation Matrix for frame rotation<br />
 <input type="text" id="t11" maxLength=10 size=7  />
@@ -661,12 +660,11 @@ Rotation Matrix for frame rotation<br />
 <input type="text" id="t32" maxLength=10 size=7  />
 <input type="text" id="t33" maxLength=10 size=7  />
 </form>
-
 <br /><button type="button" onclick="ComputeEulerAngles()">Compute All</button><br />
 <button type="button" onclick="NormalizeInputMatrix()">Normalize Matrix</button><br />
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "eulerAngles" style="color:Silver;">
 3-1-3 Euler Angles<br />
 <input type="text" id="phi" size=21/>&phi; (degs)<br />
@@ -674,28 +672,14 @@ Rotation Matrix for frame rotation<br />
 <input type="text" id="psi" size=21/>&psi; (degs)<br />
 </form>
 <br /><button type="button" onclick="ComputeQuaternion()">Compute All</button><br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
 </td>
 
-<td>
-<form id = "quaternionOut" style="color:Silver;">
+<td style="vertical-align:top;"><form id = "quaternionOut" style="color:Silver;">
 Quaternion Out (Normalized)<br />
 <input type="text" id="q0_out" size=21/>q0 (scalar)<br />
 <input type="text" id="q1_out" size=21/>q1<br />
 <input type="text" id="q2_out" size=21/>q2<br />
 <input type="text" id="q3_out" size=21/>q3<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
-<br />
 </form>
 </td>
 
@@ -710,31 +694,27 @@ Quaternion Out (Normalized)<br />
   <col valign="top" />
 <tr id="tr2">
 
-<td>
+<td style="vertical-align:top;">
 <form id = "quaternion1" style="color:Silver;">
 Quaternion 1<br />
 <input type="text" id="q0_1" size=21/>q0 (scalar)<br />
 <input type="text" id="q1_1" size=21/>q1<br />
 <input type="text" id="q2_1" size=21/>q2<br />
 <input type="text" id="q3_1" size=21/>q3<br />
-<br />
-<br />
 </form>
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "quaternion2" style="color:Silver;">
 Quaternion 2<br />
 <input type="text" id="q0_2" size=21/>q0 (scalar)<br />
 <input type="text" id="q1_2" size=21/>q1<br />
 <input type="text" id="q2_2" size=21/>q2<br />
 <input type="text" id="q3_2" size=21/>q3<br />
-<br />
-<br />
 </form>
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "quaternionResult" style="color:Silver;">
 Quaternion Result = q1xq2<br />
 <input type="text" id="q0_result" size=21/>q0 (scalar)<br />
@@ -744,14 +724,13 @@ Quaternion Result = q1xq2<br />
 </form>
 <button type="button" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
 <button type="button" onclick="ClearAllTable2()">Clear All</button><br />
-
 </td>
 
 </tr>
 
 <tr id="tr3">
 
-<td>
+<td style="vertical-align:top;">
 <form id = "matrix1" style="color:Silver;">
 Matrix 1<br />
 <input type="text" id="a11_1" maxLength=10 size=7  />
@@ -767,7 +746,7 @@ Matrix 1<br />
 </form>
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "matrix2" style="color:Silver;">
 Matrix 2<br />
 <input type="text" id="a11_2" maxLength=10 size=7  />
@@ -783,7 +762,7 @@ Matrix 2<br />
 </form>
 </td>
 
-<td>
+<td style="vertical-align:top;">
 <form id = "matrixResult" style="color:Silver;">
 Matrix Result= M1 x M2<br />
 <input type="text" id="a11_result" maxLength=10 size=7  />
