@@ -212,7 +212,9 @@ function ClearString()
 // function to display CRC help message
 function DisplayCrcHelp()
 {
-var txt = "This tool computes the 16 bit Cyclic Redundancy Check (CRC) for a series of input bytes based on the standard ESA CRC algorithm. This is CRC-16-CCITT with generator polynomial x16 + x12 + x5 + 1. The default initialisation state is all ones but any other state can be set.";
+var txt = "This tool computes the 16 bit Cyclic Redundancy Check (CRC) for a series of input bytes based on the standard ESA CRC algorithm.\n";
+txt = txt + "This is CRC-16-CCITT with generator polynomial x16 + x12 + x5 + 1.\n"; 
+txt = txt + "The default initialisation state is all ones but any other state can be set.";
 alert(txt);
 }
 
@@ -221,6 +223,7 @@ alert(txt);
 </head>
 
 <body>
+<H4 style="color:Silver;">CRC</H4>
 <p style="color:Silver;">
 This function computes the 16 bit CRC for a string of hexadecimal bytes based on the specified initialisation state.
 </p>
