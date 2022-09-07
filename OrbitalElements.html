@@ -640,6 +640,14 @@ function Perigee()
 	document.getElementById("Perigee").value = perigee;
 }
 
+function Help()
+{
+	var txt = "These are the Earth related constant that are used as inputs for the conversions.\n";
+	txt = txt + "Default values are set for each but it is possible to override these with user defined values.\n";
+	txt = txt + "The eccentricitiy of the Earth ellipsoid can be computed from the flattening factor by clicking the 'Earth Ellipsoid e' button.\n";
+	txt = txt + "All the values can be reset to the defaults by clicking the 'Reset constants' button.";
+	alert(txt);
+}
 
 </script>
 </head>
@@ -659,6 +667,7 @@ Inputs<br />
 </form>
 <button type="button" onclick="ResetInputs()">Reset constants</button><br />
 <button type="button" onclick="EarthEllipsoidEccentricity()">Earth Ellipsoid e</button><br />
+<button type="button" onclick="Help()">Help</button><br />
 </td>
 
 <td style="vertical-align:top;">
