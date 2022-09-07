@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+function DisplayTcFields()
+{
+	var str = document.getElementById("inputString").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+	TC_frame(bytes);
+}
+
+//TC_frame() extracts the TC fields from the TC frame.
+function TC_frame( bytes )
+{
+
+	var version_number = ( bytes[0] >> 6 ) & 0x3 ;
+	var bypass_flag = ( bytes[0] >> 5 ) & 0x1 ;
+	var control_command_flag = ( bytes[0] >> 4 ) & 0x1 ; 
+	var spacecraft_id = ((bytes[0] & 0x3) << 8) + (bytes[1]) ; 		
+	var virtual_channel_id  = ( bytes[2] >> 2 ) & 0x3f ;
+	var frame_length = (( bytes[2] & 0x3 )<< 8) + bytes[3] ;
+	var Frame_sequence_number = bytes[4] ;
+	var interpretation = "";
+	// segmentation header
+	var sequence_flags = (bytes[5] >> 6) & 0x3;
+	var segmentation = "";
+	var map_id = bytes[5] & 0x3F;
+	var tcPacket = "";
+	var i = 0;
+	for (i = 6; i < bytes.length-2; i++)
+	{
+		tcPacket = tcPacket + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+	var crc = bytes[bytes.length-2].toString(16).toUpperCase().padStart(2,'0') + " " + bytes[bytes.length-1].toString(16).toUpperCase().padStart(2,'0');
+
+
+// Checks the interpretation of the values of the bypass flag and control/command flag i.e AD, BD, BC etc.
+
+	if( (bypass_flag == 0) && (control_command_flag ==  0) )
+	{
+		interpretation = "AD frame, carrying data in the sequence-controlled";
+	}
+	if ( (bypass_flag == 0) && (control_command_flag ==  1) ) 
+	{
+		interpretation = "Reserved for future application" ;
+	}
+	if ( (bypass_flag == 1) && (control_command_flag ==  0) ) 
+	{
+		interpretation = "BD frame, carrying data in the expedited service";
+	}
+	if ( (bypass_flag == 1) && (control_command_flag ==  1) ) 
+	{
+		interpretation = "BC frame, carrying a control command";
+	}
+
+	// check the meaning of the segmentation sequence flags
+	switch (sequence_flags)
+	{
+		case 0:
+			segmentation = "A continuing segment of user data";
+			break;
+		case 1:
+			segmentation = "First segment of user data";
+			break;
+		case 2:
+			segmentation = "Last segment of user data";
+			break;
+		case 3:
+			segmentation = "No segmentation";
+			break;
+		default:
+			break;
+	}
+
+	document.getElementById("versionNumber").value = version_number.toString(16).toUpperCase();
+	document.getElementById("bypassFlag").value = bypass_flag.toString(16).toUpperCase();
+	document.getElementById("controlCommandFlag").value = control_command_flag.toString(16).toUpperCase();  
+	document.getElementById("interpretation").value = interpretation;		
+	document.getElementById("spacecraftId").value = spacecraft_id.toString(16).toUpperCase();
+	document.getElementById("spacecraftIdDecimal").value = spacecraft_id.toString(10);
+	document.getElementById("virtualChannelId").value = virtual_channel_id.toString(16).toUpperCase();
+	document.getElementById("frameLength").value = frame_length.toString(10);
+	document.getElementById("frameSequenceNumber").value = Frame_sequence_number.toString(16).toUpperCase();
+	//the length of the frame must be consistant with the frame data field length (the number of bytes in the frame minus one) 	
+	if (frame_length != (bytes.length -1 ))
+	{
+		frame_length++;
+		alert( "WARNING. Length of frame " + frame_length + " does not match with frame data field length " + bytes.length);
+	}
+	document.getElementById("sequenceFlags").value = sequence_flags.toString(16).toUpperCase();
+	document.getElementById("segmentation").value = segmentation;
+	document.getElementById("mapId").value = map_id.toString(16).toUpperCase();
+	document.getElementById("tcPacket").value = tcPacket.toString(16).toUpperCase();
+	document.getElementById("frameCrc").value = crc.toString(16).toUpperCase();
+
+}
+
+// remove multiple, leading or trailing spaces
+function trim(s) {
+	s = s.replace(/(^\s*)|(\s*$)/gi,"");
+	s = s.replace(/[ ]{2,}/gi," ");
+	s = s.replace(/\n /,"\n");
+	return s;
+}
+
+function ClearFields()
+{
+	document.getElementById("getString").reset();
+	document.getElementById("outputs").reset();
+}
+
+// function to display TC frame help message
+function DisplayHelp()
+{
+var txt = "This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.\n";
+txt = txt + "It assumes that the transfer sublayer below the segmentation sublayer consists of the contained TC packet data.\n";
+alert(txt);
+}
+
+
+</script>
+</head>
+
+<body>
+<H4 style="color:Silver;">TC Frame</H4>
+<p style="color:Silver;">
+This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.
+</p>
+
+<form id = "getString" style="color:Silver;">
+Input string of space delimited hexadecimal bytes representing the TC frame e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 AB 89<br />
+<input type="text" id="inputString" maxLength=600 size=200/><br />
+</form>
+
+<button type="button" onclick="DisplayTcFields()">Display TC Fields</button><br />
+<button type="button" onclick="ClearFields()">Clear Fields</button><br />
+<button type="button" onclick="DisplayHelp()">Help</button><br />
+
+<form id = "outputs" style="color:Silver;">
+TC Frame Fields<br />
+<input type="text" id="versionNumber" maxLength=10 size=10/>Version Number<br />
+<input type="text" id="bypassFlag" maxLength=10 size=10/>Bypass Flag<br />
+<input type="text" id="controlCommandFlag" maxLength=10 size=10/>Command Control Flag&emsp;
+<input type="text" id="interpretation" maxLength=50 size=50/>Command Control Meaning<br />
+<input type="text" id="spacecraftId" maxLength=10 size=10/>Spacecraft Id (hex)&emsp;
+<input type="text" id="spacecraftIdDecimal" maxLength=10 size=10/>Spacecraft Id (decimal)<br />
+<input type="text" id="virtualChannelId" maxLength=10 size=10/>VC Id<br />
+<input type="text" id="frameLength" maxLength=10 size=10/>Frame Length -1<br />
+<input type="text" id="frameSequenceNumber" maxLength=10 size=10/>Frame Sequence Number<br />
+<input type="text" id="sequenceFlags" maxLength=10 size=10/>Sequence Flags&emsp;
+<input type="text" id="segmentation" maxLength=32 size=32/>Segmentation Meaning<br />
+<input type="text" id="mapId" maxLength=10 size=10/>MAP Id<br />
+<input type="text" id="tcPacket" maxLength=600 size=200/>TC Packet<br />
+<input type="text" id="frameCrc" maxLength=10 size=10/>TC Frame CRC (frame error control field)<br />
+</form>
+
+
+</body>
+</html>
