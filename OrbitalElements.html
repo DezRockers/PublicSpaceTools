@@ -6,7 +6,9 @@
 // which is downloaded by the link AOCS Math Models
 
 var pi = 3.1415926535897932384626433832795;
-var mu = 398600.4418;	// km3/s2
+var mu = 398600.4418;	// earth gravitational constant in km3/s2
+var Re = 6378.0;	// earth equatorial radius in km
+var flat = 1.0/298.257;	// earth flattening factor at the poles
 
 // function to display Keplerian elements
 function DisplayKeplerian()
@@ -159,9 +161,10 @@ var C = Math.cos(w+f)*Math.sin(i);
 return C;
 }
 
-// function to compute the vecloity magnitude in km/s
+// function to compute the velocity magnitude in km/s from the orbtial elements
 function VelocityMagnitude()
 {
+mu=document.getElementById("mu").value;
 var a=document.getElementById("a").value;
 var e=document.getElementById("e").value;
 var i=DegreesToRadians(document.getElementById("i").value);
@@ -238,19 +241,20 @@ document.getElementById("characteristics").reset();
 // function to compute the Cartesain coordinates given the Keplerian elements
 function ComputeCartesians()
 {
-	var a=document.getElementById("a").value;
-	if (a < 6378) 
+	var a=Number(document.getElementById("a").value);
+	var Re = Number(document.getElementById("Re").value);
+	if (a < Re) 
 	{
-		alert("a is less than 6378km, the radius of the Earth. Try again");
+		alert("a is less than " + Re + "km, the equatorial radius of the Earth. Try again");
 		return;
 	} 
-	var e=document.getElementById("e").value;
+	var e=Number(document.getElementById("e").value);
 	if ((e < 0) || (e >= 1)) 
 	{
 		alert("e is not between 0 and 1. Try again");
 		return;
 	} 
-	var i=document.getElementById("i").value;
+	var i=Number(document.getElementById("i").value);
 	if ((i < 0) || (i > 180)) 
 	{
 		alert("i is not between 0 and 180. Try again");
@@ -260,6 +264,7 @@ function ComputeCartesians()
 	var Y = ComputeY();
 	var Z = ComputeZ();
 	DisplayVelocity();
+	UpdateOtherCharacteristics();
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 
@@ -306,6 +311,9 @@ function ComputeOmega()
 	V[1] = document.getElementById("ydot").value;
 	V[2] = document.getElementById("zdot").value;
 	var h = CrossProduct(R,V);
+	document.getElementById("hx").value = h[0];
+	document.getElementById("hy").value = h[1];
+	document.getElementById("hz").value = h[2];
 	var Omega = Math.atan2(h[0],-h[1]);
 	Omega = RadiansToDegrees(Omega);
 	return Omega;
@@ -340,11 +348,32 @@ function VectorMagnitude(V)
 	return R;
 }
 
+// function to compute the velocity magntiude from the cartesian values
+function VelocityMagnitudeFromCartesians()
+{
+	var xdot = document.getElementById("xdot").value;
+	var ydot = document.getElementById("ydot").value;
+	var zdot = document.getElementById("zdot").value;
+	var V = Math.sqrt(xdot*xdot + ydot*ydot + zdot*zdot);
+	return V;
+}
+
+// function to compute the range magntiude from the cartesian values
+function ComputeRangeFromCartesians()
+{
+	var x = document.getElementById("x").value;
+	var y = document.getElementById("y").value;
+	var z = document.getElementById("z").value;
+	var R = Math.sqrt(x*x + y*y + z*z);
+	return R;
+}
+
 // function to compute the semi-major axis
 function ComputeSemiMajorAxis()
 {
-	var V = VelocityMagnitude();
-	var R= ComputeR();
+	mu=document.getElementById("mu").value;
+	var V = VelocityMagnitudeFromCartesians();
+	var R = ComputeRangeFromCartesians();
 	var a = R / (2 - V*V*R/mu);
 	return a;
 }
@@ -352,6 +381,7 @@ function ComputeSemiMajorAxis()
 // function to compute the eccentricity
 function ComputeEccentricity()
 {
+	mu=document.getElementById("mu").value;
 	var R = new Array();
 	var V = new Array();
 	R[0] = document.getElementById("x").value;
@@ -370,6 +400,7 @@ function ComputeEccentricity()
 // function to compute the true anomaly in degrees
 function ComputeTrueAnomaly()
 {
+	mu=document.getElementById("mu").value;
 	var R = new Array();
 	var V = new Array();
 	R[0] = document.getElementById("x").value;
@@ -459,6 +490,7 @@ function ComputeMeanAnomaly()
 // function to compute the Mean Motion from the semi-major axis
 function ComputeMeanMotion()
 {
+	mu=document.getElementById("mu").value;
 	var a = Number(document.getElementById("a").value);
 	var n = Math.sqrt(mu/(a*a*a));
 	return RadiansToDegrees(n);
@@ -508,64 +540,147 @@ function UpdateOtherCharacteristics()
 
 	var P = ComputeOrbitalPeriod();
 	document.getElementById("P").value = P;
+
+	Altitude();
+	Perigee();
+	Apogee();
+
+	// the following call is needed to update the orbital angular momentum vector h
+	ComputeOmega();
 }
+
+function SetDefaults()
+{
+	document.getElementById("mu").defaultValue = mu;
+	document.getElementById("Re").defaultValue = Re;
+	document.getElementById("flat").defaultValue = flat;
+	ResetInputs();
+}
+
+function ResetInputs()
+{
+	document.getElementById("mu").value = document.getElementById("mu").defaultValue;
+	document.getElementById("Re").value = document.getElementById("Re").defaultValue;
+	document.getElementById("flat").value = document.getElementById("flat").defaultValue;
+	EarthEllipsoidEccentricity();
+}
+
+function EarthEllipsoidEccentricity()
+{
+	var f = document.getElementById("flat").value;
+	var EarthEcc = Math.sqrt(2.0*f - f*f);
+	document.getElementById("EarthEcc").value = EarthEcc;
+}
+
+// function to derive the altitude of the satellite above the Earth ellipsoid
+function Altitude()
+{
+	var x = document.getElementById("x").value;
+	var y = document.getElementById("y").value;
+	var z = document.getElementById("z").value;
+	var R = document.getElementById("R").value;
+
+	// we need to guard against possible rounding errors
+	var z_over_R = z/R;
+	if (z_over_R < -1.0)
+	{
+		z_over_R = -1.0;
+	}
+	else if (z_over_R > 1.0)
+	{
+		z_over_R = 1.0;
+	}
+	var phi0 = Math.asin(z_over_R);
+	var lambda = Math.atan2(y,x);
+	var phi = phi0;
+	var h = 0;
+	var zero_tolerance = 1.e-10;
+
+	// now iterate
+	var i = 0;
+	for (i = 0; i < 10; i++)
+	{
+ 		var sinphi = Math.sin(phi);
+		var cosphi = Math.cos(phi);
+		var e = document.getElementById("EarthEcc").value;
+
+		Re = document.getElementById("Re").value;
+		var N = Re/Math.sqrt(cosphi*cosphi + (1-e*e)*sinphi*sinphi);
+		// we need to check cosphi is not close to zero
+		if (Math.abs(cosphi) < zero_tolerance)
+		{
+			h = z/sinphi - (1.0-e*e)*N;
+		}
+		else
+		{
+			h = Math.sqrt(x*x+y*y)/cosphi - N;
+		}
+		phi = Math.atan(z/Math.sqrt(x*x+y*y)*1.0/(1.0 - e*e*N/(N+h)));
+	}
+
+	//alert("h = " + h + "km");
+	document.getElementById("Altitude").value = h;
+}
+
+// function to derive the apogee distance from Earth centre
+function Apogee()
+{
+	var a = Number(document.getElementById("a").value);
+	var e = Number(document.getElementById("e").value);
+	var apogee = a * (1.0 + e);
+	document.getElementById("Apogee").value = apogee;
+}
+
+// function to derive the perigee distance from Earth centre
+function Perigee()
+{
+	var a = Number(document.getElementById("a").value);
+	var e = Number(document.getElementById("e").value);
+	var perigee = a * (1.0 - e);
+	document.getElementById("Perigee").value = perigee;
+}
+
 
 </script>
 </head>
-<body>
+<body onload="SetDefaults()">
 
 <table border="1">
-  <col valign="top" />
-  <col valign="top" />
 <tr id="tr1">
-<td>
-<H4 style="color:Silver;">Convert Keplerian Elements to Cartesian Coordinates</H4>
 
+<td style="vertical-align:top;">
+<H4 style="color:Silver;">Earth related constants</H4>
+<form id = "inputs" style="color:Silver;">
+Inputs<br />
+<input type="text" id="mu" />&mu; in km&sup3;/s&sup2;<br />
+<input type="text" id="Re" />Re in km<br />
+<input type="text" id="flat" />f at poles<br />
+<input type="text" id="EarthEcc" />Earth e<br />
+</form>
+<button type="button" onclick="ResetInputs()">Reset constants</button><br />
+<button type="button" onclick="EarthEllipsoidEccentricity()">Earth Ellipsoid e</button><br />
+</td>
+
+<td style="vertical-align:top;">
+<H4 style="color:Silver;">Keplerian Elements to Cartesian Coordinates</H4>
 <form id = "keplerian" style="color:Silver;">
 Keplerian Elements<br />
-
 <input type="text" id="a" />a in km<br />
 <input type="text" id="e" />e<br />
-<input type="text" id="i" />i in degrees<br />
-<input type="text" id="Omega" />&Omega; in degrees<br />
-<input type="text" id="w" />&omega; in degrees<br />
-<input type="text" id="f" />&nu; in degrees<br />
+<input type="text" id="i" />i in degs<br />
+<input type="text" id="Omega" />&Omega; in degs<br />
+<input type="text" id="w" />&omega; in degs<br />
+<input type="text" id="f" />&nu; in degs<br />
 </form>
-
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
-<button type="button" onclick="UpdateOtherCharacteristics()">Update Other Characteristics</button><br />
 <button type="button" onclick="ClearElements()">Clear elements</button><br />
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
-
 </td>
 
-<td>
-<H4 style="color:Silver;">Other Orbital Characteristics</H4>
-
-<form id = "characteristics" style="color:Silver;">
-Other Orbital Characteristics<br />
-
-<input type="text" id="R" />R in km<br />
-<input type="text" id="V" />V in km/s<br />
-<input type="text" id="E" />E in degrees<br />
-<input type="text" id="M" />M in degrees<br />
-<input type="text" id="n" />n in degrees/second<br />
-<input type="text" id="P" />P in seconds<br />
-</form>
-
-<button type="button" onclick="ClearOtherCharacteristics()">Clear other characteristics</button><br />
-<button type="button" onclick="window.open('Anomalies.html', '_blank');">Help</button><br />
-<br />
-<br />
-
-</td>
-
-<td>
-<H4 style="color:Silver;">Convert Cartesian Coordinates to Keplerian Elements</H4>
-
+<td style="vertical-align:top;">
+<H4 style="color:Silver;">Cartesian Coordinates to Keplerian Elements</H4>
 <form id = "cartesian" style="color:Silver;">
 Cartesian Coordinates<br />
-
 <input type="text" id="x" />x in km<br />
 <input type="text" id="y" />y in km<br />
 <input type="text" id="z" />z in km<br />
@@ -573,13 +688,32 @@ Cartesian Coordinates<br />
 <input type="text" id="ydot" />y&#775; in km/s<br />
 <input type="text" id="zdot" />z&#775; in km/s<br />
 </form>
-
 <button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
 <button type="button" onclick="ClearCartesians()">Clear cartesian coordinates</button><br />
 <button type="button" onclick="window.open('OrbEl.html', '_blank');">Help</button><br />
-<br />
-
 </td>
+
+<td style="vertical-align:top;">
+<H4 style="color:Silver;">Other Orbital Characteristics</H4>
+<form id = "characteristics" style="color:Silver;">
+Other Orbital Characteristics<br />
+<input type="text" id="R" />R in km<br />
+<input type="text" id="V" />V in km/s<br />
+<input type="text" id="Altitude" />Altitude in km<br />
+<input type="text" id="Perigee" />Perigee in km<br />
+<input type="text" id="Apogee" />Apogee in km<br />
+<input type="text" id="E" />E in degs<br />
+<input type="text" id="M" />M in degs<br />
+<input type="text" id="n" />n in degs/s<br />
+<input type="text" id="P" />Period in s<br />
+<input type="text" id="hx" />hx in km&sup2;/s<br />
+<input type="text" id="hy" />hy in km&sup2;/s<br />
+<input type="text" id="hz" />hz in km&sup2;/s<br />
+</form>
+<button type="button" onclick="ClearOtherCharacteristics()">Clear other characteristics</button><br />
+<button type="button" onclick="window.open('Anomalies.html', '_blank');">Help</button><br />
+</td>
+
 </tr>
 </table>
 
