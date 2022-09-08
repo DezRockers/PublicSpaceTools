@@ -29,6 +29,7 @@ function DisplayTcFields()
 		if (bytes[i].length != 2)
 		{
 			alert("element " + i + " = " + bytes[i] + " needs length 2");
+			return;
 		}
 		// convert each 2 character string to hexadecimal integer
 		bytes[i] = parseInt(bytes[i],16) & 0xff;
@@ -50,18 +51,40 @@ function TC_packet( bytes )
 	var packetStartByte = 6;
 
 	// secondary header
+	var i = 0;
 	if (secondaryHeaderFlag == 1)
 	{
 		var pusVersionNumber = (bytes[6] >> 4) & 0xF;
 		var ackFlags = (bytes[6] >> 0) & 0xF;
 		var serviceType = bytes[7];
 		var serviceSubtype = bytes[8];
-		var sourceId = (bytes[4] << 9) + bytes[10];
-		packetStartByte = 11;
+		packetStartByte = packetStartByte + 3;
+		var sourceId = "";
+		var spare = "";
+		switch (Number(document.getElementById("sourceIdLength").value))
+		{
+			case 0:
+				break;
+			case 1:
+				packetStartByte = packetStartByte + 1;
+				sourceId = bytes[9].toString(16).toUpperCase().padStart(2,'0');
+				break;
+			case 2:
+				packetStartByte = packetStartByte + 2;
+				sourceId = bytes[9].toString(16).toUpperCase().padStart(2,'0') + " " + bytes[10].toString(16).toUpperCase().padStart(2,'0');
+				break;
+			default:
+				alert("Unrecognised source ID length field of " + document.getElementById("sourceIdLength").value + " bytes. Try again.");
+				break;
+		}
+		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("spareLength").value); i++)
+		{
+			spare = spare + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+		packetStartByte = packetStartByte + Number(document.getElementById("spareLength").value);
 	}
 
 	var tcPacket = "";
-	var i = 0;
 	for (i = packetStartByte; i < bytes.length-2; i++)
 	{
 		tcPacket = tcPacket + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
@@ -82,6 +105,7 @@ function TC_packet( bytes )
 	document.getElementById("serviceType").value = serviceType.toString(16).toUpperCase();
 	document.getElementById("serviceSubtype").value = serviceSubtype.toString(16).toUpperCase();
 	document.getElementById("sourceId").value = sourceId.toString(16).toUpperCase();
+	document.getElementById("spare").value = spare.toString(16).toUpperCase();
 
 	document.getElementById("tcPacket").value = tcPacket;
 	document.getElementById("pec").value = pec.toString(16).toUpperCase();
@@ -102,6 +126,9 @@ function ClearFields()
 	document.getElementById("primary").reset();
 	document.getElementById("secondary").reset();
 	document.getElementById("userdata").reset();
+
+	// but reset the defaults
+	SetDefaults();
 }
 
 // function to display TC packet help message
@@ -111,11 +138,18 @@ var txt = "This tool displays the individual fields of the input TC PUS packet i
 alert(txt);
 }
 
+function SetDefaults()
+{
+	document.getElementById("sourceIdLength").value = 1;
+	document.getElementById("spareLength").value = 0;
+}
+
+
 
 </script>
 </head>
 
-<body>
+<body onload="SetDefaults()">
 <H4 style="color:Silver;">TC Packet</H4>
 <p style="color:Silver;">
 This tool displays the individual fields of the input TC PUS packet in hexadecimal bytes.
@@ -125,6 +159,8 @@ This tool displays the individual fields of the input TC PUS packet in hexadecim
 Input the TC string as either non-delimited hexadecimal bytes e.g. 1860C0000005191101004075 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 and then click 'Display TC Fields' button<br />
 <input type="text" id="inputString" maxLength=600 size=200/><br />
+<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID fields in bytes. This is mission specific and is usually 0, 1 or 2 bytes long.<br />
+<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific.
 </form>
 
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
@@ -156,6 +192,7 @@ TC Secondary Header Fields<br />
 <input type="text" id="serviceType" maxLength=10 size=10/>Service Type ID (hex)<br />
 <input type="text" id="serviceSubtype" maxLength=10 size=10/>Service Subtype ID (hex)<br />
 <input type="text" id="sourceId" maxLength=10 size=10/>Source ID (hex)<br />
+<input type="text" id="spare" maxLength=10 size=10/>Spare field (hex)<br />
 </form>
 </td>
 
