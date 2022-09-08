@@ -114,6 +114,12 @@ function TM_frame( bytes )
 	document.getElementById("tfData").value = tfData;
 	document.getElementById("ocf").value = ocf;
 	document.getElementById("fecf").value = fecf;
+
+	document.getElementById("totalFrameLength").value = bytes.length;
+	document.getElementById("totalHeaderLength").value = dataFieldIndex;
+	document.getElementById("userDataLength").value = bytes.length - dataFieldIndex - tailLength;
+	document.getElementById("totalTrailerLength").value = tailLength;
+
 }
 
 // remove multiple, leading or trailing spaces
@@ -160,7 +166,7 @@ This tool displays the individual fields of the input CCSDS TM frame in hexadeci
 
 <form id = "getString" style="color:Silver;">
 Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button<br />
-or space delimited hexadecimal bytes and then click 'Display TC Fields' button<br />
+or space delimited hexadecimal bytes and then click 'Display TM Fields' button<br />
 <input type="text" id="inputString" maxLength=4000 size=200/><br />
 <input type="text" id="ocfLength" maxLength=10 size=10/>Input the length of the OCF field in bytes. This is mission specific and is usually 0 or 4 bytes long.<br />
 <input type="text" id="fecfLength" maxLength=10 size=10/>Input the length of the FECF field in bytes. This is also mission specific and is usually 2 bytes long.
@@ -177,7 +183,7 @@ or space delimited hexadecimal bytes and then click 'Display TC Fields' button<b
 <td style="vertical-align:top;">
 <form id = "primary" style="color:Silver;">
 TM Frame Primary Header Fields<br />
-<input type="text" id="versionNumber" maxLength=10 size=10/>Frame Version Number<br />
+<input type="text" id="versionNumber" maxLength=10 size=10/>Frame Version Number (should be 0)<br />
 <input type="text" id="spacecraftId" maxLength=10 size=10/>Spacecraft Id (hex)<br />
 <input type="text" id="vcId" maxLength=10 size=10/>VC ID<br />
 <input type="text" id="ocfFlag" maxLength=10 size=10/>OCF Flag<br />
@@ -205,7 +211,14 @@ TM Frame Secondary Header Fields<br />
 TM Frame User Data<br />
 <input type="text" id="tfData" maxLength=4000 size=100/>TM user data (hex)<br />
 <input type="text" id="ocf" maxLength=10 size=10/>Operational Control Field (hex)<br />
-<input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br />
+<input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br /><br />
+
+Other Useful Data<br />
+<input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Frame Length (decimal)<br />
+<input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
+<input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br /><br />
+
 </form>
 </td>
 
