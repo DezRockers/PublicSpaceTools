@@ -103,6 +103,14 @@ function Help()
 	alert(txt);
 }
 
+function AddSpaces()
+{
+	var str = document.getElementById("inputString").value;
+	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
+	document.getElementById("inputString").value = result;
+}
+
+
 </script>
 </head>
 
@@ -116,14 +124,15 @@ e.g. 14 56 F8 9A 00 01 will yield 24 DC
 
 <form id = "getString" style="color:Silver;">
 Input bytes (hex format)<br />
-<input type="text" id="inputString" maxLength=375 size=125/><br />
+<input type="text" id="inputString" maxLength=4000 size=125/><br />
 Computed ISO Checksum<br />
 <input type="text" id="checksum"/>
 </form>
 
-<button type="button" onclick="DisplayIsoChecksum()">Calculate ISO Checksum</button><br />
-<button type="button" onclick="ClearString()">Clear String</button><br />
-<button type="button" onclick="Help()">Help</button><br />
+<button type="button" onclick="AddSpaces()">Add Spaces to the String</button>
+<button type="button" onclick="DisplayIsoChecksum()">Calculate ISO Checksum</button>
+<button type="button" onclick="ClearString()">Clear String</button>
+<button type="button" onclick="Help()">Help</button>
 
 </body>
 </html>
