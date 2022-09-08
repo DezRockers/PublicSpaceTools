@@ -218,6 +218,12 @@ txt = txt + "The default initialisation state is all ones but any other state ca
 alert(txt);
 }
 
+function AddSpaces()
+{
+	var str = document.getElementById("inputString").value;
+	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
+	document.getElementById("inputString").value = result;
+}
 
 </script>
 </head>
@@ -320,19 +326,20 @@ This tool computes the 16 bit CRC for a string of hexadecimal bytes based on the
 AllOnes();
 </script>
 
-<button type="button" onclick="AllOnes()">Set Init State to all ones</button><br />
-<button type="button" onclick="AllZeroes()">Set Init State to all zeroes</button><br />
+<button type="button" onclick="AllOnes()">Set Init State to all ones</button>
+<button type="button" onclick="AllZeroes()">Set Init State to all zeroes</button><br /><br />
 
 <form id = "getString" style="color:Silver;">
 Input string of space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 will produce CRC of AB 89<br />
-<input type="text" id="inputString" maxLength=375 size=125/><br />
+<input type="text" id="inputString" maxLength=4000 size=125/><br />
 Computed CRC<br />
 <input type="text" id="crc"/>
 </form>
 
-<button type="button" onclick="DisplayCrc()">Calculate CRC</button><br />
-<button type="button" onclick="ClearString()">Clear String</button><br />
-<button type="button" onclick="DisplayCrcHelp()">Help</button><br />
+<button type="button" onclick="AddSpaces()">Add Spaces to the String</button>
+<button type="button" onclick="DisplayCrc()">Calculate CRC</button>
+<button type="button" onclick="ClearString()">Clear String</button>
+<button type="button" onclick="DisplayCrcHelp()">Help</button>
 
 </body>
 </html>
