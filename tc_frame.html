@@ -3,6 +3,13 @@
 <head>
 <script type="text/javascript">
 
+function AddSpaces()
+{
+	var str = document.getElementById("inputString").value;
+	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
+	document.getElementById("inputString").value = result;
+}
+
 function DisplayTcFields()
 {
 	var str = document.getElementById("inputString").value;
@@ -148,12 +155,14 @@ This tool displays the individual fields of the input CCSDS TC frame in hexadeci
 </p>
 
 <form id = "getString" style="color:Silver;">
-Input string of space delimited hexadecimal bytes representing the TC frame e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 AB 89<br />
+Input the TC string as either non-delimited hexadecimal bytes e.g. 233F041300C21860C0000005191101004075AB89 and then click 'Add Spaces to TC String' button<br />
+or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 AB 89 and then click 'Display TC Fields' button<br />
 <input type="text" id="inputString" maxLength=600 size=200/><br />
 </form>
 
-<button type="button" onclick="DisplayTcFields()">Display TC Fields</button><br />
-<button type="button" onclick="ClearFields()">Clear Fields</button><br />
+<button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
+<button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
+<button type="button" onclick="ClearFields()">Clear Fields</button>
 <button type="button" onclick="DisplayHelp()">Help</button><br />
 
 <form id = "outputs" style="color:Silver;">
@@ -165,8 +174,8 @@ TC Frame Fields<br />
 <input type="text" id="spacecraftId" maxLength=10 size=10/>Spacecraft Id (hex)&emsp;
 <input type="text" id="spacecraftIdDecimal" maxLength=10 size=10/>Spacecraft Id (decimal)<br />
 <input type="text" id="virtualChannelId" maxLength=10 size=10/>VC Id<br />
-<input type="text" id="frameLength" maxLength=10 size=10/>Frame Length -1<br />
-<input type="text" id="frameSequenceNumber" maxLength=10 size=10/>Frame Sequence Number<br />
+<input type="text" id="frameLength" maxLength=10 size=10/>Frame Length -1 (decimal)<br />
+<input type="text" id="frameSequenceNumber" maxLength=10 size=10/>Frame Sequence Number (hex)<br />
 <input type="text" id="sequenceFlags" maxLength=10 size=10/>Sequence Flags&emsp;
 <input type="text" id="segmentation" maxLength=32 size=32/>Segmentation Meaning<br />
 <input type="text" id="mapId" maxLength=10 size=10/>MAP Id<br />
