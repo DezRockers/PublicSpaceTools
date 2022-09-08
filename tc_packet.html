@@ -161,9 +161,9 @@ This tool displays the individual fields of the input TC PUS packet in hexadecim
 <form id = "getString" style="color:Silver;">
 Input the TC string as either non-delimited hexadecimal bytes e.g. 1860C0000005191101004075 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 and then click 'Display TC Fields' button<br />
-<input type="text" id="inputString" maxLength=600 size=200/><br />
-<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID field in bytes. This is mission specific and is usually 0, 1 or 2 bytes long.<br />
-<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific.
+<input type="text" id="inputString" maxLength=4000 size=200/><br />
+<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID field in bytes. This is mission specific and is usually 0, 1 or 2 bytes long. Default is 1.<br />
+<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific. Default is 0.
 </form>
 
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
@@ -202,7 +202,7 @@ TC Secondary Header Fields<br />
 <td style="vertical-align:top;">
 <form id = "userdata" style="color:Silver;">
 TC Packet data<br />
-<input type="text" id="tcPacket" maxLength=600 size=100/>TC Packet data (hex)<br />
+<input type="text" id="tcPacket" maxLength=4000 size=100/>TC Packet data (hex)<br />
 <input type="text" id="pec" maxLength=10 size=10/>packet error control field (hex)<br />
 </form>
 </td>
