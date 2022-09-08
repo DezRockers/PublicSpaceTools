@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+<script type="text/javascript">
+
+function AddSpaces()
+{
+	var str = document.getElementById("inputString").value;
+	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
+	document.getElementById("inputString").value = result;
+}
+
+function DisplayTmFields()
+{
+	var str = document.getElementById("inputString").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+	TM_frame(bytes);
+}
+
+//TM_frame() extracts the TM fields from the TM frame.
+// uses information from ECSS standards document ECSS-E-ST-50-03C 31 July 2008
+function TM_frame( bytes )
+{
+
+	// Tm transfer frame primary header
+	var versionNumber = ( bytes[0] >> 6 ) & 0x3 ;
+	var spacecraftId = ((bytes[0] & 0x3F) << 4) + ((bytes[1] >> 4) & 0xF); 		
+	var vcId  = ( bytes[1] >> 1 ) & 0x7;
+	var ocfFlag  = bytes[1] & 0x1;
+	var masterChannelFrameCount = bytes[2];
+	var virtualChannelFrameCount = bytes[3];
+	var secondaryHeaderFlag = (bytes[4] >> 7) & 0x1;	
+	var syncFlag = (bytes[4] >> 6) & 0x1;
+	var packetOrderFlag = (bytes[4] >> 5) & 0x1;	
+	var segmentLengthId = (bytes[4] >> 3) & 0x3;
+	var firstHeaderPointer = (bytes[4] & 0x7) << 8 + bytes[5];
+
+	// display the fields
+	document.getElementById("versionNumber").value = versionNumber.toString(16).toUpperCase();
+	document.getElementById("spacecraftId").value = spacecraftId.toString(16).toUpperCase();
+	document.getElementById("vcId").value = vcId.toString(16).toUpperCase();
+	document.getElementById("ocfFlag").value = ocfFlag.toString(16).toUpperCase();
+	document.getElementById("masterChannelFrameCount").value = masterChannelFrameCount.toString(10);
+	document.getElementById("virtualChannelFrameCount").value = virtualChannelFrameCount.toString(10);
+	document.getElementById("secondaryHeaderFlag").value = secondaryHeaderFlag.toString(16).toUpperCase();
+	document.getElementById("syncFlag").value = syncFlag.toString(16).toUpperCase();
+	document.getElementById("packetOrderFlag").value = packetOrderFlag.toString(16).toUpperCase();
+	document.getElementById("segmentLengthId").value = segmentLengthId.toString(16).toUpperCase();
+	document.getElementById("firstHeaderPointer").value = firstHeaderPointer.toString(16).toUpperCase();
+
+	var dataFieldIndex = 6;
+
+	// secondary header
+	if (secondaryHeaderFlag == 1)
+	{
+		var secondaryHeaderVersionNumber = (bytes[6] >> 6) & 0x3; // should always be 0
+		var secondaryHeaderLength = bytes[6] & 0x3F;	// length of secondary header - 1
+		var secondaryHeaderData = "";
+		for (i = 7; i < secondaryHeaderLength + 7 + 1; i++)
+		{
+			secondaryHeaderData = secondaryHeaderData + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+		dataFieldIndex = dataFieldIndex + secondaryHeaderLength + 1;
+
+		// display the fields
+		document.getElementById("secondaryHeaderVersionNumber").value = secondaryHeaderVersionNumber.toString(16).toUpperCase();
+		document.getElementById("secondaryHeaderLength").value = secondaryHeaderLength.toString(10);
+		document.getElementById("secondaryHeaderData").secondaryHeaderData = secondaryHeaderData;
+	}
+
+	var fecfLength = Number(document.getElementById("fecfLength").value);
+	var tailLength = fecfLength;
+	var fecf = "";
+	var ocf = "";
+	for (i = 0; i < fecfLength; i++)
+	{
+		fecf = fecf + bytes[bytes.length - fecfLength + i].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+	if (ocfFlag == 1)
+	{
+		var ocfLength = Number(document.getElementById("ocfLength").value);
+		tailLength = tailLength + ocfLength;
+		for (i = 0; i < ocfLength; i++)
+		{
+			ocf = ocf + bytes[bytes.length - tailLength + i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+	}
+	var tfData = "";
+	for (i = dataFieldIndex; i < bytes.length - tailLength; i++)
+	{
+		tfData = tfData + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+
+	// display the fields
+	document.getElementById("tfData").value = tfData;
+	document.getElementById("ocf").value = ocf;
+	document.getElementById("fecf").value = fecf;
+}
+
+// remove multiple, leading or trailing spaces
+function trim(s) {
+	s = s.replace(/(^\s*)|(\s*$)/gi,"");
+	s = s.replace(/[ ]{2,}/gi," ");
+	s = s.replace(/\n /,"\n");
+	return s;
+}
+
+function ClearFields()
+{
+	document.getElementById("getString").reset();
+	document.getElementById("primary").reset();
+	document.getElementById("secondary").reset();
+	document.getElementById("userdata").reset();
+
+	// but reset the defaults
+	SetDefaults();
+}
+
+function SetDefaults()
+{
+	document.getElementById("ocfLength").value = 4;
+	document.getElementById("fecfLength").value = 2;
+}
+
+// function to display TC frame help message
+function DisplayHelp()
+{
+var txt = "This tool displays the individual fields of the input CCSDS TM frame in hexadecimal bytes.\n";
+alert(txt);
+}
+
+
+</script>
+</head>
+
+<body onload="SetDefaults()">
+<H4 style="color:Silver;">TM Frame</H4>
+<p style="color:Silver;">
+This tool displays the individual fields of the input CCSDS TM frame in hexadecimal bytes.
+</p>
+
+<form id = "getString" style="color:Silver;">
+Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button<br />
+or space delimited hexadecimal bytes and then click 'Display TC Fields' button<br />
+<input type="text" id="inputString" maxLength=4000 size=200/><br />
+<input type="text" id="ocfLength" maxLength=10 size=10/>Input the length of the OCF field in bytes. This is mission specific and is usually 0 or 4 bytes long.<br />
+<input type="text" id="fecfLength" maxLength=10 size=10/>Input the length of the FECF field in bytes. This is also mission specific and is usually 2 bytes long.
+</form>
+
+<button type="button" onclick="AddSpaces()">Add Spaces to TM String</button>
+<button type="button" onclick="DisplayTmFields()">Display TM Fields</button>
+<button type="button" onclick="ClearFields()">Clear Fields</button>
+<button type="button" onclick="DisplayHelp()">Help</button><br />
+
+<table border="1">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
+<form id = "primary" style="color:Silver;">
+TM Frame Primary Header Fields<br />
+<input type="text" id="versionNumber" maxLength=10 size=10/>Frame Version Number<br />
+<input type="text" id="spacecraftId" maxLength=10 size=10/>Spacecraft Id (hex)<br />
+<input type="text" id="vcId" maxLength=10 size=10/>VC ID<br />
+<input type="text" id="ocfFlag" maxLength=10 size=10/>OCF Flag<br />
+<input type="text" id="masterChannelFrameCount" maxLength=10 size=10/>Master Channel Frame Count (decimal)<br />
+<input type="text" id="virtualChannelFrameCount" maxLength=10 size=10/>Virtual Channel Frame Count (decimal)<br />
+<input type="text" id="secondaryHeaderFlag" maxLength=10 size=10/>Secondary Header Flag<br />
+<input type="text" id="syncFlag" maxLength=10 size=10/>Sync Flag<br />
+<input type="text" id="packetOrderFlag" maxLength=10 size=10/>Packet Order Flag<br />
+<input type="text" id="segmentLengthId" maxLength=10 size=10/>Segment Length Id<br />
+<input type="text" id="firstHeaderPointer" maxLength=10 size=10/>First Header Pointer (hex)<br />
+</form>
+</td>
+
+<td style="vertical-align:top;">
+<form id = "secondary" style="color:Silver;">
+TM Frame Secondary Header Fields<br />
+<input type="text" id="secondaryHeaderVersionNumber" maxLength=10 size=10/>Secondary Header Version Number<br />
+<input type="text" id="secondaryHeaderLength" maxLength=10 size=10/>Secondary Header length - 1 (decimal)<br />
+<input type="text" id="secondaryHeaderData" maxLength=50 size=10/>Secondary Header Data Field (hex)<br />
+</form>
+</td>
+
+<td style="vertical-align:top;">
+<form id = "userdata" style="color:Silver;">
+TM Frame User Data<br />
+<input type="text" id="tfData" maxLength=4000 size=100/>TM user data (hex)<br />
+<input type="text" id="ocf" maxLength=10 size=10/>Operational Control Field (hex)<br />
+<input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br />
+</form>
+</td>
+
+</tr>
+</table>
+
+</body>
+</html>

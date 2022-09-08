@@ -50,6 +50,15 @@ function TC_packet( bytes )
 	var packetDataLength = (bytes[4] << 8) + bytes[5];
 	var packetStartByte = 6;
 
+	// display the fields
+	document.getElementById("packetVersionNumber").value = packetVersionNumber.toString(16).toUpperCase();
+	document.getElementById("packetType").value = packetType.toString(16).toUpperCase();
+	document.getElementById("secondaryHeaderFlag").value = secondaryHeaderFlag.toString(16).toUpperCase();
+	document.getElementById("apid").value = apid.toString(16).toUpperCase();
+	document.getElementById("sequenceFlags").value = sequenceFlags.toString(16).toUpperCase();
+	document.getElementById("packetSequenceCount").value = packetSequenceCount.toString(16).toUpperCase();
+	document.getElementById("packetDataLength").value = packetDataLength.toString(10);
+
 	// secondary header
 	var i = 0;
 	if (secondaryHeaderFlag == 1)
@@ -82,6 +91,15 @@ function TC_packet( bytes )
 			spare = spare + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
 		}
 		packetStartByte = packetStartByte + Number(document.getElementById("spareLength").value);
+
+		// display the fields
+		document.getElementById("pusVersionNumber").value = pusVersionNumber.toString(16).toUpperCase();
+		document.getElementById("ackFlags").value = ackFlags.toString(16).toUpperCase();
+		document.getElementById("serviceType").value = serviceType.toString(16).toUpperCase();
+		document.getElementById("serviceSubtype").value = serviceSubtype.toString(16).toUpperCase();
+		document.getElementById("sourceId").value = sourceId.toString(16).toUpperCase();
+		document.getElementById("spare").value = spare.toString(16).toUpperCase();
+
 	}
 
 	var tcPacket = "";
@@ -92,21 +110,6 @@ function TC_packet( bytes )
 	var pec = bytes[bytes.length-2].toString(16).toUpperCase().padStart(2,'0') + " " + bytes[bytes.length-1].toString(16).toUpperCase().padStart(2,'0');
 
 	// display the fields
-	document.getElementById("packetVersionNumber").value = packetVersionNumber.toString(16).toUpperCase();
-	document.getElementById("packetType").value = packetType.toString(16).toUpperCase();
-	document.getElementById("secondaryHeaderFlag").value = secondaryHeaderFlag.toString(16).toUpperCase();
-	document.getElementById("apid").value = apid.toString(16).toUpperCase();
-	document.getElementById("sequenceFlags").value = sequenceFlags.toString(16).toUpperCase();
-	document.getElementById("packetSequenceCount").value = packetSequenceCount.toString(16).toUpperCase();
-	document.getElementById("packetDataLength").value = packetDataLength.toString(10);
-
-	document.getElementById("pusVersionNumber").value = pusVersionNumber.toString(16).toUpperCase();
-	document.getElementById("ackFlags").value = ackFlags.toString(16).toUpperCase();
-	document.getElementById("serviceType").value = serviceType.toString(16).toUpperCase();
-	document.getElementById("serviceSubtype").value = serviceSubtype.toString(16).toUpperCase();
-	document.getElementById("sourceId").value = sourceId.toString(16).toUpperCase();
-	document.getElementById("spare").value = spare.toString(16).toUpperCase();
-
 	document.getElementById("tcPacket").value = tcPacket;
 	document.getElementById("pec").value = pec.toString(16).toUpperCase();
 
@@ -159,7 +162,7 @@ This tool displays the individual fields of the input TC PUS packet in hexadecim
 Input the TC string as either non-delimited hexadecimal bytes e.g. 1860C0000005191101004075 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 and then click 'Display TC Fields' button<br />
 <input type="text" id="inputString" maxLength=600 size=200/><br />
-<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID fields in bytes. This is mission specific and is usually 0, 1 or 2 bytes long.<br />
+<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID field in bytes. This is mission specific and is usually 0, 1 or 2 bytes long.<br />
 <input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific.
 </form>
 
