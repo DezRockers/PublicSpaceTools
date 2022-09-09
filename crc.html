@@ -221,9 +221,15 @@ alert(txt);
 function AddSpaces()
 {
 	var str = document.getElementById("inputString").value;
+
+	// first remove any white space
+	str = str.replace(/\s/g, '');
+
+	// then add space every 2 characters
 	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
 	document.getElementById("inputString").value = result;
 }
+
 
 </script>
 </head>
