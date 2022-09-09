@@ -1,19 +1,10 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
+
+<script src="generic.js"></script>
+
 <script type="text/javascript">
-
-function AddSpaces()
-{
-	var str = document.getElementById("inputString").value;
-
-	// first remove any white space
-	str = str.replace(/\s/g, '');
-
-	// then add space every 2 characters
-	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
-	document.getElementById("inputString").value = result;
-}
 
 function DisplayTcFields()
 {

@@ -1,6 +1,9 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
+
+<script src="generic.js"></script>
+
 <script type="text/javascript">
 
 function DisplayIsoChecksum()
@@ -101,18 +104,6 @@ function Help()
 	txt = txt + "If CK2 = 0, then CK1 = 255.\n";
 	txt = txt + "Place the resulting values of CK1 and CK2 in their destination fields.\n";
 	alert(txt);
-}
-
-function AddSpaces()
-{
-	var str = document.getElementById("inputString").value;
-
-	// first remove any white space
-	str = str.replace(/\s/g, '');
-
-	// then add space every 2 characters
-	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
-	document.getElementById("inputString").value = result;
 }
 
 </script>
