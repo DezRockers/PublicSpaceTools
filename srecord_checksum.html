@@ -1,6 +1,9 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
+
+<script src="generic.js"></script>
+
 <script type="text/javascript">
 
 function DisplayChecksum()
@@ -39,14 +42,6 @@ function DisplayChecksum()
 	}
 	var checksum = CalculateChecksum(bytes);
 	document.getElementById("checksum").value = checksum.toString(16).toUpperCase().padStart(2,'0');
-}
-
-// remove multiple, leading or trailing spaces
-function trim(s) {
-	s = s.replace(/(^\s*)|(\s*$)/gi,"");
-	s = s.replace(/[ ]{2,}/gi," ");
-	s = s.replace(/\n /,"\n");
-	return s;
 }
 
 // Calculates the S record checksum based on the passed in bytes

@@ -36,14 +36,6 @@ function DisplayIsoChecksum()
 	document.getElementById("checksum").value = msb.toString(16).toUpperCase().padStart(2,'0') + " " + lsb.toString(16).toUpperCase().padStart(2,'0');
 }
 
-// remove multiple, leading or trailing spaces
-function trim(s) {
-	s = s.replace(/(^\s*)|(\s*$)/gi,"");
-	s = s.replace(/[ ]{2,}/gi," ");
-	s = s.replace(/\n /,"\n");
-	return s;
-}
-
 // Calculates ISO checksum of the passed in bytes (see ECSS-E-70-41A Annex A Section A.2)
 function CalculateISOChecksum(bytes)
 {
