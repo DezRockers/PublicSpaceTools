@@ -63,15 +63,41 @@ function TM_packet( bytes )
 		var timeRef = (bytes[6] >> 0) & 0xF;
 		var serviceType = bytes[7];
 		var serviceSubtype = bytes[8];
-		var messageTypeCounter = (bytes[9] << 8) + bytes[10];
-		var destinationId = (bytes[11] << 8) + bytes[12];
-		var time = "";
-		packetStartByte = packetStartByte + 7;
-		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("timeLength").value); i++)
+		packetStartByte = packetStartByte + 3;
+
+		// message type counter if present
+		var messageTypeCounter = "";
+		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("msgTypeCntrLength").value); i++)
 		{
-			time = time + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+			messageTypeCounter = messageTypeCounter + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
 		}
-		packetStartByte = packetStartByte + Number(document.getElementById("timeLength").value);
+		packetStartByte = packetStartByte + Number(document.getElementById("msgTypeCntrLength").value);
+
+		// destination id if present
+		var destinationId = "";
+		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("destIdLength").value); i++)
+		{
+			destinationId = destinationId + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+		packetStartByte = packetStartByte + Number(document.getElementById("destIdLength").value);
+
+		// time p-field if present
+		var timePfield = "";
+		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("pFieldLength").value); i++)
+		{
+			timePfield = timePfield + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+		packetStartByte = packetStartByte + Number(document.getElementById("pFieldLength").value);
+
+		// time t-field if present
+		var timeTfield = "";
+		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("timeFieldLength").value); i++)
+		{
+			timeTfield = timeTfield + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
+		packetStartByte = packetStartByte + Number(document.getElementById("timeFieldLength").value);
+
+		// spare field if present
 		var spare = "";
 		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("spareLength").value); i++)
 		{
@@ -86,7 +112,8 @@ function TM_packet( bytes )
 		document.getElementById("serviceSubtype").value = serviceSubtype.toString(16).toUpperCase();
 		document.getElementById("messageTypeCounter").value = messageTypeCounter.toString(10);
 		document.getElementById("destinationId").value = destinationId.toString(16).toUpperCase();
-		document.getElementById("time").value = time.toString(16).toUpperCase();
+		document.getElementById("pField").value = timePfield.toString(16).toUpperCase();
+		document.getElementById("timeField").value = timeTfield.toString(16).toUpperCase();
 		document.getElementById("spare").value = spare.toString(16).toUpperCase();
 
 	}
@@ -123,13 +150,17 @@ function ClearFields()
 // function to display TM packet help message
 function DisplayHelp()
 {
-var txt = "This tool displays the individual fields of the input TM PUS packet in hexadecimal bytes.\n";
+var txt = "This tool displays the individual fields of the input TM CCSDS Space packet in hexadecimal bytes.\n";
+txt = txt + "The information has been taken from ECSS-E-ST-70-41C 15 April 2016 section 7.4.";
 alert(txt);
 }
 
 function SetDefaults()
 {
-	document.getElementById("timeLength").value = 7;
+	document.getElementById("msgTypeCntrLength").value = 2;
+	document.getElementById("destIdLength").value = 2;
+	document.getElementById("pFieldLength").value = 1;
+	document.getElementById("timeFieldLength").value = 7;
 	document.getElementById("spareLength").value = 0;
 }
 
@@ -141,15 +172,18 @@ function SetDefaults()
 <body onload="SetDefaults()">
 <H4 style="color:Silver;">TM Packet</H4>
 <p style="color:Silver;">
-This tool displays the individual fields of the input TM PUS packet in hexadecimal bytes.
+This tool displays the individual fields of the input TM CCSDS packet in hexadecimal bytes.
 </p>
 
 <form id = "getString" style="color:Silver;">
 Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button<br />
 or space delimited hexadecimal bytes and then click 'Display TM Fields' button<br />
 <input type="text" id="inputString" maxLength=4000 size=200/><br />
-<input type="text" id="timeLength" maxLength=10 size=10/>Input the length of the time field in bytes. This is mission specific and is usually 7 bytes long. Default is 7.<br />
-<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific. Default is 0.
+<input type="text" id="msgTypeCntrLength" maxLength=10 size=10/>Input the length of the message type counter field in bytes. The CCSDS value for this is 2 bytes but some missions omit this field.<br />
+<input type="text" id="destIdLength" maxLength=10 size=10/>Input the length of the destination ID field in bytes. The CCSDS value for this is 2 bytes but some missions omit this field.<br />
+<input type="text" id="pFieldLength" maxLength=10 size=10/>Input the length of the time P-field in bytes. This is mission specific and is usually 0 or 1 byte long. Default is 1.<br />
+<input type="text" id="timeFieldLength" maxLength=10 size=10/>Input the length of the time T-field in bytes. This is mission specific and is usually several bytes long. Default is 7.<br />
+<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is mission specific. Default is 0.
 </form>
 
 <button type="button" onclick="AddSpaces()">Add Spaces to TM String</button>
@@ -182,7 +216,8 @@ TM Secondary Header Fields<br />
 <input type="text" id="serviceSubtype" maxLength=10 size=10/>Service Subtype ID (hex)<br />
 <input type="text" id="messageTypeCounter" maxLength=10 size=10/>Message Type Counter (decimal)<br />
 <input type="text" id="destinationId" maxLength=10 size=10/>Destination ID (hex)<br />
-<input type="text" id="time" maxLength=20 size=20/>Time Field (hex)<br />
+<input type="text" id="pField" maxLength=10 size=10/>Time P-Field (hex)<br />
+<input type="text" id="timeField" maxLength=20 size=20/>Time T-Field (hex)<br />
 <input type="text" id="spare" maxLength=10 size=10/>Spare field (hex)<br />
 </form>
 </td>
