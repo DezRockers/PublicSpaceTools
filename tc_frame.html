@@ -116,6 +116,11 @@ function TC_frame( bytes )
 	document.getElementById("tcPacket").value = tcPacket.toString(16).toUpperCase();
 	document.getElementById("frameCrc").value = crc.toString(16).toUpperCase();
 
+	document.getElementById("totalFrameLength").value = bytes.length;
+	document.getElementById("totalHeaderLength").value = 6;
+	document.getElementById("userDataLength").value = bytes.length - 6 - 2;
+	document.getElementById("totalTrailerLength").value = 2;
+
 }
 
 function ClearFields()
@@ -145,13 +150,18 @@ This tool displays the individual fields of the input CCSDS TC frame in hexadeci
 <form id = "getString" style="color:Silver;">
 Input the TC string as either non-delimited hexadecimal bytes e.g. 233F041300C21860C0000005191101004075AB89 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19 11 01 00 40 75 AB 89 and then click 'Display TC Fields' button<br />
-<input type="text" id="inputString" maxLength=600 size=200/><br />
+<input type="text" id="inputString" maxLength=1000 size=200/><br />
 </form>
 
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
 <button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
 <button type="button" onclick="DisplayHelp()">Help</button><br />
+
+<table border="1">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
 
 <form id = "outputs" style="color:Silver;">
 TC Frame Fields<br />
@@ -167,9 +177,24 @@ TC Frame Fields<br />
 <input type="text" id="sequenceFlags" maxLength=10 size=10/>Sequence Flags&emsp;
 <input type="text" id="segmentation" maxLength=32 size=32/>Segmentation Meaning<br />
 <input type="text" id="mapId" maxLength=10 size=10/>MAP Id<br />
-<input type="text" id="tcPacket" maxLength=600 size=200/>TC Packet<br />
+<input type="text" id="tcPacket" maxLength=1000 size=100/>TC Packet<br />
 <input type="text" id="frameCrc" maxLength=10 size=10/>TC Frame CRC (frame error control field)<br />
 </form>
+
+<td style="vertical-align:top;">
+<form id = "userdata" style="color:Silver;">
+Other Useful Data<br />
+<input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Frame Length (decimal)<br />
+<input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
+<input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)
+</form>
+</td>
+
+</td>
+
+</tr>
+</table>
 
 
 </body>
