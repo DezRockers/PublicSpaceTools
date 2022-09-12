@@ -109,6 +109,11 @@ function TC_packet( bytes )
 	document.getElementById("tcPacket").value = tcPacket;
 	document.getElementById("pec").value = pec.toString(16).toUpperCase();
 
+	document.getElementById("totalFrameLength").value = bytes.length;
+	document.getElementById("totalHeaderLength").value = packetStartByte;
+	document.getElementById("userDataLength").value = bytes.length - packetStartByte - 2;
+	document.getElementById("totalTrailerLength").value = 2;
+
 }
 
 function ClearFields()
@@ -191,7 +196,15 @@ TC Secondary Header Fields<br />
 <form id = "userdata" style="color:Silver;">
 TC Packet data<br />
 <input type="text" id="tcPacket" maxLength=4000 size=100/>TC Packet data (hex)<br />
-<input type="text" id="pec" maxLength=10 size=10/>packet error control field (hex)<br />
+<input type="text" id="pec" maxLength=10 size=10/>packet error control field (hex)<br /><br />
+
+Other Useful Data<br />
+<input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Packet Length (decimal)<br />
+<input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
+<input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br /><br />
+
+
 </form>
 </td>
 
