@@ -176,7 +176,15 @@ function DisplayCrossProduct()
 		if (sintheta < -1.0) sintheta = -1.0;
 		theta = Math.asin(sintheta);
 	}
-	document.getElementById("thetasin").value = RadiansToDegrees(theta);
+	var t = document.getElementById("RadiansOrDegrees");
+	if (t.innerHTML=="Outputs in Degrees")
+	{
+		document.getElementById("thetasin").value = (theta);
+	}
+	else
+	{
+		document.getElementById("thetasin").value = RadiansToDegrees(theta);
+	}
 	
 }
 
@@ -205,7 +213,16 @@ function DisplayDotProduct()
 		if (costheta < -1.0) costheta = -1.0;
 		theta = Math.acos(costheta);
 	}
-	document.getElementById("thetacos").value = RadiansToDegrees(theta);
+
+	var t = document.getElementById("RadiansOrDegrees");
+	if (t.innerHTML=="Outputs in Degrees")
+	{
+		document.getElementById("thetacos").value = (theta);
+	}
+	else
+	{
+		document.getElementById("thetacos").value = RadiansToDegrees(theta);
+	}
 }
 
 function ClearVectors()
@@ -224,6 +241,29 @@ function Help()
 	alert(txt);
 }
 
+function RadiansOrDegrees()
+{
+	var t = document.getElementById("RadiansOrDegrees");
+	var thetasinlabel = document.getElementById("thetasinlabel");
+	var thetacoslabel = document.getElementById("thetacoslabel");
+	if (t.innerHTML=="Outputs in Degrees")
+	{
+		t.innerHTML = "Outputs in Radians";
+		thetasinlabel.innerHTML = "&theta; (degs)";
+		thetacoslabel.innerHTML = "&theta; (degs)";
+		document.getElementById("thetacos").value = RadiansToDegrees(document.getElementById("thetacos").value);
+		document.getElementById("thetasin").value = RadiansToDegrees(document.getElementById("thetasin").value);
+	}
+	else
+	{
+		t.innerHTML = "Outputs in Degrees";
+		thetasinlabel.innerHTML = "&theta; (rads)";
+		thetacoslabel.innerHTML = "&theta; (rads)";
+		document.getElementById("thetacos").value = DegreesToRadians(document.getElementById("thetacos").value);
+		document.getElementById("thetasin").value = DegreesToRadians(document.getElementById("thetasin").value);
+	}
+}
+
 </script>
 </head>
 
@@ -235,10 +275,14 @@ function Help()
 <td style="vertical-align:top;">
 <form id = "vector1" style="color:Silver;">
 Vector 1<br />
-<input type="text" id="x1" />x1<br />
-<input type="text" id="y1" />y1<br />
-<input type="text" id="z1" />z1<br />
-<input type="text" id="magnitude1" /><u><b>|v1|</b></u><br />
+<input type="text" id="x1" />
+<label for="x1">x<sub>1</sub></label><br />
+<input type="text" id="y1" />
+<label for="y1">y<sub>1</sub></label><br />
+<input type="text" id="z1" />
+<label for="z1">z<sub>1</sub></label><br />
+<input type="text" id="magnitude1" />
+<label for="magnitude1"><b>|<u>v</u><sub>1</sub>|</b></label><br />
 </form>
 <button type="button" onclick="MagnitudeV1()">Magnitude of V1</button><br />
 <button type="button" onclick="NormaliseV1()">Normalise V1</button><br />
@@ -250,10 +294,14 @@ Vector 1<br />
 <td style="vertical-align:top;">
 <form id = "vector2" style="color:Silver;">
 Vector 2<br />
-<input type="text" id="x2" />x2<br />
-<input type="text" id="y2" />y2<br />
-<input type="text" id="z2" />z2<br />
-<input type="text" id="magnitude2" /><u><b>|v2|</b></u><br />
+<input type="text" id="x2" />
+<label for="x2">x<sub>2</sub></label><br />
+<input type="text" id="y2" />
+<label for="y2">y<sub>2</sub></label><br />
+<input type="text" id="z2" />
+<label for="z2">z<sub>2</sub></label><br />
+<input type="text" id="magnitude2" />
+<label for="magnitude2"><b>|<u>v</u><sub>2</sub>|</b></label><br />
 </form>
 <button type="button" onclick="MagnitudeV2()">Magnitude of V2</button><br />
 <button type="button" onclick="NormaliseV2()">Normalise V2</button><br />
@@ -263,11 +311,16 @@ Vector 2<br />
 <td style="vertical-align:top;">
 <form id = "OutputVector" style="color:Silver;">
 Cross Product<br />
-<input type="text" id="x" />x<br />
-<input type="text" id="y" />y<br />
-<input type="text" id="z" />z<br />
-<input type="text" id="magnitude" /><u><b>|v|</b></u><br />
-<input type="text" id="thetasin" />&theta; (degs)<br />
+<input type="text" id="x" />
+<label for="x" style="padding-right:50px;">x</label><br />
+<input type="text" id="y" />
+<label for="y" style="padding-right:50px;">y</label><br />
+<input type="text" id="z" />
+<label for="z" style="padding-right:50px;">z</label><br />
+<input type="text" id="magnitude" />
+<label for="magnitude"><u><b>|v|</b></u></label><br />
+<input type="text" id="thetasin" />
+<label id = "thetasinlabel" for="thetasin">&theta; (degs)</label><br />
 </form>
 <button type="button" onclick="NormaliseV()">Normalise V</button><br />
 <button type="button" onclick="DenormaliseV()">Denormalise V</button><br />
@@ -277,10 +330,14 @@ Cross Product<br />
 <td style="vertical-align:top;">
 <form id = "OutputScalar" style="color:Silver;">
 Scalar Dot Product<br />
-<input type="text" id="r" />r<br />
-<input type="text" id="thetacos" />&theta; (degs)<br />
+<input type="text" id="r" />
+<label for="r" style="padding-right:50px;">r</label><br />
+<input type="text" id="thetacos" />
+<label id="thetacoslabel" for="thetacos">&theta; (degs)</label><br />
 </form>
 <button type="button" onclick="DisplayDotProduct()">Scalar Dot Product</button><br />
+<button type="button" onclick="RadiansOrDegrees()" id="RadiansOrDegrees">Outputs in Radians</button><br />
+
 </td>
 
 </tr>
