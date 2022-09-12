@@ -1,4 +1,5 @@
 // define some generic javascript functions
+var pi = 3.1415926535897932384626433832795;
 
 // add white space between every 2 chars of a string
 function AddSpaces()
@@ -28,6 +29,20 @@ function trim(s) {
 	s = s.replace(/\n /,"\n");
 	return s;
 }
+
+// function to convert degrees to radians
+function DegreesToRadians(x)
+{
+	return x * pi / 180;
+}
+
+// function to convert radians to degrees
+function RadiansToDegrees(x)
+{
+	return x * 180 / pi;
+}
+
+
 
 
 

@@ -1,6 +1,9 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
+
+<script src="generic.js"></script>
+
 <script type="text/javascript">
 
 function VectorMagnitude(V)
@@ -22,10 +25,34 @@ function Normalise(V)
 
 function Denormalise(R,V)
 {
+
+	// we shouldn't keep denormalising a normalised vector
+	// so we need to ensure we are first normalised
+	V = Normalise(V);
 	V[0] = R * V[0];
 	V[1] = R * V[1];
 	V[2] = R * V[2];
 	return V;
+}
+
+function MagnitudeV1()
+{
+	var V1 = new Array();
+	V1[0] = document.getElementById("x1").value;
+	V1[1] = document.getElementById("y1").value;
+	V1[2] = document.getElementById("z1").value;
+	R = VectorMagnitude(V1);
+	document.getElementById("magnitude1").value = R;
+}
+
+function MagnitudeV2()
+{
+	var V2 = new Array();
+	V2[0] = document.getElementById("x2").value;
+	V2[1] = document.getElementById("y2").value;
+	V2[2] = document.getElementById("z2").value;
+	R = VectorMagnitude(V2);
+	document.getElementById("magnitude2").value = R;
 }
 
 function NormaliseV1()
@@ -34,12 +61,10 @@ function NormaliseV1()
 	V1[0] = document.getElementById("x1").value;
 	V1[1] = document.getElementById("y1").value;
 	V1[2] = document.getElementById("z1").value;
-	var R = VectorMagnitude(V1);
 	V1 = Normalise(V1);
 	document.getElementById("x1").value = V1[0];
 	document.getElementById("y1").value = V1[1];
 	document.getElementById("z1").value = V1[2];
-	document.getElementById("magnitude1").value = R;
 }
 
 function NormaliseV2()
@@ -48,12 +73,10 @@ function NormaliseV2()
 	V2[0] = document.getElementById("x2").value;
 	V2[1] = document.getElementById("y2").value;
 	V2[2] = document.getElementById("z2").value;
-	var R = VectorMagnitude(V2);
 	V2 = Normalise(V2);
 	document.getElementById("x2").value = V2[0];
 	document.getElementById("y2").value = V2[1];
 	document.getElementById("z2").value = V2[2];
-	document.getElementById("magnitude2").value = R;
 }
 
 function NormaliseV()
@@ -62,12 +85,10 @@ function NormaliseV()
 	V[0] = document.getElementById("x").value;
 	V[1] = document.getElementById("y").value;
 	V[2] = document.getElementById("z").value;
-	var R = VectorMagnitude(V);
 	V = Normalise(V);
 	document.getElementById("x").value = V[0];
 	document.getElementById("y").value = V[1];
 	document.getElementById("z").value = V[2];
-	document.getElementById("magnitude").value = R;
 }
 
 function DenormaliseV1()
@@ -81,7 +102,6 @@ function DenormaliseV1()
 	document.getElementById("x1").value = V1[0];
 	document.getElementById("y1").value = V1[1];
 	document.getElementById("z1").value = V1[2];
-	document.getElementById("magnitude1").value = 0;
 }
 
 function DenormaliseV2()
@@ -95,7 +115,6 @@ function DenormaliseV2()
 	document.getElementById("x2").value = V2[0];
 	document.getElementById("y2").value = V2[1];
 	document.getElementById("z2").value = V2[2];
-	document.getElementById("magnitude2").value = 0;
 }
 
 function DenormaliseV()
@@ -109,7 +128,6 @@ function DenormaliseV()
 	document.getElementById("x").value = V[0];
 	document.getElementById("y").value = V[1];
 	document.getElementById("z").value = V[2];
-	document.getElementById("magnitude").value = 0;
 }
 
 function CrossProduct(V1, V2)
@@ -147,11 +165,24 @@ function DisplayCrossProduct()
 	document.getElementById("x").value = V[0];
 	document.getElementById("y").value = V[1];
 	document.getElementById("z").value = V[2];
+
+	document.getElementById("magnitude").value = VectorMagnitude(V);
+
+	var theta = 0.0;
+	if (VectorMagnitude(V1)*VectorMagnitude(V2) != 0.0)
+	{
+		var sintheta = VectorMagnitude(V)/(VectorMagnitude(V1)*VectorMagnitude(V2));
+		if (sintheta > 1.0) sintheta = 1.0;
+		if (sintheta < -1.0) sintheta = -1.0;
+		theta = Math.asin(sintheta);
+	}
+	document.getElementById("thetasin").value = RadiansToDegrees(theta);
+	
 }
 
 function DisplayDotProduct()
 {
-	document.getElementById("OutputVector").reset();
+	document.getElementById("OutputScalar").reset();
 	var V1 = new Array();
 	var V2 = new Array();
 
@@ -164,14 +195,33 @@ function DisplayDotProduct()
 	V2[2] = document.getElementById("z2").value;
 
 	var R = DotProduct(V1, V2);
-	document.getElementById("magnitude").value = R;
+	document.getElementById("r").value = R;
+
+	var theta = 0.0;
+	if (VectorMagnitude(V1)*VectorMagnitude(V2) != 0.0)
+	{
+		var costheta = R/(VectorMagnitude(V1)*VectorMagnitude(V2));
+		if (costheta > 1.0) costheta = 1.0;
+		if (costheta < -1.0) costheta = -1.0;
+		theta = Math.acos(costheta);
+	}
+	document.getElementById("thetacos").value = RadiansToDegrees(theta);
 }
 
 function ClearVectors()
 {
-document.getElementById("vector1").reset();
-document.getElementById("vector2").reset();
-document.getElementById("OutputVector").reset();
+	document.getElementById("vector1").reset();
+	document.getElementById("vector2").reset();
+	document.getElementById("OutputVector").reset();
+	document.getElementById("OutputScalar").reset();
+}
+
+function Help()
+{
+	var txt = "The angle, theta, between the two vectors v1 and v2 is computed from either the dot product or the cross product as follows:\n";
+	txt = txt + "theta = acos((v1.v2) / |v1||v2|)\n";
+	txt = txt + "theta = asin(|v1Xv2|/|v1||v2|)";
+	alert(txt);
 }
 
 </script>
@@ -180,9 +230,6 @@ document.getElementById("OutputVector").reset();
 <body>
 <H4 style="color:Silver;">Vector Products</H4>
 <table border="1">
-  <col valign="top" />
-  <col valign="top" />
-  <col valign="top" />
 <tr id="tr1">
 
 <td style="vertical-align:top;">
@@ -193,8 +240,11 @@ Vector 1<br />
 <input type="text" id="z1" />z1<br />
 <input type="text" id="magnitude1" /><u><b>|v1|</b></u><br />
 </form>
+<button type="button" onclick="MagnitudeV1()">Magnitude of V1</button><br />
 <button type="button" onclick="NormaliseV1()">Normalise V1</button><br />
 <button type="button" onclick="DenormaliseV1()">Denormalise V1</button><br />
+<button type="button" onclick="ClearVectors()">Clear All</button><br />
+<button type="button" onclick="Help()">Help</button><br />
 </td>
 
 <td style="vertical-align:top;">
@@ -205,23 +255,32 @@ Vector 2<br />
 <input type="text" id="z2" />z2<br />
 <input type="text" id="magnitude2" /><u><b>|v2|</b></u><br />
 </form>
+<button type="button" onclick="MagnitudeV2()">Magnitude of V2</button><br />
 <button type="button" onclick="NormaliseV2()">Normalise V2</button><br />
 <button type="button" onclick="DenormaliseV2()">Denormalise V2</button><br />
 </td>
 
 <td style="vertical-align:top;">
 <form id = "OutputVector" style="color:Silver;">
-Output Vector<br />
+Cross Product<br />
 <input type="text" id="x" />x<br />
 <input type="text" id="y" />y<br />
 <input type="text" id="z" />z<br />
 <input type="text" id="magnitude" /><u><b>|v|</b></u><br />
+<input type="text" id="thetasin" />&theta; (degs)<br />
 </form>
 <button type="button" onclick="NormaliseV()">Normalise V</button><br />
 <button type="button" onclick="DenormaliseV()">Denormalise V</button><br />
 <button type="button" onclick="DisplayCrossProduct()">Vector Cross Product</button><br />
+</td>
+
+<td style="vertical-align:top;">
+<form id = "OutputScalar" style="color:Silver;">
+Scalar Dot Product<br />
+<input type="text" id="r" />r<br />
+<input type="text" id="thetacos" />&theta; (degs)<br />
+</form>
 <button type="button" onclick="DisplayDotProduct()">Scalar Dot Product</button><br />
-<button type="button" onclick="ClearVectors()">Clear vectors</button><br />
 </td>
 
 </tr>

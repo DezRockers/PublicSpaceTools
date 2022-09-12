@@ -1,11 +1,13 @@
 <html>
 <head>
+
+<script src="generic.js"></script>
+
 <script type="text/javascript">
 
 // the following JavaScript functions are taken from my document DDDAPP1.doc
 // which is downloaded by the link AOCS Math Models
 
-var pi = 3.1415926535897932384626433832795;
 var mu = 398600.4418;	// earth gravitational constant in km3/s2
 var Re = 6378.0;	// earth equatorial radius in km
 var flat = 1.0/298.257;	// earth flattening factor at the poles
@@ -26,18 +28,6 @@ txt = txt + "Omega = " + Omega + " degrees\n";
 txt = txt + "w = " + w + " degrees\n";
 txt = txt + "f = " + f + " degrees\n";
 alert(txt);
-}
-
-// function to convert degrees to radians
-function DegreesToRadians(x)
-{
-	return x * pi / 180;
-}
-
-// function to convert radians to degrees
-function RadiansToDegrees(x)
-{
-	return x * 180 / pi;
 }
 
 // function to compute R
