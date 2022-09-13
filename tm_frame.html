@@ -138,8 +138,9 @@ function SetDefaults()
 // function to display TC frame help message
 function DisplayHelp()
 {
-var txt = "This tool displays the individual fields of the input CCSDS TM frame in hexadecimal bytes.\n";
-alert(txt);
+	var txt = "This tool displays the individual fields of the input CCSDS TM frame (excluding ASW) in hexadecimal bytes.\n";
+	txt = txt + "It uses information taken from ECSS standards document ECSS-E-ST-50-03C 31 July 2008.";
+	alert(txt);
 }
 
 
@@ -149,12 +150,11 @@ alert(txt);
 <body onload="SetDefaults()">
 <H4 style="color:Silver;">TM Frame</H4>
 <p style="color:Silver;">
-This tool displays the individual fields of the input CCSDS TM frame in hexadecimal bytes.
+This tool displays the individual fields of the input CCSDS TM frame (excluding ASW) in hexadecimal bytes.
 </p>
 
 <form id = "getString" style="color:Silver;">
-Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button<br />
-or space delimited hexadecimal bytes and then click 'Display TM Fields' button<br />
+Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button or space delimited hexadecimal bytes and then click 'Display TM Fields' button<br />
 <input type="text" id="inputString" maxLength=4000 size=200/><br />
 <input type="text" id="ocfLength" maxLength=10 size=10/>Input the length of the OCF field in bytes. This is mission specific and is usually 0 or 4 bytes long.<br />
 <input type="text" id="fecfLength" maxLength=10 size=10/>Input the length of the FECF field in bytes. This is also mission specific and is usually 2 bytes long.

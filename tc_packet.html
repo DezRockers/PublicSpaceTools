@@ -130,8 +130,9 @@ function ClearFields()
 // function to display TC packet help message
 function DisplayHelp()
 {
-var txt = "This tool displays the individual fields of the input TC PUS packet in hexadecimal bytes.\n";
-alert(txt);
+	var txt = "This tool displays the individual fields of the input TC CCSDS Space packet in hexadecimal bytes.\n";
+	txt = txt + "The information has been taken from ECSS-E-ST-70-41C 15 April 2016 section 7.4.";
+	alert(txt);
 }
 
 function SetDefaults()
@@ -148,7 +149,7 @@ function SetDefaults()
 <body onload="SetDefaults()">
 <H4 style="color:Silver;">TC Packet</H4>
 <p style="color:Silver;">
-This tool displays the individual fields of the input TC PUS packet in hexadecimal bytes.
+This tool displays the individual fields of the input TC CCSDS Space packet in hexadecimal bytes.
 </p>
 
 <form id = "getString" style="color:Silver;">

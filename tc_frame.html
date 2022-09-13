@@ -132,9 +132,10 @@ function ClearFields()
 // function to display TC frame help message
 function DisplayHelp()
 {
-var txt = "This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.\n";
-txt = txt + "It assumes that the transfer sublayer below the segmentation sublayer consists of the contained TC packet data.\n";
-alert(txt);
+	var txt = "This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.\n";
+	txt = txt + "It assumes that the transfer sublayer below the segmentation sublayer consists of the contained TC packet data.\n";
+	txt = txt + "It uses information taken from ECSS standards document ECSS-E-ST-50-04C 31 July 2008.\n";
+	alert(txt);
 }
 
 
