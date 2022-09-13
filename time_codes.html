@@ -1,0 +1,577 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+
+<script src="generic.js"></script>
+
+<script type="text/javascript">
+
+// the following code is based on information contained in CCSDS Time Code Formats CCSDS 301.0-B-4
+
+function Decode()
+{
+	// first decode the P-Field
+	var str = document.getElementById("pField").value;
+	str = trim(str);
+	var bytes = new Array();
+	bytes = str.split(" ");
+	if (bytes.length > 1) 
+	{
+		alert("P Field length should be 1 octet. Try again.");
+		return;
+	}
+
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+
+	var value = document.getElementById("format").value;
+	switch (value)
+	{
+		case "CUC":
+			DecodeCuc(bytes[0]);
+			break;
+		case "CDS":
+			DecodeCds(bytes[0]);
+			break;
+		case "CCS":
+			DecodeCcs(bytes[0]);
+			break;
+	}
+}
+
+function DecodeCuc(pField)
+{
+	// decode the P field
+	var extensionBit = (pField >> 7) & 0x1;
+	if (extensionBit == 1)
+	{
+		alert("P field extension bit is 1 which is not supported. Try again.");
+	}
+	var timeCodeId = (pField >> 4) & 0x7;
+	if ((timeCodeId != 0b001) && (timeCodeId != 0b010))
+	{
+		alert("Time code id is 0b" + timeCodeId.toString(2).padStart(3,'0') + " but should be 0b001 or 0b010 for CUC format.");
+	}
+	var numberBasicOctets = ((pField >> 2) & 0x3) + 1;
+	var numberFractionalOctets = ((pField >> 0) & 0x3);
+
+	document.getElementById("pField1").value = extensionBit;
+	switch (timeCodeId)
+	{
+		case 1:
+			document.getElementById("pField2").value = "1 Jan 1958";
+			break;
+			
+		case 2:
+			document.getElementById("pField2").value = "Agency defined epoch";
+			break;
+		default:
+			document.getElementById("pField2").value = "Unknown time code";
+			break;
+	}
+	document.getElementById("pField3").value = numberBasicOctets;
+	document.getElementById("pField4").value = numberFractionalOctets;
+
+	// decode the T field
+	var bytes = new Array();
+	bytes = ReadTField();
+
+	// first check the length
+	var lengthFromPfield = numberBasicOctets + numberFractionalOctets;
+	if (bytes.length != lengthFromPfield)
+	{
+		var txt = "The length of the T-Field " + bytes.length + " is not equal to the length specified by the CUC P-field " + lengthFromPfield + ".\n";
+		txt = txt + "Try again.";
+		alert(txt);
+		return;
+	}
+
+	var timeInSeconds = 0.0;
+	for (i = 0; i < numberBasicOctets; i++)
+	{
+		timeInSeconds = timeInSeconds + bytes[i]*Math.pow(256.0, (numberBasicOctets-1-i));
+	}
+	for (i = 0; i < numberFractionalOctets; i++)
+	{
+		timeInSeconds = timeInSeconds + bytes[i+numberBasicOctets]*Math.pow(256.0, -1-i);
+	}
+	document.getElementById("tField1").value = timeInSeconds;
+	document.getElementById("tField2").value = "";
+}
+
+function DecodeCds(pField)
+{
+	// decode the P field
+	var timeCodeId = (pField >> 4) & 0x7;
+	if (timeCodeId != 0b100)
+	{
+		alert("Time code id is 0b" + timeCodeId.toString(2).padStart(3,'0') + " but should be 0b100 for CDS format.");
+	}
+	var epochId = (pField >> 3) & 0x1;
+	var lengthOfDaySegment = ((pField >> 2) & 0x1);
+	var lengthOfSubmilliSegment = ((pField >> 0) & 0x3);
+
+	var lengthOfDaySegmentBytes = 0;
+	var lengthOfSubmilliSegmentBytes = 0;
+
+	document.getElementById("pField1").value = "0b" + timeCodeId.toString(2).padStart(3,'0');	// should be 0b100
+	switch (epochId)
+	{
+		case 0:
+			document.getElementById("pField2").value = "1 Jan 1958";
+			break;
+			
+		case 1:
+			document.getElementById("pField2").value = "Agency defined epoch";
+			break;
+	}
+	switch (lengthOfDaySegment)
+	{
+		case 0:
+			document.getElementById("pField3").value = "16-bit";
+			lengthOfDaySegmentBytes = 2;
+			break;
+			
+		case 1:
+			document.getElementById("pField3").value = "24-bit";
+			lengthOfDaySegmentBytes = 3;
+			break;
+	}
+	switch (lengthOfSubmilliSegment)
+	{
+		case 0:
+			document.getElementById("pField4").value = "absent (millisec)";
+			lengthOfSubmilliSegmentBytes = 0;
+			break;
+			
+		case 1:
+			document.getElementById("pField4").value = "16-bit (microsec)";
+			lengthOfSubmilliSegmentBytes = 2;
+			break;
+		case 2:
+			document.getElementById("pField4").value = "32-bit (picosec)";
+			lengthOfSubmilliSegmentBytes = 4;
+			break;
+		case 3:
+			document.getElementById("pField4").value = "reserved";
+			break;
+	}
+
+	// decode the T field
+	var bytes = new Array();
+	bytes = ReadTField();
+
+	// first check the length
+	var lengthFromPfield = lengthOfDaySegmentBytes + lengthOfSubmilliSegmentBytes + 4;
+	if (bytes.length != lengthFromPfield)
+	{
+		var txt = "The length of the T-Field " + bytes.length + " is not equal to the length specified by the CDS P-field " + lengthFromPfield + ".\n";
+		txt = txt + "Try again.";
+		alert(txt);
+		return;
+	}
+
+	var days = 0;
+	for (i = 0; i < lengthOfDaySegmentBytes; i++)
+	{
+		days = days + bytes[i]*Math.pow(256.0, (lengthOfDaySegmentBytes-1-i));
+	}
+	var milliseconds = 0.0;
+	for (i = 0; i < 4; i++)
+	{
+		milliseconds = milliseconds + bytes[i+lengthOfDaySegmentBytes]*Math.pow(256.0, 3-i);
+	}
+	var numberMilliSecondsInDay = 86400 * 1000;
+	if (milliseconds > numberMilliSecondsInDay)
+	{
+		alert("The number of millisconds " + milliseconds + " is more than the number in a day " + numberMilliSecondsInDay + ". Rolling over.");
+		var delta = Math.floor(milliseconds / numberMilliSecondsInDay);
+		days = days + delta;
+		milliseconds = milliseconds % numberMilliSecondsInDay;
+	}
+
+	for (i = 0; i < lengthOfSubmilliSegmentBytes; i++)
+	{
+		milliseconds = milliseconds + bytes[i+lengthOfDaySegmentBytes+4]*Math.pow(256.0, -1-i);
+	}
+
+	document.getElementById("tField1").value = days;
+	document.getElementById("tField2").value = milliseconds;
+}
+
+function DecodeCcs(pField)
+{
+	// decode the P field
+	var timeCodeId = (pField >> 4) & 0x7;
+	if (timeCodeId != 0b101)
+	{
+		alert("Time code id is 0b" + timeCodeId.toString(2).padStart(3,'0') + " but should be 0b101 for CCS format.");
+	}
+	document.getElementById("pField1").value = "0b" + timeCodeId.toString(2).padStart(3,'0');	// should be 0b101
+
+	var calendarVarFlag = (pField >> 3) & 0x1;
+	switch (calendarVarFlag)
+	{
+		case 0:
+			document.getElementById("pField2").value = "MOY/DOM variation";
+			document.getElementById("tField1Label").innerHTML="YR/MO/DOM:hh:mm:ss";
+			document.getElementById("tField2Label").innerHTML="Fraction of second";
+			break;
+		case 1:
+			document.getElementById("pField2").value = "DOY variation";
+			document.getElementById("tField1Label").innerHTML="YR/DOY:hh:mm:ss";
+			document.getElementById("tField2Label").innerHTML="Fraction of second";
+			break;
+	}
+
+	var resolution = ((pField >> 0) & 0x7);	// the resolution number gives the extra number of fractional bytes
+	switch (resolution)
+	{
+		case 0:
+			document.getElementById("pField3").value = "1s";
+			break;
+		case 1:
+			document.getElementById("pField3").value = "10e-2s";
+			break;
+		case 2:
+			document.getElementById("pField3").value = "10e-4s";
+			break;
+		case 3:
+			document.getElementById("pField3").value = "10e-6s";
+			break;
+		case 4:
+			document.getElementById("pField3").value = "10e-8s";
+			break;
+		case 5:
+			document.getElementById("pField3").value = "10e-10s";
+			break;
+		case 6:
+			document.getElementById("pField3").value = "10e-12s";
+			break;
+		case 7:
+			document.getElementById("pField3").value = "not used";
+			break;
+	}
+
+	// decode the T field
+	var bytes = new Array();
+	bytes = ReadTField();
+
+	// first check the length
+	var lengthFromPfield = resolution + 7;
+	if (bytes.length != lengthFromPfield)
+	{
+		var txt = "The length of the T-Field " + bytes.length + " is not equal to the length specified by the CCS P-field " + lengthFromPfield + ".\n";
+		txt = txt + "Try again.";
+		alert(txt);
+		return;
+	}
+
+	var year = "0001";
+	var month = "01";
+	var dayOfMonth = "01";
+	var dayOfYear = "0001";
+	var hours = "00";
+	var minutes = "00";
+	var seconds = "00";
+	var fraction = "0.";
+	var msb = 0;
+	var lsb = 0;
+
+	// do the year
+	msb = ByteToDecimal(bytes[0]);
+	lsb = ByteToDecimal(bytes[1]);
+	year = (msb*100 + lsb).toString(10).padStart(4,'0');
+
+	if (calendarVarFlag == 0)
+	{
+		// do the month etc
+		month = ByteToString(bytes[2]);
+		dayOfMonth = ByteToString(bytes[3]);
+	}
+	else
+	{
+		// do the day of year etc
+		msb = ByteToDecimal(bytes[2]);
+		lsb = ByteToDecimal(bytes[3]);
+		dayOfYear = (msb*100 + lsb).toString(10).padStart(3,'0');
+	}
+	hours = ByteToString(bytes[4]);
+	minutes = ByteToString(bytes[5]);
+	seconds = ByteToString(bytes[6]);
+
+	// check that all fields are within the specified ranges for their types
+	CheckAllRanges(Number(year),Number(month),Number(dayOfMonth),Number(dayOfYear),Number(hours),Number(minutes),Number(seconds));
+
+	if (calendarVarFlag == 0)
+	{
+		document.getElementById("tField1").value = year + '/' + month + '/' + dayOfMonth + ':' + hours + ':' + minutes + ':' + seconds;
+	}
+	else
+	{
+		document.getElementById("tField1").value = year + '/' + dayOfYear + ':' + hours + ':' + minutes + ':' + seconds;
+	}
+
+	// now do the fraction
+	for (i = 7; i < 7 + resolution; i++)
+	{
+		fraction = fraction + ByteToString(bytes[i]);
+	}
+	document.getElementById("tField2").value = fraction;
+}
+
+function CheckAllRanges(year,month,dayOfMonth,dayOfYear,hours,minutes,seconds)
+{
+	if ((year < 1) || (year > 9999))
+	{
+		alert("Year " + year + " is outside range 1-9999");
+	}
+
+	if ((month < 1) || (month > 12))
+	{
+		alert("Month " + month + " is outside range 1-12");
+	}
+	switch (month)
+	{
+		case 1:
+		case 3:
+		case 5:
+		case 7:
+		case 8:
+		case 10:
+		case 12:
+			if ((dayOfMonth < 1) || (dayOfMonth > 31))
+			{
+				alert("Day of month " + dayOfMonth + " is outside range 1-31 for month " + month);
+			}
+			break;
+		case 4:
+		case 6:
+		case 9:
+		case 11:
+			if ((dayOfMonth < 1) || (dayOfMonth > 30))
+			{
+				alert("Day of month " + dayOfMonth + " is outside range 1-30 for month " + month);
+			}
+			break;
+		case 2:
+			if ((dayOfMonth < 1) || (dayOfMonth > 29))
+			{
+				alert("Day of month " + dayOfMonth + " is outside range 1-29 for month " + month);
+			}
+			break;
+		default:
+			break;
+	}
+	if ((dayOfYear < 1) || (dayOfYear > 366))
+	{
+		alert("Day Of Year " + dayOfYear + " is outside range 1-366");
+	}
+	if ((hours < 0) || (hours > 23))
+	{
+		alert("Hour of day " + hours + " is outside range 0-23");
+	}
+	if ((minutes < 0) || (minutes > 59))
+	{
+		alert("Minute of hour " + minutes + " is outside range 0-59");
+	}
+	if ((seconds < 0) || (seconds > 59))
+	{
+		alert("Seconds of minute " + seconds + " is outside range 0-59");
+	}
+
+}
+
+function ByteToDecimal(byte)
+{
+	var nibble1 = (byte >> 4) & 0xF;
+	var nibble2 = (byte >> 0) & 0xF;
+
+	if ((nibble1 >= 10) || (nibble2 >= 10))
+	{
+		alert("Byte " + byte.toString(16).padStart(2,'0') + " does not represent a decimal");
+		return 0;
+	}
+	return (nibble1*10 + nibble2);
+}
+
+function ByteToString(byte)
+{
+	byte = ByteToDecimal(byte);
+	return byte.toString(10).padStart(2,'0');
+}
+
+function ReadTField()
+{
+	var str = document.getElementById("tField").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+	return bytes;
+}
+
+
+function ClearAll()
+{
+	document.getElementById("PField").reset();
+	document.getElementById("TField").reset();
+	document.getElementById("Format").reset();
+	document.getElementById("PFieldOutputs").reset();
+	document.getElementById("TFieldOutputs").reset();
+}
+
+function Help()
+{
+	var txt = "This tool converts the input P and T field time code formats into human readable times.\n";
+	txt = txt + "CUC, CDS and CCS time code formats are supported.\n";
+	txt = txt + "See document CCSDS Time Code Formats CCSDS 301.0-B-4 for details.";
+	alert(txt);
+}
+
+// callback function for when the drop down selction changes
+function TimeCodeCallback(format)
+{
+	var value = document.getElementById("format").value;
+	switch (value)
+	{
+		case "CUC":
+			document.getElementById("pField1Label").innerHTML="P-Field Extension";
+			document.getElementById("pField2Label").innerHTML="Time code identification";
+			document.getElementById("pField3Label").innerHTML="Number of basic octets";
+			document.getElementById("pField4Label").innerHTML="Number of fractional octets";
+
+			document.getElementById("tField1Label").innerHTML="Seconds from fixed epoch";
+			document.getElementById("tField2Label").innerHTML="";
+
+			break;
+		case "CDS":
+			document.getElementById("pField1Label").innerHTML="Time code id (binary)";
+			document.getElementById("pField2Label").innerHTML="Epoch identification";
+			document.getElementById("pField3Label").innerHTML="Length of day segment";
+			document.getElementById("pField4Label").innerHTML="Length of submillisecond segment";
+
+			document.getElementById("tField1Label").innerHTML="Days from fixed epoch";
+			document.getElementById("tField2Label").innerHTML="Milliseconds of day";
+
+			break;
+		case "CCS":
+			document.getElementById("pField1Label").innerHTML="Time code id (binary)";
+			document.getElementById("pField2Label").innerHTML="Calendar variation flag";
+			document.getElementById("pField3Label").innerHTML="Resolution";
+			document.getElementById("pField4Label").innerHTML="";
+
+			document.getElementById("tField1Label").innerHTML="YR/MO/DOM:hh:mm:ss";
+			document.getElementById("tField2Label").innerHTML="Fraction of second";
+
+			break;
+	}
+	document.getElementById("PFieldOutputs").reset();
+	document.getElementById("TFieldOutputs").reset();
+}
+
+
+</script>
+</head>
+
+<body onload="TimeCodeCallback()">
+<H4 style="color:Silver;">CCSDS Time Codes</H4>
+<table border="1">
+
+<tr id="tr1">
+<H4 style="color:Silver;">Time Code Format (hex strings)</H4>
+
+<td style="vertical-align:top;">
+<form id = "PField" style="color:Silver;">
+<input type="text" id="pField" size=20/>
+<label style="padding-right:150px;">P-Field</label>
+</form>
+</td>
+
+<td style="vertical-align:top;">
+<form id = "TField" style="color:Silver;">
+<input type="text" id="tField" maxLength=40 size=30/>
+<label style="padding-right:100px;">T-Field</label>
+</form>
+</td>
+
+<td style="vertical-align:top;">
+<form id = "Format" style="color:Silver;">
+<select name="format" id="format" onchange="TimeCodeCallback()">
+	<option value="CUC">CUC</option>
+	<option value="CDS">CDS</option>
+	<option value="CCS">CCS</option>
+</select>
+<label for="format">Input the time code format</label>
+</form>
+</td>
+
+</tr>
+
+
+<tr id="tr2">
+<td style="vertical-align:top;">
+<button type="button" onclick="Decode()">Decode Time</button>
+</td>
+<td style="vertical-align:top;">
+<button type="button" onclick="ClearAll()">Clear All</button>
+</td>
+<td style="vertical-align:top;">
+<button type="button" onclick="Help()">Help</button>
+</td>
+</tr>
+
+<tr id="tr3">
+
+<td style="vertical-align:top;">
+<form id = "PFieldOutputs" style="color:Silver;">
+<input type="text" id="pField1" size=15/>
+<label id="pField1Label" for="pField1">P-Field Extension</label><br />
+<input type="text" id="pField2" size=15/>
+<label id="pField2Label" for="pField2">Time code identification</label><br />
+<input type="text" id="pField3" size=15/>
+<label id="pField3Label" for="pField3">Number of basic octets</label><br />
+<input type="text" id="pField4" size=15/>
+<label id="pField4Label" for="pField4">Number of fractional octets</label><br />
+</form>
+</td>
+
+<td style="vertical-align:top;">
+<form id = "TFieldOutputs" style="color:Silver;">
+<input type="text" id="tField1" size=20/>
+<label id="tField1Label" for="tField1">Seconds from fixed epoch</label><br />
+<input type="text" id="tField2" size=20/>
+<label id="tField2Label" for="tField2"></label><br />
+</form>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>
+
