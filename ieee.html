@@ -50,6 +50,27 @@ function GetIeeeFloatFromInteger()
 	var pData = document.getElementById("integerIn").value;
 	var SizeInBits = Number(document.getElementById("bitLength").value);
 
+	// check for correct input data length
+	switch (SizeInBits)
+	{
+		case 32:
+			if (pData.length != 10)
+			{
+				alert("The input integer needs to be 10 characters long including the '0x'.\n e.g. '0x3F800000'.\n Try again.");
+				return;
+			}
+			break;
+		case 64:
+			if (pData.length != 18)
+			{
+				alert("The input integer needs to be 18 characters long including the '0x'.\n e.g. '0x3FF0000000000000'.\n Try again.");
+				return;
+			}
+			break;
+		default:
+			return;
+	}
+
 	var Value = 0.0;
 	var Sign = 1.0;
 	var Exponent = 0;
@@ -189,7 +210,8 @@ function Help()
 {
 	var txt = "This tool converts between IEEE 754 representations of floating point numbers and integers.\n";
 	txt = txt + "The representations can be either 32 bits (4 bytes single precision) or 64 bits (8 bytes double precision).\n";
-	txt = txt + "The integers need to be input in hexadecimal format with correct string length for the respective cases e.g.\n";
+	txt = txt + "The integers need to be input in hexadecimal format with '0x' prefix and correct string length for the respective cases.\n";
+	txt = txt + "For the 32 bit case this is 10 characters long. For the 64 bit case this is 18 characters long e.g.\n";
 	txt = txt + "0x3F800000 would be converted to 1.0 for the 32 bit case \n";
 	txt = txt + "0x3FF0000000000000 would be converted to 1.0 for the 64 bit case \n";
 
