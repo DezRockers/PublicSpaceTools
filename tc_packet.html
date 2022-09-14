@@ -152,6 +152,10 @@ function SetDefaults()
 This tool displays the individual fields of the input TC CCSDS Space packet in hexadecimal bytes.
 </p>
 
+<table border="1" borderColor="Silver">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
 <form id = "getString" style="color:Silver;">
 Input the TC string as either non-delimited hexadecimal bytes e.g. 1860C0000005191101004075 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 and then click 'Display TC Fields' button<br />
@@ -164,8 +168,11 @@ or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 an
 <button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
 <button type="button" onclick="DisplayHelp()">Help</button><br />
+</td>
+</tr>
+</table>
 
-<table border="1">
+<table border="1" borderColor="Silver">
 <tr id="tr1">
 
 <td style="vertical-align:top;">
@@ -196,7 +203,7 @@ TC Secondary Header Fields<br />
 <td style="vertical-align:top;">
 <form id = "userdata" style="color:Silver;">
 TC Packet data<br />
-<input type="text" id="tcPacket" maxLength=4000 size=100/>TC Packet data (hex)<br />
+<input type="text" id="tcPacket" maxLength=4000 size=108/>TC Packet data (hex)<br />
 <input type="text" id="pec" maxLength=10 size=10/>packet error control field (hex)<br /><br />
 
 Other Useful Data<br />

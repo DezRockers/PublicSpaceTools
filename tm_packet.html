@@ -175,6 +175,10 @@ function SetDefaults()
 This tool displays the individual fields of the input TM CCSDS packet in hexadecimal bytes.
 </p>
 
+<table border="1" borderColor="Silver">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
 <form id = "getString" style="color:Silver;">
 Input the TM string as either non-delimited hexadecimal bytes and then click 'Add Spaces to TM String' button or space delimited hexadecimal bytes and then click 'Display TM Fields' button<br />
 <input type="text" id="inputString" maxLength=4000 size=200/><br />
@@ -189,8 +193,11 @@ Input the TM string as either non-delimited hexadecimal bytes and then click 'Ad
 <button type="button" onclick="DisplayTmFields()">Display TM Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
 <button type="button" onclick="DisplayHelp()">Help</button><br />
+</td>
+</tr>
+</table>
 
-<table border="1">
+<table border="1" borderColor="Silver">
 <tr id="tr1">
 
 <td style="vertical-align:top;">
@@ -224,7 +231,7 @@ TM Secondary Header Fields<br />
 <td style="vertical-align:top;">
 <form id = "userdata" style="color:Silver;">
 TM Packet data<br />
-<input type="text" id="tmPacket" maxLength=4000 size=100/>TM Packet data (hex)<br />
+<input type="text" id="tmPacket" maxLength=4000 size=107/>TM Packet data (hex)<br />
 <input type="text" id="pec" maxLength=10 size=10/>packet error control field (hex)<br /><br />
 
 Other Useful Data<br />
