@@ -1,0 +1,465 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+
+<script src="generic.js"></script>
+
+<script type="text/javascript">
+
+// function to convert the input command word (hex format) into the respective command fields (decimal format) and binary fields 
+function ConvertCommandWord()
+{	
+	var word = document.getElementById("cmdWord").value;
+	// first remove any white space
+	word = word.replace(/\s/g, '');
+	word = word.padStart(4,'0');
+
+	// convert the 4 character string to hexadecimal integer
+	word = parseInt(word, 16);
+
+	var rtAddress = (word >> 11) & 0x1F;
+	var rorT = (word >> 10) & 0x1;
+	var subaddress = (word >> 5) & 0x1F;
+	var numWords1 = (word >> 0) & 0x1F;
+	var numWords2 = (word >> 0) & 0x1F;
+	// note that 0 means 32 words
+	if (numWords1 == 0)
+	{
+		numWords1 = 32;
+	}
+
+	document.getElementById("rtAddressCmd1").value = rtAddress.toString(10);
+	document.getElementById("rtAddressCmd2").value = rtAddress.toString(2).padStart(5,'0');
+	switch (rorT)
+	{
+		case 0:
+			document.getElementById("rorT1").value = "Receive (at RT)";
+			document.getElementById("rorT2").value = "0";
+			break;
+		case 1:
+			document.getElementById("rorT1").value = "Transmit (from RT)";
+			document.getElementById("rorT2").value = "1";
+			break;
+	}
+	document.getElementById("subaddress1").value = subaddress.toString(10);
+	document.getElementById("subaddress2").value = subaddress.toString(2).padStart(5,'0');
+
+	// check whether this a mode code command
+	if ((subaddress == 0) || (subaddress == 31))
+	{
+		document.getElementById("numWords1label").innerHTML = "Mode Code Number";
+	}
+	else
+	{
+		document.getElementById("numWords1label").innerHTML = "Number of Words";
+	}
+
+	document.getElementById("numWords1").value = numWords1.toString(10);
+	document.getElementById("numWords2").value = numWords2.toString(2).padStart(5,'0');
+
+}
+
+// function to convert the input command command fields (decimal format) into the command word (hex format) and binary fields 
+function ConvertCommandFields()
+{	
+	var rtAddress = Number(document.getElementById("rtAddressCmd1").value);
+	if (rtAddress > 31)
+	{
+		alert("RT Address must be between 0 and 31. Try again.");
+		return;
+	}
+
+	var rorT = document.getElementById("rorT1").value;
+	if ((rorT == "Receive (at RT)") || (rorT == "0"))
+	{
+		rorT = 0;
+	}
+	else if ((rorT == "Transmit (from RT)") || (rorT == "1"))
+	{
+		rorT = 1;
+	}
+	var subaddress = Number(document.getElementById("subaddress1").value);
+	if (subaddress > 31)
+	{
+		alert("RT Subddress must be between 0 and 31. Try again.");
+		return;
+	}
+	var numWords = Number(document.getElementById("numWords1").value);
+	// note that 0 means 32 words
+	if (numWords == 32)
+	{
+		numWords = 0;
+	}
+	if (numWords > 31)
+	{
+		alert("Number of words must be between 1 and 32. Try again.");
+		return;
+	}
+
+	var cmdWord = (rtAddress << 11) + (rorT << 10) + (subaddress << 5) + numWords;
+
+	document.getElementById("cmdWord").value = cmdWord.toString(16).padStart(4,'0').toUpperCase();
+
+	// then call ConvertCommandWord to update the binary fields
+	ConvertCommandWord();
+}
+
+// function to convert the input command command fields (decimal format) into the command word (hex format) and binary fields 
+function ConvertCommandBinary()
+{	
+	var rtAddress = parseInt(document.getElementById("rtAddressCmd2").value, 2);
+	if (rtAddress > 31)
+	{
+		alert("RT Address must be between 0 and 31. Try again.");
+		return;
+	}
+
+	var rorT = Number(document.getElementById("rorT2").value);
+	var subaddress = parseInt(document.getElementById("subaddress2").value,2);
+	if (subaddress > 31)
+	{
+		alert("RT Subddress must be between 0 and 31. Try again.");
+		return;
+	}
+	var numWords = parseInt(document.getElementById("numWords2").value,2);
+	if (numWords > 31)
+	{
+		alert("Number of words must be between 1 and 32 (where 32 is represented by 0). Try again.");
+		return;
+	}
+
+	var cmdWord = (rtAddress << 11) + (rorT << 10) + (subaddress << 5) + numWords;
+
+	document.getElementById("cmdWord").value = cmdWord.toString(16).padStart(4,'0').toUpperCase();
+
+	// then call ConvertCommandWord to update the command fields
+	ConvertCommandWord();
+}
+
+// function to convert the status word in hex format into the respective status fields (decimal) and binary fields
+function ConvertStatusWord()
+{	
+	var word = document.getElementById("statusWord").value;
+	// first remove any white space
+	word = word.replace(/\s/g, '');
+	word = word.padStart(4,'0');
+
+	// convert the 4 character string to hexadecimal integer
+	word = parseInt(word, 16);
+
+	var rtAddress = (word >> 11) & 0x1F;
+	var messageError = (word >> 10) & 0x1;
+	var instrumentation = (word >> 9) & 0x1;
+	var serviceRequest = (word >> 8) & 0x1;
+	var reserved = (word >> 5) & 0x7;
+	var bcr = (word >> 4) & 0x1;
+	var busy = (word >> 3) & 0x1;
+	var subsystemFlag = (word >> 2) & 0x1;
+	var dba = (word >> 1) & 0x1;
+	var terminalFlag = (word >> 0) & 0x1;
+
+	document.getElementById("rtAddressStatus1").value = rtAddress.toString(10);
+	document.getElementById("rtAddressStatus2").value = rtAddress.toString(2).padStart(5,'0');
+
+	document.getElementById("messageError1").value = messageError;
+	document.getElementById("messageError2").value = messageError;
+
+	document.getElementById("instrumentation1").value = instrumentation;
+	document.getElementById("instrumentation2").value = instrumentation;
+
+	document.getElementById("serviceRequest1").value = serviceRequest;
+	document.getElementById("serviceRequest2").value = serviceRequest;
+
+	document.getElementById("reserved1").value = reserved.toString(10);;
+	document.getElementById("reserved2").value = reserved.toString(2).padStart(3,'0');;
+
+	document.getElementById("broadcast1").value = bcr;
+	document.getElementById("broadcast2").value = bcr;
+
+	document.getElementById("busy1").value = busy;
+	document.getElementById("busy2").value = busy;
+
+	document.getElementById("subsystemFlag1").value = subsystemFlag;
+	document.getElementById("subsystemFlag2").value = subsystemFlag;
+
+	document.getElementById("dynamicBusAcceptance1").value = dba;
+	document.getElementById("dynamicBusAcceptance2").value = dba;
+
+	document.getElementById("terminalFlag1").value = terminalFlag;
+	document.getElementById("terminalFlag2").value = terminalFlag;
+}
+
+// function to convert the status fields (decimal) into the hexadecimal status word and binary fields
+function ConvertStatusFields()
+{	
+	var rtAddress = Number(document.getElementById("rtAddressStatus1").value);
+	if (rtAddress > 31)
+	{
+		alert("RT Address must be between 0 and 31. Try again.");
+		return;
+	}
+	var messageError = parseInt(document.getElementById("messageError1").value, 2);
+	var instrumentation = parseInt(document.getElementById("instrumentation1").value, 2);
+	var serviceRequest = parseInt(document.getElementById("serviceRequest1").value, 2);
+	var reserved = Number(document.getElementById("reserved1").value);
+	if (reserved > 7)
+	{
+		alert("Reserved field must be between 0 and 7. Try again.");
+		return;
+	}
+	var bcr = parseInt(document.getElementById("broadcast1").value, 2);
+	var busy = parseInt(document.getElementById("busy1").value, 2);
+	var subsystemFlag = parseInt(document.getElementById("subsystemFlag1").value, 2);
+	var dba = parseInt(document.getElementById("dynamicBusAcceptance1").value, 2);
+	var terminalFlag = parseInt(document.getElementById("terminalFlag1").value, 2);
+
+	var statusWord = (rtAddress << 11) + 
+		(messageError << 10) + 
+		(instrumentation << 9) + 
+		(serviceRequest << 8) + 
+		(reserved << 5) + 
+		(bcr << 4) +
+		(busy << 3) +
+		(subsystemFlag << 2) +
+		(dba << 1) +
+		(terminalFlag << 0);
+
+	document.getElementById("statusWord").value = statusWord.toString(16).padStart(4,'0').toUpperCase();
+	ConvertStatusWord();
+}
+
+// function to convert the status binary fields into the hexadecimal status word and decimal fields
+function ConvertStatusBinary()
+{	
+	var rtAddress = parseInt(document.getElementById("rtAddressStatus2").value,2);
+	if (rtAddress > 31)
+	{
+		alert("RT Address must be between 0 and 31. Try again.");
+		return;
+	}
+	var messageError = parseInt(document.getElementById("messageError2").value, 2);
+	var instrumentation = parseInt(document.getElementById("instrumentation2").value, 2);
+	var serviceRequest = parseInt(document.getElementById("serviceRequest2").value, 2);
+	var reserved = parseInt(document.getElementById("reserved2").value,2);
+	if (reserved > 7)
+	{
+		alert("Reserved field must be between 0b000 and 0b111. Try again.");
+		return;
+	}
+	var bcr = parseInt(document.getElementById("broadcast2").value, 2);
+	var busy = parseInt(document.getElementById("busy2").value, 2);
+	var subsystemFlag = parseInt(document.getElementById("subsystemFlag2").value, 2);
+	var dba = parseInt(document.getElementById("dynamicBusAcceptance2").value, 2);
+	var terminalFlag = parseInt(document.getElementById("terminalFlag2").value, 2);
+
+	var statusWord = (rtAddress << 11) + 
+		(messageError << 10) + 
+		(instrumentation << 9) + 
+		(serviceRequest << 8) + 
+		(reserved << 5) + 
+		(bcr << 4) +
+		(busy << 3) +
+		(subsystemFlag << 2) +
+		(dba << 1) +
+		(terminalFlag << 0);
+
+	document.getElementById("statusWord").value = statusWord.toString(16).padStart(4,'0').toUpperCase();
+	ConvertStatusWord();
+}
+
+function ClearCommand()
+{
+	document.getElementById("CommandWord").reset();
+	document.getElementById("CommandWordBitUsage").reset();
+}
+
+function ClearStatus()
+{
+	document.getElementById("StatusWord").reset();
+	document.getElementById("StatusWordBitUsage").reset();
+}
+
+// function to display 1553 command help message
+function CommandHelp()
+{
+	var txt = "This tool converts 1553 command words into or from the respective bit fields:\n";
+	txt = txt + "RT address (5 bits), address 31 is used for broadcasting\n";
+	txt = txt + "R/T (1 bit) with 0 meaning the RT receives command data from the BC, 1 meaning the RT transmits return data to the BC\n";
+	txt = txt + "RT subaddress (5 bits), subaddresses 0 and 31 are used for mode codes\n";
+	txt = txt + "Number of 16 bit words to receive/transmit (or the mode code number)(5 bits), 0 means 32 words\n";
+	txt = txt + "Note that the command word is represented in hexadecimal format but the command fields are represented in decimal format.\n";
+	alert(txt);
+}
+
+// function to display 1553 status help message
+function StatusHelp()
+{
+	var txt = "This tool converts 1553 status words into or from the respective bit fields:\n";
+	txt = txt + "RT address (5 bits)\n";
+	txt = txt + "Message Error (1 bit)\n";
+	txt = txt + "Instrumentation (1 bit)\n";
+	txt = txt + "Service Request (1 bit)\n";
+	txt = txt + "Reserved field (3 bits)\n";
+	txt = txt + "Broadcast Command Received (BCR) (1 bit)\n";
+	txt = txt + "Busy (1 bit)\n";
+	txt = txt + "Subsystem Flag (1 bit)\n";
+	txt = txt + "Dynamic Bus Acceptance (DBA) (1 bit)\n";
+	txt = txt + "Terminal Flag (1 bit)\n";
+	txt = txt + "Note that the status word is represented in hexadecimal format but the status fields are represented in decimal format.\n";
+	alert(txt);
+}
+
+function CommandInterpretation()
+{
+	var rtAddress = document.getElementById("rtAddressCmd1").value;
+	var subAddress = document.getElementById("subaddress1").value;
+
+	var commandType = "command";
+	var numWords = document.getElementById("numWords1").value;
+	// check for mode code command
+	if ((subAddress == 0) || (subAddress == 31))
+	{
+		commandType = "mode code type command with mode code number " + numWords;
+	}
+	var txt = "This is a BC to RT address " + rtAddress + " ";
+	// check for broadcast command
+	if (rtAddress == 31)
+	{
+		txt = "This is a broadcast ";
+	}
+	txt = txt + commandType;
+
+	if ((subAddress > 0) && (subAddress < 31))
+	{
+		var rorT = Number(document.getElementById("rorT2").value);
+		if (rorT == 0)
+		{
+			txt = txt + " requesting the reception of " + numWords + " 16-bit words at subaddress " + subAddress;
+		}
+		else
+		{
+			txt = txt + " requesting the transmission of " + numWords + " 16-bit words from subaddress " + subAddress;
+		}
+	}
+
+	alert(txt);
+}
+
+</script>
+</head>
+
+<body>
+<H4 style="color:Silver;">1553 Command and Status Words</H4>
+<p style="color:Silver;">
+This tool converts 1553 command and status words into or from the respective bit fields.
+</p>
+
+<table border="1" bordercolor="Silver">
+
+<tr id="tr1">
+
+<td style="vertical-align:top;">
+
+<form id = "CommandWord" style="color:Silver;">
+<table  border="0" style="color:Silver;">
+<tr>
+<td>
+<p style="color:Silver;">1553 Command Word <br>(hex format)</p>
+<input type="text" id="cmdWord" maxLength=4 size=4  />Command Word
+</td>
+<td>
+<p style="color:Silver;">Command Fields <br>(decimal format)</p>
+<input type="text" id="rtAddressCmd1" maxLength=2 size=2  />RT Address
+<input type="text" id="rorT1" maxLength=13 size=13  />R/T
+<input type="text" id="subaddress1" maxLength=2 size=2  />RT Subaddress
+<input type="text" id="numWords1" maxLength=2 size=2  />
+<label id="numWords1label" for="numWords1">Number of Words</label>
+</td>
+</tr>
+</table>
+</form>
+
+<form id = "CommandWordBitUsage" style="color:Silver;">
+<table  border="0" style="color:Silver;">
+<tr>
+<td>
+<p style="color:Silver;">Binary Fields</p>
+<input type="text" id="rtAddressCmd2" maxLength=5 size=5  />
+<input type="text" id="rorT2" maxLength=1 size=1  />
+<input type="text" id="subaddress2" maxLength=5 size=5  />
+<input type="text" id="numWords2" maxLength=5 size=5  />Command Word Bit Usage (binary)<br />
+RT Address&ensp; R/T&emsp; Subaddress&nbsp; Num Words
+</td>
+</tr>
+</table>
+</form>
+
+<button type="button" onclick="ConvertCommandWord()">Convert Cmd Word</button>
+<button type="button" onclick="ConvertCommandFields()">Convert Cmd Fields</button>
+<button type="button" onclick="ConvertCommandBinary()">Convert Binary Fields</button>
+<button type="button" onclick="ClearCommand()">Clear Command</button>
+<button type="button" onclick="CommandHelp()">Help</button>
+<button type="button" onclick="CommandInterpretation()">Interpretation</button>
+</td>
+</tr>
+
+<tr id="tr2">
+
+<td style="vertical-align:top;">
+<form id = "StatusWord" style="color:Silver;">
+<table  border="0" style="color:Silver;">
+<tr>
+<td>
+<p style="color:Silver;">1553 Status Word <br>(hex format)</p>
+<input type="text" id="statusWord" maxLength=4 size=4  />Status Word
+</td>
+<td>
+<p style="color:Silver;">Status Word Fields<br>(decimal format)</p>
+<input type="text" id="rtAddressStatus1" maxLength=2 size=2  />RT Address
+<input type="text" id="messageError1" maxLength=1 size=1  />Message Error
+<input type="text" id="instrumentation1" maxLength=1 size=1  />Instrumentation
+<input type="text" id="serviceRequest1" maxLength=1 size=1  />Service Request
+<input type="text" id="reserved1" maxLength=1 size=1  />Reserved
+<input type="text" id="broadcast1" maxLength=1 size=1  />BCR
+<input type="text" id="busy1" maxLength=1 size=1  />Busy
+<input type="text" id="subsystemFlag1" maxLength=1 size=1  />S/S Flag
+<input type="text" id="dynamicBusAcceptance1" maxLength=1 size=1  />DBA
+<input type="text" id="terminalFlag1" maxLength=1 size=1  />Terminal Flag
+</td>
+</tr>
+</table>
+</form>
+
+<form id = "StatusWordBitUsage" style="color:Silver;">
+<table  border="0" style="color:Silver;">
+<tr>
+<td>
+<p style="color:Silver;">Binary Fields</p>
+<input type="text" id="rtAddressStatus2" maxLength=5 size=5  />
+<input type="text" id="messageError2" maxLength=1 size=1  />
+<input type="text" id="instrumentation2" maxLength=1 size=1  />
+<input type="text" id="serviceRequest2" maxLength=1 size=1  />
+<input type="text" id="reserved2" maxLength=3 size=3  />
+<input type="text" id="broadcast2" maxLength=1 size=1  />
+<input type="text" id="busy2" maxLength=1 size=1  />
+<input type="text" id="subsystemFlag2" maxLength=1 size=1  />
+<input type="text" id="dynamicBusAcceptance2" maxLength=1 size=1  />
+<input type="text" id="terminalFlag2" maxLength=1 size=1  />Status Word Bit Usage (binary)<br />
+RT Address&emsp; ME&emsp; Instr&emsp; SReq&ensp; Reserved&ensp; BCR&emsp; Busy&emsp; S/S&emsp; DBA&emsp; Term
+</td>
+</tr>
+</table>
+</form>
+
+<button type="button" onclick="ConvertStatusWord()">Convert Status Word</button>
+<button type="button" onclick="ConvertStatusFields()">Convert Status Fields</button>
+<button type="button" onclick="ConvertStatusBinary()">Convert Binary Fields</button>
+<button type="button" onclick="ClearStatus()">Clear Status</button>
+<button type="button" onclick="StatusHelp()">Help</button>
+</td>
+</tr>
+
+</table>
+
+</body>
+</html>
