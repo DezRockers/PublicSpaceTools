@@ -6,6 +6,9 @@
 
 <script type="text/javascript">
 
+// global variables
+var tmPacket = new Array();
+
 function DisplayTmFields()
 {
 	var str = document.getElementById("inputString").value;
@@ -48,7 +51,7 @@ function TM_frame( bytes )
 	var syncFlag = (bytes[4] >> 6) & 0x1;
 	var packetOrderFlag = (bytes[4] >> 5) & 0x1;	
 	var segmentLengthId = (bytes[4] >> 3) & 0x3;
-	var firstHeaderPointer = (bytes[4] & 0x7) << 8 + bytes[5];
+	var firstHeaderPointer = ((bytes[4] & 0x7) << 8) + bytes[5];
 
 	// display the fields
 	document.getElementById("versionNumber").value = versionNumber.toString(16).toUpperCase();
@@ -82,6 +85,7 @@ function TM_frame( bytes )
 		document.getElementById("secondaryHeaderLength").value = secondaryHeaderLength.toString(10);
 		document.getElementById("secondaryHeaderData").secondaryHeaderData = secondaryHeaderData;
 	}
+	var headerLength = dataFieldIndex;
 
 	var fecfLength = Number(document.getElementById("fecfLength").value);
 	var tailLength = fecfLength;
@@ -106,32 +110,62 @@ function TM_frame( bytes )
 		tfData = tfData + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
 	}
 
-	// also extract the first TM packet from the frame data
-	// using the first header pointer and the computed packet length from bytes 4 and 5 after the firstHeaderPointer
-	var tmPacket ="";
-	var tmPacketLengthIndex = dataFieldIndex + firstHeaderPointer + 4;
-	var tmPacketLength = (bytes[tmPacketLengthIndex] << 8) + bytes[tmPacketLengthIndex+1] + 7; // + 7 for the TM packet header and trailer
-	for (i = (dataFieldIndex + firstHeaderPointer); i < (dataFieldIndex + firstHeaderPointer + tmPacketLength); i++)
+	// check for idle frame and if so compute frame contents accordnigly
+	if (firstHeaderPointer == 0x7FE)
 	{
-		tmPacket = tmPacket + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		var arrayIndex = 0;
+		tmPacket[arrayIndex] = "";
+		for (i = dataFieldIndex; i < (bytes.length - tailLength); i++)
+		{
+			tmPacket[arrayIndex] = tmPacket[arrayIndex] + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+		}
 	}
-	
+	else
+	{
+		// also extract the first TM packet from the frame data
+		// using the first header pointer and the computed packet length from bytes 4 and 5 after the firstHeaderPointer
+		var arrayIndex = 0;
+		dataFieldIndex = dataFieldIndex + firstHeaderPointer;
+		do {
+			tmPacket[arrayIndex] = "";
+			var tmPacketLengthIndex = dataFieldIndex + 4;
+			var tmPacketLength = (bytes[tmPacketLengthIndex] << 8) + bytes[tmPacketLengthIndex+1] + 7; // + 7 for the TM packet header and trailer
+			for (i = dataFieldIndex; i < (dataFieldIndex + tmPacketLength); i++)
+			{
+				tmPacket[arrayIndex] = tmPacket[arrayIndex] + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+			}
+			arrayIndex++;
+			dataFieldIndex = dataFieldIndex + tmPacketLength;
+			
+		} while (dataFieldIndex < bytes.length - tailLength);
+	}
 
 	// display the fields
 	document.getElementById("tfData").value = tfData;
-	document.getElementById("tmPacket").value = tmPacket;
 	document.getElementById("ocf").value = ocf;
 	document.getElementById("fecf").value = fecf;
 
+	document.getElementById("numTmPackets").value = arrayIndex;
+	document.getElementById("tmPacket").value = tmPacket[0];
+	document.getElementById("tmPacketToDisplay").value = 1;
+	document.getElementById("tmPacketLabel").innerHTML = "TM Packet 1 (hex)";
+
 	document.getElementById("totalFrameLength").value = bytes.length;
-	document.getElementById("totalHeaderLength").value = dataFieldIndex;
-	document.getElementById("userDataLength").value = bytes.length - dataFieldIndex - tailLength;
+	document.getElementById("totalHeaderLength").value = headerLength;
+	document.getElementById("userDataLength").value = bytes.length - headerLength - tailLength;
 	document.getElementById("totalTrailerLength").value = tailLength;
 
 }
 
 function ClearFields()
 {
+	// empty the tmPacket array
+	var numTmPackets = Number(document.getElementById("numTmPackets").value);
+	for (i = 0; i < numTmPackets; i++)
+	{
+		tmPacket[i] = "";
+	}
+
 	document.getElementById("getString").reset();
 	document.getElementById("primary").reset();
 	document.getElementById("secondary").reset();
@@ -139,8 +173,9 @@ function ClearFields()
 
 	// but reset the defaults
 	SetDefaults();
-}
 
+}
+1
 function SetDefaults()
 {
 	document.getElementById("ocfLength").value = 4;
@@ -153,6 +188,13 @@ function DisplayHelp()
 	var txt = "This tool displays the individual fields of the input CCSDS TM frame (excluding ASW) in hexadecimal bytes.\n";
 	txt = txt + "It uses information taken from ECSS standards document ECSS-E-ST-50-03C 31 July 2008.";
 	alert(txt);
+}
+
+function TmPacketToDisplay()
+{
+	var tmPacketToDisplay = document.getElementById("tmPacketToDisplay").value;
+	document.getElementById("tmPacket").value = tmPacket[tmPacketToDisplay-1];
+	document.getElementById("tmPacketLabel").innerHTML = "TM Packet " + tmPacketToDisplay + " (hex)";
 }
 
 
@@ -215,12 +257,16 @@ TM Frame Secondary Header Fields<br />
 <td style="vertical-align:top;">
 <form id = "userdata" style="color:Silver;">
 TM Frame User Data<br />
-<input type="text" id="tfData" maxLength=4000 size=97/>TM user data (hex)<br />
-<input type="text" id="tmPacket" maxLength=4000 size=97/>First TM packet (hex)<br />
+<input type="text" id="tfData" maxLength=4000 size=99/>TM user data (hex)<br />
 <input type="text" id="ocf" maxLength=10 size=10/>Operational Control Field (hex)<br />
 <input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br /><br />
 
 Other Useful Data<br />
+<input type="text" id="numTmPackets" maxLength=10 size=10/>Number of Contained TM Packets
+<input type="text" id="tmPacketToDisplay" maxLength=10 size=10/>Select TM Packet to Display
+<button type="button" onclick="TmPacketToDisplay()">Display TM Packet</button><br />
+<input type="text" id="tmPacket" maxLength=4000 size=99/>
+<label id="tmPacketLabel" for="tmPacket">TM packet 1 (hex)</label><br />
 <input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Frame Length (decimal)<br />
 <input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
