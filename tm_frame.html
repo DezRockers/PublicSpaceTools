@@ -106,8 +106,20 @@ function TM_frame( bytes )
 		tfData = tfData + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
 	}
 
+	// also extract the first TM packet from the frame data
+	// using the first header pointer and the computed packet length from bytes 4 and 5 after the firstHeaderPointer
+	var tmPacket ="";
+	var tmPacketLengthIndex = dataFieldIndex + firstHeaderPointer + 4;
+	var tmPacketLength = (bytes[tmPacketLengthIndex] << 8) + bytes[tmPacketLengthIndex+1] + 7; // + 7 for the TM packet header and trailer
+	for (i = (dataFieldIndex + firstHeaderPointer); i < (dataFieldIndex + firstHeaderPointer + tmPacketLength); i++)
+	{
+		tmPacket = tmPacket + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+	
+
 	// display the fields
 	document.getElementById("tfData").value = tfData;
+	document.getElementById("tmPacket").value = tmPacket;
 	document.getElementById("ocf").value = ocf;
 	document.getElementById("fecf").value = fecf;
 
@@ -203,7 +215,8 @@ TM Frame Secondary Header Fields<br />
 <td style="vertical-align:top;">
 <form id = "userdata" style="color:Silver;">
 TM Frame User Data<br />
-<input type="text" id="tfData" maxLength=4000 size=99/>TM user data (hex)<br />
+<input type="text" id="tfData" maxLength=4000 size=97/>TM user data (hex)<br />
+<input type="text" id="tmPacket" maxLength=4000 size=97/>First TM packet (hex)<br />
 <input type="text" id="ocf" maxLength=10 size=10/>Operational Control Field (hex)<br />
 <input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br /><br />
 
