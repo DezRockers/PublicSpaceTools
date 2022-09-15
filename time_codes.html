@@ -448,6 +448,8 @@ function ClearAll()
 function Help()
 {
 	var txt = "This tool converts the input P and T field time code formats into human readable times.\n";
+	txt = txt + "The fields need to be input as space delimited hex strings of 2 character bytes e.g. 00 12 34 56 78 9A.\n";
+	txt = txt + "Note however that the P-field is normally only 1 byte long.\n";
 	txt = txt + "CUC, CDS and CCS time code formats are supported.\n";
 	txt = txt + "See document CCSDS Time Code Formats CCSDS 301.0-B-4 for details.";
 	alert(txt);
@@ -503,19 +505,19 @@ function TimeCodeCallback(format)
 <table border="1" borderColor="Silver">
 
 <tr id="tr1">
-<H4 style="color:Silver;">Time Code Format (hex strings)</H4>
+<H4 style="color:Silver;">Time Code Format (space delimited hex strings of bytes)</H4>
 
 <td style="vertical-align:top;">
 <form id = "PField" style="color:Silver;">
 <input type="text" id="pField" size=20/>
-<label style="padding-right:150px;">P-Field</label>
+<label style="padding-right:150px;">Input P-Field</label>
 </form>
 </td>
 
 <td style="vertical-align:top;">
 <form id = "TField" style="color:Silver;">
 <input type="text" id="tField" maxLength=40 size=30/>
-<label style="padding-right:100px;">T-Field</label>
+<label style="padding-right:100px;">Input T-Field</label>
 </form>
 </td>
 
@@ -545,6 +547,7 @@ function TimeCodeCallback(format)
 
 <td style="vertical-align:top;">
 <form id = "PFieldOutputs" style="color:Silver;">
+Decoded P-Field<br>
 <input type="text" id="pField1" size=15/>
 <label id="pField1Label" for="pField1">P-Field Extension</label><br />
 <input type="text" id="pField2" size=15/>
@@ -558,6 +561,7 @@ function TimeCodeCallback(format)
 
 <td style="vertical-align:top;">
 <form id = "TFieldOutputs" style="color:Silver;">
+Decoded T-Field<br>
 <input type="text" id="tField1" size=20/>
 <label id="tField1Label" for="tField1">Seconds from fixed epoch</label><br />
 <input type="text" id="tField2" size=20/>

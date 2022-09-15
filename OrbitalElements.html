@@ -232,13 +232,14 @@ document.getElementById("characteristics").reset();
 function ComputeCartesians()
 {
 	var a=Number(document.getElementById("a").value);
+	var e=Number(document.getElementById("e").value);
 	var Re = Number(document.getElementById("Re").value);
-	if (a < Re) 
+
+	if (a*(1-e) < Re) 
 	{
-		alert("a is less than " + Re + "km, the equatorial radius of the Earth. Try again");
+		alert("Perigee distance " + a*(1-e) +"km is less than " + Re + "km, the equatorial radius of the Earth. Try again");
 		return;
 	} 
-	var e=Number(document.getElementById("e").value);
 	if ((e < 0) || (e >= 1)) 
 	{
 		alert("e is not between 0 and 1. Try again");
@@ -656,7 +657,7 @@ Inputs<br />
 <input type="text" id="flat" />f at poles<br />
 <input type="text" id="EarthEcc" />Earth e<br />
 </form>
-<button type="button" onclick="ResetInputs()">Reset constants</button><br />
+<button type="button" onclick="ResetInputs()">Reset Constants</button><br />
 <button type="button" onclick="EarthEllipsoidEccentricity()">Earth Ellipsoid e</button><br />
 <button type="button" onclick="Help()">Help</button><br />
 </td>
@@ -673,7 +674,7 @@ Keplerian Elements<br />
 <input type="text" id="f" />&nu; in degs<br />
 </form>
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
-<button type="button" onclick="ClearElements()">Clear elements</button><br />
+<button type="button" onclick="ClearElements()">Clear Elements</button><br />
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
 </td>
 
@@ -689,7 +690,7 @@ Cartesian Coordinates<br />
 <input type="text" id="zdot" />z&#775; in km/s<br />
 </form>
 <button type="button" onclick="ComputeKeplerians()">Convert Cartesian Values</button><br />
-<button type="button" onclick="ClearCartesians()">Clear cartesian coordinates</button><br />
+<button type="button" onclick="ClearCartesians()">Clear Cartesian Coordinates</button><br />
 <button type="button" onclick="window.open('OrbEl.html', '_blank');">Help</button><br />
 </td>
 
@@ -710,7 +711,7 @@ Other Orbital Characteristics<br />
 <input type="text" id="hy" />h<sub>y</sub> in km&sup2;/s<br />
 <input type="text" id="hz" />h<sub>z</sub> in km&sup2;/s<br />
 </form>
-<button type="button" onclick="ClearOtherCharacteristics()">Clear other characteristics</button><br />
+<button type="button" onclick="ClearOtherCharacteristics()">Clear Other Characteristics</button><br />
 <button type="button" onclick="window.open('Anomalies.html', '_blank');">Help</button><br />
 </td>
 

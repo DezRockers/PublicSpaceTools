@@ -202,8 +202,9 @@ function GetIeeeFloatFromInteger()
 
 function ClearAll()
 {
-document.getElementById("IntegerIn").reset();
-document.getElementById("FloatOut").reset();
+	document.getElementById("IntegerIn").reset();
+	document.getElementById("FloatOut").reset();
+	document.getElementById("integerIn").value = "0x";
 }
 
 function Help()
@@ -221,7 +222,7 @@ function Help()
 </script>
 </head>
 
-<body>
+<body onload="ClearAll()">
 <H3 style="color:Silver;">IEEE Floating Point Conversions</H3>
 <table border="1" borderColor="Silver">
   <col valign="top" />
