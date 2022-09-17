@@ -157,7 +157,7 @@ function GenerateReport()
 	target.addEventListener("click", function(){
 
 		var report = "Date created : " + new Date() + "\n";
-		report = report + "Input TC Frame : " + document.getElementById("inputString").value + "\n";
+		report = report + "Input TC Frame (hex bytes) : " + document.getElementById("inputString").value + "\n";
 		report = report + "TC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
 		report = report + "TC Frame Bypass Flag : " + document.getElementById("bypassFlag").value + "\n";
 		report = report + "TC Frame Command Control Flag : " + document.getElementById("controlCommandFlag").value + "\n";
@@ -170,12 +170,12 @@ function GenerateReport()
 		report = report + "TC Frame Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
 		report = report + "TC Frame Sequence Flags Meaning : " + document.getElementById("segmentation").value + "\n";
 		report = report + "TC Frame MAP ID : " + document.getElementById("mapId").value + "\n";
-		report = report + "TC Frame CRC : " + document.getElementById("frameCrc").value + "\n";
-		report = report + "Contained TC Packet : " + document.getElementById("tcPacket").value + "\n";
-		report = report + "TC Frame Total Length : " + document.getElementById("totalFrameLength").value + "\n";
-		report = report + "TC Frame Header Length : " + document.getElementById("totalHeaderLength").value + "\n";
-		report = report + "TC Frame User Data Length : " + document.getElementById("userDataLength").value + "\n";
-		report = report + "TC Frame Trailer Length : " + document.getElementById("totalTrailerLength").value + "\n";
+		report = report + "TC Frame CRC (hex bytes) : " + document.getElementById("frameCrc").value + "\n";
+		report = report + "Contained TC Packet (hex bytes) : " + document.getElementById("tcPacket").value + "\n";
+		report = report + "TC Frame Total Length (decimal) : " + document.getElementById("totalFrameLength").value + "\n";
+		report = report + "TC Frame Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
+		report = report + "TC Frame User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";
+		report = report + "TC Frame Trailer Length (decimal) : " + document.getElementById("totalTrailerLength").value + "\n";
 		
 		document.getElementById('downloadLink').href = generateTextFileUrl(report);
 	});

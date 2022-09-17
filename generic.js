@@ -51,7 +51,7 @@ function generateTextFileUrl(txt) {
     let fileData = new Blob([txt], {type: 'text/plain'});
     // If a file has been previously generated, revoke the existing URL
     if (textFileUrl !== null) {
-        window.URL.revokeObjectURL(textFile);
+        window.URL.revokeObjectURL(textFileUrl);
     }
     textFileUrl = window.URL.createObjectURL(fileData);
     // Returns a reference to the global variable holding the URL
