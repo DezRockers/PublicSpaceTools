@@ -2,6 +2,30 @@
 <html>
 <head>
 
+<style>
+a:link {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:visited {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:hover {
+  color: red;
+  background-color: white;
+  text-decoration: underline;
+}
+a:active {
+  color: green;
+  background-color: white;
+  text-decoration: underline;
+}
+</style>
+</style>
+
 <script src="generic.js"></script>
 
 <script type="text/javascript">
@@ -120,13 +144,49 @@ function TC_frame( bytes )
 	document.getElementById("totalHeaderLength").value = 6;
 	document.getElementById("userDataLength").value = bytes.length - 6 - 2;
 	document.getElementById("totalTrailerLength").value = 2;
+	
+	GenerateReport();
+}
 
+function GenerateReport()
+{
+	// Generate the file download URL and assign it to the link
+	// Wait until the page has loaded! Otherwise the download link element will not exist
+	let target = document.getElementById('downloadLink');
+	target.style.visibility = "visible";
+	target.addEventListener("click", function(){
+
+		var report = "Date created : " + new Date() + "\n";
+		report = report + "Input TC Frame : " + document.getElementById("inputString").value + "\n";
+		report = report + "TC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
+		report = report + "TC Frame Bypass Flag : " + document.getElementById("bypassFlag").value + "\n";
+		report = report + "TC Frame Command Control Flag : " + document.getElementById("controlCommandFlag").value + "\n";
+		report = report + "TC Frame Command Control Meaning : " + document.getElementById("interpretation").value + "\n";
+		report = report + "TC Frame Spaceraft Id (hex) : " + document.getElementById("spacecraftId").value + "\n";
+		report = report + "TC Frame Spaceraft Id (decimal) : " + document.getElementById("spacecraftIdDecimal").value + "\n";
+		report = report + "TC Frame VC ID : " + document.getElementById("virtualChannelId").value + "\n";
+		report = report + "TC Frame Length - 1 (decimal) : " + document.getElementById("frameLength").value + "\n";
+		report = report + "TC Frame Sequence Number (hex) : " + document.getElementById("frameSequenceNumber").value + "\n";
+		report = report + "TC Frame Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
+		report = report + "TC Frame Sequence Flags Meaning : " + document.getElementById("segmentation").value + "\n";
+		report = report + "TC Frame MAP ID : " + document.getElementById("mapId").value + "\n";
+		report = report + "TC Frame CRC : " + document.getElementById("frameCrc").value + "\n";
+		report = report + "Contained TC Packet : " + document.getElementById("tcPacket").value + "\n";
+		report = report + "TC Frame Total Length : " + document.getElementById("totalFrameLength").value + "\n";
+		report = report + "TC Frame Header Length : " + document.getElementById("totalHeaderLength").value + "\n";
+		report = report + "TC Frame User Data Length : " + document.getElementById("userDataLength").value + "\n";
+		report = report + "TC Frame Trailer Length : " + document.getElementById("totalTrailerLength").value + "\n";
+		
+		document.getElementById('downloadLink').href = generateTextFileUrl(report);
+	});
 }
 
 function ClearFields()
 {
 	document.getElementById("getString").reset();
 	document.getElementById("outputs").reset();
+	let target = document.getElementById('downloadLink');
+	target.style.visibility = "hidden";
 }
 
 // function to display TC frame help message
@@ -161,7 +221,12 @@ or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
 <button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button><br />
+<button type="button" onclick="DisplayHelp()">Help</button>
+
+<!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
+<!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
+<a id="downloadLink" href="#" download="TcFrameReport.txt" style="visibility:hidden">Download Report</a>
+
 </td>
 </tr>
 </table>
@@ -195,13 +260,13 @@ Other Useful Data<br />
 <input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Frame Length (decimal)<br />
 <input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
-<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br />
+
 </form>
 </td>
 
 </tr>
 </table>
-
 
 </body>
 </html>
