@@ -148,37 +148,32 @@ function TC_frame( bytes )
 	GenerateReport();
 }
 
+
+// Generate the file download URL and assign it to the link
 function GenerateReport()
 {
-	// Generate the file download URL and assign it to the link
-	// Wait until the page has loaded! Otherwise the download link element will not exist
-	let target = document.getElementById('downloadLink');
-	target.style.visibility = "visible";
-	target.addEventListener("click", function(){
+	var report = "Date created : " + new Date() + "\n";
+	report = report + "Input TC Frame (hex bytes) : " + document.getElementById("inputString").value + "\n";
+	report = report + "TC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
+	report = report + "TC Frame Bypass Flag : " + document.getElementById("bypassFlag").value + "\n";
+	report = report + "TC Frame Command Control Flag : " + document.getElementById("controlCommandFlag").value + "\n";
+	report = report + "TC Frame Command Control Meaning : " + document.getElementById("interpretation").value + "\n";
+	report = report + "TC Frame Spaceraft Id (hex) : " + document.getElementById("spacecraftId").value + "\n";
+	report = report + "TC Frame Spaceraft Id (decimal) : " + document.getElementById("spacecraftIdDecimal").value + "\n";
+	report = report + "TC Frame VC ID : " + document.getElementById("virtualChannelId").value + "\n";
+	report = report + "TC Frame Length - 1 (decimal) : " + document.getElementById("frameLength").value + "\n";
+	report = report + "TC Frame Sequence Number (hex) : " + document.getElementById("frameSequenceNumber").value + "\n";
+	report = report + "TC Frame Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
+	report = report + "TC Frame Sequence Flags Meaning : " + document.getElementById("segmentation").value + "\n";
+	report = report + "TC Frame MAP ID : " + document.getElementById("mapId").value + "\n";
+	report = report + "TC Frame CRC (hex bytes) : " + document.getElementById("frameCrc").value + "\n";
+	report = report + "Contained TC Packet (hex bytes) : " + document.getElementById("tcPacket").value + "\n";
+	report = report + "TC Frame Total Length (decimal) : " + document.getElementById("totalFrameLength").value + "\n";
+	report = report + "TC Frame Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
+	report = report + "TC Frame User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";
+	report = report + "TC Frame Trailer Length (decimal) : " + document.getElementById("totalTrailerLength").value + "\n";
 
-		var report = "Date created : " + new Date() + "\n";
-		report = report + "Input TC Frame (hex bytes) : " + document.getElementById("inputString").value + "\n";
-		report = report + "TC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
-		report = report + "TC Frame Bypass Flag : " + document.getElementById("bypassFlag").value + "\n";
-		report = report + "TC Frame Command Control Flag : " + document.getElementById("controlCommandFlag").value + "\n";
-		report = report + "TC Frame Command Control Meaning : " + document.getElementById("interpretation").value + "\n";
-		report = report + "TC Frame Spaceraft Id (hex) : " + document.getElementById("spacecraftId").value + "\n";
-		report = report + "TC Frame Spaceraft Id (decimal) : " + document.getElementById("spacecraftIdDecimal").value + "\n";
-		report = report + "TC Frame VC ID : " + document.getElementById("virtualChannelId").value + "\n";
-		report = report + "TC Frame Length - 1 (decimal) : " + document.getElementById("frameLength").value + "\n";
-		report = report + "TC Frame Sequence Number (hex) : " + document.getElementById("frameSequenceNumber").value + "\n";
-		report = report + "TC Frame Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
-		report = report + "TC Frame Sequence Flags Meaning : " + document.getElementById("segmentation").value + "\n";
-		report = report + "TC Frame MAP ID : " + document.getElementById("mapId").value + "\n";
-		report = report + "TC Frame CRC (hex bytes) : " + document.getElementById("frameCrc").value + "\n";
-		report = report + "Contained TC Packet (hex bytes) : " + document.getElementById("tcPacket").value + "\n";
-		report = report + "TC Frame Total Length (decimal) : " + document.getElementById("totalFrameLength").value + "\n";
-		report = report + "TC Frame Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
-		report = report + "TC Frame User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";
-		report = report + "TC Frame Trailer Length (decimal) : " + document.getElementById("totalTrailerLength").value + "\n";
-		
-		document.getElementById('downloadLink').href = generateTextFileUrl(report);
-	});
+	DownloadFile('downloadLink', report);
 }
 
 function ClearFields()

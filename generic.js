@@ -59,4 +59,14 @@ function generateTextFileUrl(txt) {
     return textFileUrl;
 };
 
+function DownloadFile(link, txt)
+{
+	let target = document.getElementById(link);
+	target.style.visibility = "visible";
+	target.addEventListener("click", (evt) => Download(link, txt, evt));
+}
 
+function Download(link, txt, evt)
+{
+	document.getElementById(link).href = generateTextFileUrl(txt);
+}
