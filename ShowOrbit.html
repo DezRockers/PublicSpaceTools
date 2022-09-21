@@ -154,7 +154,7 @@
         axisZ.setInterval(-Max, Max, false, true); 
         
         // draw our own axes
-        const Xaxis = chart.addLineSeries()
+        const Xaxis = chart.addPointLineSeries()
             .setName('X-axis')
             .add({ x: 0, y: 0, z: 0 })
             .add({ x: Max, y: 0, z: 0 })
@@ -162,9 +162,13 @@
 			     thickness: 2,
 			     fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255) })	// set colour to white
 			 }))
+        	.setPointStyle( (pointStyle) => pointStyle
+        		.setShape( 'sphere' )
+        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 255) }) )
+        	)
 
 		// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
-		const Yaxis = chart.addLineSeries()
+		const Yaxis = chart.addPointLineSeries()
             .setName('Y-axis')
             .add({ x: 0, y: 0, z: 0 })
             .add({ x: 0, y: 0, z: Max })
@@ -172,8 +176,12 @@
 			     thickness: 2,
 			     fillStyle: new SolidFill({ color: ColorRGBA(0, 255, 0) })	// set colour to green
 			 }))
+        	.setPointStyle( (pointStyle) => pointStyle
+        		.setShape( 'sphere' )
+        		.setFillStyle( new SolidFill({ color: ColorRGBA(0, 255, 0) }) )
+        	)
 
-        const Zaxis = chart.addLineSeries()
+        const Zaxis = chart.addPointLineSeries()
             .setName('Z-axis')
             .add({ x: 0, y: 0, z: 0 })
             .add({ x: 0, y: Max, z: 0 })
@@ -181,6 +189,10 @@
 			     thickness: 2,
 			     fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 0) })	// set colour to yellow
 			 }))
+        	.setPointStyle( (pointStyle) => pointStyle
+        		.setShape( 'sphere' )
+        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 0) }) )
+        	)
 
 		// draw the equator
 		// remembering to swap Y and Z coordinates!

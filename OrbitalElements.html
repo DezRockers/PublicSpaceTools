@@ -216,6 +216,8 @@ document.getElementById("zdot").value = V[2];
 function ClearElements()
 {
 document.getElementById("keplerian").reset();
+let target = document.getElementById('VisOrbit');
+	target.style.visibility = "hidden";
 }
 
 function ClearCartesians()
@@ -259,6 +261,9 @@ function ComputeCartesians()
 	
 	// loop round an entire orbit for display purposes
 	LoopOrbit();
+	
+	let target = document.getElementById('VisOrbit');
+	target.style.visibility = "visible";
 }
 
 function LoopOrbit()
@@ -706,7 +711,7 @@ Keplerian Elements<br />
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="ClearElements()">Clear Elements</button><br />
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
-<button type="button" onclick="window.open('ShowOrbit.html', '_blank');">Visualise Orbit</button><br />
+<button type="button" id="VisOrbit" style="visibility:hidden" onclick="window.open('ShowOrbit.html', '_blank');">Visualise Orbit</button><br />
 </td>
 
 <td style="vertical-align:top;">
