@@ -256,6 +256,36 @@ function ComputeCartesians()
 	var Z = ComputeZ();
 	DisplayVelocity();
 	UpdateOtherCharacteristics();
+	
+	// loop round an entire orbit for display purposes
+	LoopOrbit();
+}
+
+function LoopOrbit()
+{
+	var initialf = Number(document.getElementById("f").value);
+	var f = initialf;
+	var xValues = new Array();
+	var yValues = new Array();
+	var zValues = new Array();
+	
+	for (i = 0; i < 360; i++)
+	{
+		f = f + 1;
+		document.getElementById("f").value = f;
+		xValues[i] = Number(ComputeX());
+		yValues[i] = Number(ComputeY());
+		zValues[i] = Number(ComputeZ());
+	}
+	
+	document.getElementById("f").value = initialf;
+	
+	// update local storage for passing between html pages
+	localStorage.setItem("xValues", xValues);
+	localStorage.setItem("yValues", yValues);
+	localStorage.setItem("zValues", zValues);
+	localStorage.setItem("semiMajorAxis", document.getElementById("a").value);
+	localStorage.setItem("ascendingNode", document.getElementById("Omega").value);
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 
@@ -676,6 +706,7 @@ Keplerian Elements<br />
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="ClearElements()">Clear Elements</button><br />
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
+<button type="button" onclick="window.open('ShowOrbit.html', '_blank');">Visualise Orbit</button><br />
 </td>
 
 <td style="vertical-align:top;">
