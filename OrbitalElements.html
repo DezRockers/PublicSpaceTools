@@ -340,6 +340,10 @@ function ComputeOmega()
 	document.getElementById("hx").value = h[0];
 	document.getElementById("hy").value = h[1];
 	document.getElementById("hz").value = h[2];
+	
+	// normalise h for visualisation
+	var N = Normalise(h);
+	localStorage.setItem("h", N);
 	var Omega = Math.atan2(h[0],-h[1]);
 	Omega = RadiansToDegrees(Omega);
 	return Omega;

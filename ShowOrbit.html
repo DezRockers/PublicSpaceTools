@@ -70,7 +70,7 @@
             // Chart's size will automatically adjust to div's size. 
             container: 'target'
         })
-            .setTitle('Orbit plot') // Set chart title
+            .setTitle('Orbit Plot') // Set chart title
             
             chart.setCameraLocation({x:1,y:1,z:-1});
             
@@ -134,6 +134,7 @@
 			     fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to redish
 			 }))
         	
+        // draw a solid sphere for the earth
         const ellipsoidSeries = chart.addPointSeries()
 	    // Specify ellipsoid center coordinate.
 	    .setName('Earth')
@@ -234,7 +235,7 @@
 			     fillStyle: new SolidFill({ color: ColorRGBA(50, 0, 0) })	// set colour to dark redish
 			 }))
 			 
-		// line to the ascending node
+		// draw line to the ascending node
 		var ascendingNode = Number(localStorage.getItem("ascendingNode"));	// degrees
 		X = a * Math.cos(ascendingNode*pi/180);
 		Y = a * Math.sin(ascendingNode*pi/180);
@@ -247,6 +248,24 @@
 			     fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
 			 }))
 			 
+	    // draw the angular momentum vector scaled to 'a'
+	    var h = localStorage.getItem("h").split(',');
+	    h[0] = h[0]*a;
+	    h[1] = h[1]*a;
+	    h[2] = h[2]*a;
+        const angularMomentum = chart.addPointLineSeries()
+            .setName('Angular Momentum Vector')
+            .add({ x: 0, y: 0, z: 0 })
+            .add({ x: h[0], y: h[2], z: h[1] })
+        	.setStrokeStyle(new SolidLine({
+			     thickness: 2,
+			     fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
+			 }))
+        	.setPointStyle( (pointStyle) => pointStyle
+        		.setShape( 'sphere' )
+        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 192, 203) }) )
+        	)
+	    
 		// Add LegendBox to chart.
 		const legend = chart.addLegendBox()
 	    // Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
@@ -255,6 +274,7 @@
         	maxWidth: 0.30,
     	})
 	    .add(chart)
+	    
     </script>
 </body>
 
