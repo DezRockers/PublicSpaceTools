@@ -266,18 +266,70 @@ function ComputeCartesians()
 	target.style.visibility = "visible";
 }
 
+// get the Eccentric anomaly from the true anonmlay in radians
+function EAfromTA(f,e)
+{
+	var tan_f_over_2 = Math.tan(f/2.0);
+	var one_minus_e = 1.0 - e;
+	var one_plus_e = 1.0 + e;
+	var scale = one_minus_e / one_plus_e;
+	var tan_E_over_2 = Math.sqrt(scale)*tan_f_over_2;
+	var E = 2*Math.atan(tan_E_over_2);
+
+	return E;
+}
+
+// get the true anomaly from the eccentric anonmlay in radians
+function TAfromEA(E,e)
+{
+	var tan_E_over_2 = Math.tan(E/2.0);
+	var one_minus_e = 1.0 - e;
+	var one_plus_e = 1.0 + e;
+	var scale = one_plus_e / one_minus_e;
+	var tan_f_over_2 = Math.sqrt(scale)*tan_E_over_2;
+	var f = 2*Math.atan(tan_f_over_2);
+
+	return f;
+}
+
+// get the Mean anomaly from the eccentric anonmlay in radians
+function MAfromEA(E,e)
+{
+	var M = E - e*Math.sin(E);
+	return M;
+}
+
+// get the eccentric anomaly from the mean anonmlay in radians
+function EAfromMA(M,e)
+{
+	var E = M;
+	var i = 0;
+	for (i = 0; i < 10; i++)
+	{
+		E = M + e*Math.sin(E);
+	}
+	return E;
+}
+
+// loop round an entire orbit in terms of Mean anomaly
 function LoopOrbit()
 {
-	var initialf = Number(document.getElementById("f").value);
-	var f = initialf;
+	var initialf = Number(document.getElementById("f").value);	// degrees
+	var e = Number(document.getElementById("e").value);
+	var E = EAfromTA(DegreesToRadians(initialf), e);	// radians
+	var M = MAfromEA(E, e);	// radians
+	var f;
+	
 	var xValues = new Array();
 	var yValues = new Array();
 	var zValues = new Array();
 	
 	for (i = 0; i < 360; i++)
 	{
-		f = f + 1;
-		document.getElementById("f").value = f;
+		M = M + DegreesToRadians(1);
+		E = EAfromMA(M, e);	// radians
+		f = TAfromEA(E, e);	// radians
+		document.getElementById("f").value = RadiansToDegrees(f);
 		xValues[i] = Number(ComputeX());
 		yValues[i] = Number(ComputeY());
 		zValues[i] = Number(ComputeZ());
