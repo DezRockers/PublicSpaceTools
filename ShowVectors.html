@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Space Tools Vectors</title>
+		<link rel="icon" href="icon.jpg">
+	<meta charset="utf-8" />
+	<!-- Automatically support high DPI devices -->
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+	<!-- Flexbox styling to have the chart and header fill the page.
+	Chart will take as much space as possible. -->
+	<style>
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+		}
+
+		.box {
+			display: flex;
+			flex-flow: column;
+			height: 100%;
+		}
+
+		.box .row.header {
+			flex: 0 1 auto;
+		}
+
+		.box .row.content {
+			flex: 1 1 auto;
+		}
+	</style>
+
+</head>
+
+<body class="box">
+	<h1 class="row header">Using LightningChart<sup>&#174;</sup> JS in Space Tools Vectors Page</h1>
+
+	<!-- Create div to render the chart into-->
+	<div id="target" class="row content"></div>
+
+	<!--IIFE assembly (lcjs.iife.js) is a standalone JS file, 
+	which does not need any build tools, 
+	such as NPM, to be installed-->
+	<!--Script source must be defined in it's own script tag-->
+	<script src="lightningchart/dist/lcjs.iife.js"></script>
+
+	<script src="generic.js"></script>
+
+	<!--Actual chart related script tag-->
+	<script>
+	// Replace the contents of this script tag if you want to test code from our examples:
+	// https://www.arction.com/lightningchart-js-interactive-examples/
+
+	// Extract required parts from LightningChartJS.
+	const {
+		lightningChart,
+		PointStyle3D,
+		ColorShadingStyles,
+		ColorRGBA,
+		SolidFill,
+		SolidLine,
+		AxisTickStrategies,
+		emptyLine,
+		emptyFill,
+		UIElementBuilders,
+		UIOrigins,
+		UIPanel,
+		Themes
+	} = lcjs //Note: @arction/lcjs is not needed here, when using IIFE assembly
+
+	// Create Dashboard and Charts.
+	const db = lightningChart().Dashboard({
+		numberOfColumns: 4,
+		numberOfRows: 1,
+	});
+ 
+	// Create UI panel inside Dashboard for placing legend.
+	const legendPanel = db.createUIPanel({
+		columnIndex: 3,
+		rowIndex: 0,
+		columnSpan: 1,
+		rowSpan: 1
+	})
+
+	// Create 3D chart inside Dashboard for placing vectors plot.
+	const chart = db.createChart3D({
+		columnIndex: 0,
+		rowIndex: 0,
+		columnSpan: 3,
+		rowSpan: 1
+	})
+		.setTitle('Vectors') // Set chart title
+            
+	chart.setCameraLocation({x:1,y:1,z:-1});
+
+            
+	// get each axis
+	let axisX = chart.getDefaultAxisX();
+	let axisY = chart.getDefaultAxisY();
+	let axisZ = chart.getDefaultAxisZ();
+            
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	//axisX.setTitle("X-axis");
+	//axisY.setTitle("Z-axis");
+	//axisZ.setTitle("Y-axis");
+            
+	axisX.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+	axisY.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+	axisZ.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+
+	// retrieve the position vectors back from localStorage by splitting on commas
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	var data = new Array();
+	var v1Vector = localStorage.getItem("v1Vector").split(',');
+	var v2Vector = localStorage.getItem("v2Vector").split(',');
+	var v3Vector = localStorage.getItem("v3Vector").split(',');
+	var point1 = {x:v1Vector[0], y:v1Vector[2], z:v1Vector[1]};
+	var point2 = {x:v2Vector[0], y:v2Vector[2], z:v2Vector[1]};
+	var point3 = {x:v3Vector[0], y:v3Vector[2], z:v3Vector[1]};
+       	
+	// compute max values for axis scaling
+	var Max = 0.0;
+	var r1 = Math.sqrt(v1Vector[0]*v1Vector[0] + v1Vector[1]*v1Vector[1] + v1Vector[2]*v1Vector[2]);
+	var r2 = Math.sqrt(v2Vector[0]*v2Vector[0] + v2Vector[1]*v2Vector[1] + v2Vector[2]*v2Vector[2]);
+	var r3 = Math.sqrt(v3Vector[0]*v3Vector[0] + v3Vector[1]*v3Vector[1] + v3Vector[2]*v3Vector[2]);
+	if (r1 > Max)
+	{
+		Max = r1;
+	}
+	if (r2 > Max)
+	{
+		Max = r2;
+	}
+	if (r3 > Max)
+	{
+		Max = r3;
+	}
+	// scale Max to give a margin
+	//Max = Max * 1.5;
+
+	// then scale the axes
+	axisX.setInterval(-Max, Max, false, true);
+	axisY.setInterval(-Max, Max, false, true);
+	axisZ.setInterval(-Max, Max, false, true); 
+        
+	// draw our own axes
+	const Xaxis = chart.addPointLineSeries()
+		.setName('X-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: Max, y: 0, z: 0 })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255) })	// set colour to white
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 255) }) )
+		)
+
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	const Yaxis = chart.addPointLineSeries()
+		.setName('Y-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: 0, y: 0, z: Max })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(0, 255, 0) })	// set colour to green
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 255, 0) }) )
+		)
+
+	const Zaxis = chart.addPointLineSeries()
+		.setName('Z-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: 0, y: Max, z: 0 })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 0) })	// set colour to yellow
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 0) }) )
+		)
+
+	// draw line to the vector 1
+	const lineToV1 = chart.addLineSeries()
+		.setName('Line to V1')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: point1.x, y: point1.y, z: point1.z })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to red
+		}))
+			 
+	// draw line to the vector 2
+	const lineToV2 = chart.addLineSeries()
+		.setName('Line to V2')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: point2.x, y: point2.y, z: point2.z })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 255) })	// set colour to blue
+		}))
+			 
+	// draw line to vector 3
+	const lineToV3 = chart.addLineSeries()
+		.setName('Line to V (Cross Prouct)')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: point3.x, y: point3.y, z: point3.z })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
+		}))
+	    
+	// Add LegendBox to slider panel.
+	const legend = legendPanel.addLegendBox()
+		// Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
+		.setAutoDispose({
+			type: 'max-width',
+			maxWidth: 0.30,
+		})
+		.setPosition({
+			x: 50,
+			y: 75
+		})
+		.add(chart)
+
+    
+	</script>
+</body>
+
+</html>

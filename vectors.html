@@ -186,6 +186,13 @@ function DisplayCrossProduct()
 		document.getElementById("thetasin").value = RadiansToDegrees(theta);
 	}
 	
+	// update local storage for passing between html pages
+	localStorage.setItem("v1Vector", V1);
+	localStorage.setItem("v2Vector", V2);
+	localStorage.setItem("v3Vector", V);
+
+	let target = document.getElementById('VisVectors');
+	target.style.visibility = "visible";
 }
 
 function DisplayDotProduct()
@@ -231,6 +238,8 @@ function ClearVectors()
 	document.getElementById("vector2").reset();
 	document.getElementById("OutputVector").reset();
 	document.getElementById("OutputScalar").reset();
+	let target = document.getElementById('VisVectors');
+	target.style.visibility = "hidden";
 }
 
 function Help()
@@ -331,6 +340,7 @@ Cross Product<br />
 <button type="button" onclick="NormaliseV()">Normalise <u>V</u></button><br />
 <button type="button" onclick="DenormaliseV()">Denormalise <u>V</u></button><br />
 <button type="button" onclick="DisplayCrossProduct()">Vector Cross Product</button><br />
+<button type="button" id="VisVectors" style="visibility:hidden" onclick="window.open('ShowVectors.html', '_blank');">Visualise Vectors</button><br />
 </td>
 
 <td style="vertical-align:top;">
