@@ -420,7 +420,9 @@
 
 	// help button
 	help.onclick = () => {
-		var txt = "Toggle the Animate On/Off button to start/stop the orbital point update.\n\n";
+		var txt = "Toggle the Animate On/Off button to start/stop the orbital point update.\n";
+		txt = txt + "Note that animation resumes from the point of perigee rather than from where it was previosuly stopped.\n";
+		txt = txt + "The animation rate accounts for the eccentricity though any variation in speed may only be observed for highly eccentric orbits.\n\n";
 		txt = txt + "Use the Earth Transparency Slider to vary the transparency of the Earth and Equatorial plane.\n";
 		txt = txt + "This may be useful to display axes, angles and/or vectors within the Earth.\n\n";
 		txt = txt + "Hover over an item in the legend display to highlight that item in the 3D Orbital Plot.\n\n";
