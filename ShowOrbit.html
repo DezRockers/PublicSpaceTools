@@ -2,466 +2,477 @@
 <html lang="en">
 
 <head>
-    <title>Space Tools Orbit</title>
-	<link rel="icon" href="icon.jpg">
-    <meta charset="utf-8" />
-    <!-- Automatically support high DPI devices -->
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Space Tools Orbit</title>
+		<link rel="icon" href="icon.jpg">
+	<meta charset="utf-8" />
+	<!-- Automatically support high DPI devices -->
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <!-- Flexbox styling to have the chart and header fill the page.
-        Chart will take as much space as possible. -->
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
+	<!-- Flexbox styling to have the chart and header fill the page.
+	Chart will take as much space as possible. -->
+	<style>
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+		}
 
-        .box {
-            display: flex;
-            flex-flow: column;
-            height: 100%;
-        }
+		.box {
+			display: flex;
+			flex-flow: column;
+			height: 100%;
+		}
 
-        .box .row.header {
-            flex: 0 1 auto;
-        }
+		.box .row.header {
+			flex: 0 1 auto;
+		}
 
-        .box .row.content {
-            flex: 1 1 auto;
-        }
-    </style>
+		.box .row.content {
+			flex: 1 1 auto;
+		}
+	</style>
 </head>
 
 <body class="box">
-    <h1 class="row header">Using LightningChart<sup>&#174;</sup> JS in Space Tools Orbital Plot Page</h1>
+	<h1 class="row header">Using LightningChart<sup>&#174;</sup> JS in Space Tools Orbital Plot Page</h1>
 
-    <!-- Create div to render the chart into-->
-    <div id="target" class="row content"></div>
+	<!-- Create div to render the chart into-->
+	<div id="target" class="row content"></div>
 
-    <!--IIFE assembly (lcjs.iife.js) is a standalone JS file, 
-      which does not need any build tools, 
-      such as NPM, to be installed-->
-    <!--Script source must be defined in it's own script tag-->
-    <script src="lightningchart/dist/lcjs.iife.js"></script>
+	<!--IIFE assembly (lcjs.iife.js) is a standalone JS file, 
+	which does not need any build tools, 
+	such as NPM, to be installed-->
+	<!--Script source must be defined in it's own script tag-->
+	<script src="lightningchart/dist/lcjs.iife.js"></script>
 
-    <!--Actual chart related script tag-->
-    <script>
-        // Replace the contents of this script tag if you want to test code from our examples:
-        // https://www.arction.com/lightningchart-js-interactive-examples/
+	<!--Actual chart related script tag-->
+	<script>
+	// Replace the contents of this script tag if you want to test code from our examples:
+	// https://www.arction.com/lightningchart-js-interactive-examples/
 
-        // Extract required parts from LightningChartJS.
-        const {
-            lightningChart,
-    		PointStyle3D,
-    		ColorShadingStyles,
-    		ColorRGBA,
-    		SolidFill,
-    		SolidLine,
-    		AxisTickStrategies,
-		    emptyLine,
-    		emptyFill,
-    		UIElementBuilders,
-    		UIOrigins,
-    		UIPanel,
-    		Themes
-        } = lcjs //Note: @arction/lcjs is not needed here, when using IIFE assembly
+	// Extract required parts from LightningChartJS.
+	const {
+		lightningChart,
+		PointStyle3D,
+		ColorShadingStyles,
+		ColorRGBA,
+		SolidFill,
+		SolidLine,
+		AxisTickStrategies,
+		emptyLine,
+		emptyFill,
+		UIElementBuilders,
+		UIOrigins,
+		UIPanel,
+		Themes
+	} = lcjs //Note: @arction/lcjs is not needed here, when using IIFE assembly
 
-		// Create Dashboard and Charts.
-		const db = lightningChart().Dashboard({
-		  numberOfColumns: 4,
-		  numberOfRows: 3,
-		});
+	// Create Dashboard and Charts.
+	const db = lightningChart().Dashboard({
+		numberOfColumns: 4,
+		numberOfRows: 1,
+	});
  
-		// Create UI panel inside Dashboard for placing legend.
-		const legendPanel = db.createUIPanel({
-		  columnIndex: 3,
-		  rowIndex: 0,
-		  columnSpan: 1,
-		  rowSpan: 2
-		})
+	// Create UI panel inside Dashboard for placing legend.
+	//const legendPanel = db.createUIPanel({
+	//	columnIndex: 3,
+	//	rowIndex: 0,
+	//	columnSpan: 1,
+	//	rowSpan: 1
+	//})
 
-		// Create UI panel inside Dashboard for placing transparency slider.
-		const sliderPanel = db.createUIPanel({
-		  columnIndex: 3,
-		  rowIndex: 2,
-		  columnSpan: 1,
-		  rowSpan: 1
-		});
+	// Create UI panel inside Dashboard for placing transparency slider.
+	const sliderPanel = db.createUIPanel({
+		columnIndex: 3,
+		rowIndex: 0,
+		columnSpan: 1,
+		rowSpan: 1
+	});
 
-		// add text boxes to the slider panel
-		const sliderTitle = sliderPanel.addUIElement(
-                UIElementBuilders.TextBox
-            )
-			.setPosition({
-			    x: 50,
-			    y: 75
-			  })
-            .setText('Earth Transparency Level')
+	// Create 3D chart inside Dashboard for placing orbital plot.
+	const chart = db.createChart3D({
+		columnIndex: 0,
+		rowIndex: 0,
+		columnSpan: 3,
+		rowSpan: 1
+	})
+		.setTitle('Orbital Plot') // Set chart title
             
-		const sliderMin = sliderPanel.addUIElement(
-                UIElementBuilders.TextBox
-            )
-			.setPosition({
-			    x: 15,
-			    y: 30
-			  })
-            .setText('Transparent')
-
-		const sliderMax = sliderPanel.addUIElement(
-                UIElementBuilders.TextBox
-            )
-			.setPosition({
-			    x: 90,
-			    y: 30
-			  })
-            .setText('Opaque')
-
-		// Create 3D chart inside Dashboard for placing orbital plot.
-		const chart = db.createChart3D({
-	        columnIndex: 0,
-	        rowIndex: 0,
-	        columnSpan: 3,
-	        rowSpan: 3
-	    })
-            .setTitle('Orbital Plot') // Set chart title
-            
-        chart.setCameraLocation({x:1,y:1,z:-1});
+	chart.setCameraLocation({x:1,y:1,z:-1});
 
             
-        // get each axis
-        let axisX = chart.getDefaultAxisX();
-        let axisY = chart.getDefaultAxisY();
-        let axisZ = chart.getDefaultAxisZ();
+	// get each axis
+	let axisX = chart.getDefaultAxisX();
+	let axisY = chart.getDefaultAxisY();
+	let axisZ = chart.getDefaultAxisZ();
             
-		// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
-            //axisX.setTitle("X-axis");
-            //axisY.setTitle("Z-axis");
-            //axisZ.setTitle("Y-axis");
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	//axisX.setTitle("X-axis");
+	//axisY.setTitle("Z-axis");
+	//axisZ.setTitle("Y-axis");
             
-            axisX.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
-            axisY.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
-            axisZ.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+	axisX.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+	axisY.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+	axisZ.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
 
-        //const data = [
-        //    { x: 7100, y: 0, z: 0 },
-        //    { x: 7000, y: 1000, z: 1000 },
-        //    { x: 6800, y: 2000, z: 2000 },
-        //    { x: 6500, y: 2800, z: 2800 },
-        //    { x: 6000, y: 3000, z: 3000 }
-        //]
-		
-		// retrieve the position vectors back from localStorage by splitting on commas
-		// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
-       	var data = new Array();
-       	var xValues = localStorage.getItem("xValues").split(',');
-       	var yValues = localStorage.getItem("zValues").split(',');
-       	var zValues = localStorage.getItem("yValues").split(',');
+	// retrieve the position vectors back from localStorage by splitting on commas
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	// there is a data point for each degree of Mean anomaly from 0 to 360
+	var data = new Array();
+	var xValues = localStorage.getItem("xValues").split(',');
+	var yValues = localStorage.getItem("zValues").split(',');
+	var zValues = localStorage.getItem("yValues").split(',');
        	
-       	// compute max values for axis scaling
-       	var Max = 0.0;
-        for (i = 0; i < xValues.length; i++)
-        {
-        	var point = {x:xValues[i], y:yValues[i], z:zValues[i]};
-        	if (Math.abs(xValues[i]) > Max)
-        	{
-        		Max = Math.abs(xValues[i]);
-        	}
-        	if (Math.abs(yValues[i]) > Max)
-        	{
-        		Max = Math.abs(yValues[i]);
-        	}
-        	if (Math.abs(zValues[i]) > Max)
-        	{
-        		Max = Math.abs(zValues[i]);
-        	}
-        	data[i] = point;
+	// compute max values for axis scaling
+	var Max = 0.0;
+	for (i = 0; i < xValues.length; i++)
+	{
+		var point = {x:xValues[i], y:yValues[i], z:zValues[i]};
+		if (Math.abs(xValues[i]) > Max)
+		{
+			Max = Math.abs(xValues[i]);
 		}
-		// scale Max to give a margin
-		Max = Max * 1.5;
+		if (Math.abs(yValues[i]) > Max)
+		{
+			Max = Math.abs(yValues[i]);
+		}
+		if (Math.abs(zValues[i]) > Max)
+		{
+			Max = Math.abs(zValues[i]);
+		}
+		data[i] = point;
+	}
+	// scale Max to give a margin
+	Max = Max * 1.5;
 
-        // Add a line series for the orbit
-        const orbitData = chart.addLineSeries()
-            .setName('Orbit data')
-            .add(data)
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(150, 0, 0) })	// set colour to dark redish
-			 }))
+	// Add a line series for the orbit
+	const orbitData = chart.addLineSeries()
+		.setName('Orbital Path')
+		.add(data)
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(150, 0, 0) })	// set colour to dark redish
+		}))
         	
-        // then scale the axes
-        axisX.setInterval(-Max, Max, false, true);
-        axisY.setInterval(-Max, Max, false, true);
-        axisZ.setInterval(-Max, Max, false, true); 
+	// then scale the axes
+	axisX.setInterval(-Max, Max, false, true);
+	axisY.setInterval(-Max, Max, false, true);
+	axisZ.setInterval(-Max, Max, false, true); 
         
-        // draw our own axes
-        const Xaxis = chart.addPointLineSeries()
-            .setName('X-axis')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: Max, y: 0, z: 0 })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255) })	// set colour to white
-			 }))
-        	.setPointStyle( (pointStyle) => pointStyle
-        		.setShape( 'sphere' )
-        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 255) }) )
-        	)
+	// draw our own axes
+	const Xaxis = chart.addPointLineSeries()
+		.setName('X-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: Max, y: 0, z: 0 })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255) })	// set colour to white
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 255) }) )
+		)
 
-		// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
-		const Yaxis = chart.addPointLineSeries()
-            .setName('Y-axis')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: 0, y: 0, z: Max })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(0, 255, 0) })	// set colour to green
-			 }))
-        	.setPointStyle( (pointStyle) => pointStyle
-        		.setShape( 'sphere' )
-        		.setFillStyle( new SolidFill({ color: ColorRGBA(0, 255, 0) }) )
-        	)
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	const Yaxis = chart.addPointLineSeries()
+		.setName('Y-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: 0, y: 0, z: Max })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(0, 255, 0) })	// set colour to green
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 255, 0) }) )
+		)
 
-        const Zaxis = chart.addPointLineSeries()
-            .setName('Z-axis')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: 0, y: Max, z: 0 })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 0) })	// set colour to yellow
-			 }))
-        	.setPointStyle( (pointStyle) => pointStyle
-        		.setShape( 'sphere' )
-        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 0) }) )
-        	)
+	const Zaxis = chart.addPointLineSeries()
+		.setName('Z-axis')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: 0, y: Max, z: 0 })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 0) })	// set colour to yellow
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 0) }) )
+		)
 
-		// some constants
-		var a = Number(localStorage.getItem("semiMajorAxis"));	// km
-		var Re = 6378;	// km
-		var pi = 3.1415926535897932384626433832795;
+	// some constants
+	const a = Number(localStorage.getItem("semiMajorAxis"));	// km
+	const Re = 6378;	// km
+	const pi = 3.1415926535897932384626433832795;
 
-		// draw line to the ascending node
-		var ascendingNode = Number(localStorage.getItem("ascendingNode"));	// radians
-		var ascendingNodeDistance = Number(localStorage.getItem("ascendingNodeDistance"));	// km
-		X = ascendingNodeDistance * Math.cos(ascendingNode);
-		Y = ascendingNodeDistance * Math.sin(ascendingNode);
-        const lineToAcsendingNode = chart.addLineSeries()
-            .setName('Line to Ascending Node')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: X, y: 0, z: Y })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
-			 }))
+	// draw line to the ascending node
+	var ascendingNode = Number(localStorage.getItem("ascendingNode"));	// radians
+	var ascendingNodeDistance = Number(localStorage.getItem("ascendingNodeDistance"));	// km
+	X = ascendingNodeDistance * Math.cos(ascendingNode);
+	Y = ascendingNodeDistance * Math.sin(ascendingNode);
+	const lineToAcsendingNode = chart.addLineSeries()
+		.setName('Line to Ascending Node')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: X, y: 0, z: Y })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+		}))
 			 
-        // Add a point series for the ascending node angle
-        const ascendingNodeAngle = chart.addLineSeries()
-            .setName('Ascending Node Angle')
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
-			 }))
+	// Add a line series for the ascending node angle
+	const ascendingNodeAngle = chart.addLineSeries()
+		.setName('Ascending Node Angle')
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+		}))
 			 
-        for (i = 0; i < ascendingNode*180/pi; i++)
-        {
-        	var X = a * Math.cos(i*pi/180);
-        	var Y = a * Math.sin(i*pi/180);
-        	var point = {x:X/5, y:0, z:Y/5};	// scaled by factor of 5
-        	ascendingNodeAngle.add(point);
-		}
+	for (i = 0; i < ascendingNode*180/pi; i++)
+	{
+		var X = a * Math.cos(i*pi/180);
+		var Y = a * Math.sin(i*pi/180);
+		var point = {x:X/5, y:0, z:Y/5};	// scaled by factor of 5
+		ascendingNodeAngle.add(point);
+	}
         	
-		// draw line to the perigee
-		var perigeeX = Number(localStorage.getItem("perigeeX"));
-		var perigeeY = Number(localStorage.getItem("perigeeY"));
-		var perigeeZ = Number(localStorage.getItem("perigeeZ"));
-        const lineToPerigee = chart.addLineSeries()
-            .setName('Line to Perigee')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: perigeeX, y: perigeeZ, z: perigeeY })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to ?
-			 }))
+	// draw line to the perigee
+	var perigeeX = Number(localStorage.getItem("perigeeX"));
+	var perigeeY = Number(localStorage.getItem("perigeeY"));
+	var perigeeZ = Number(localStorage.getItem("perigeeZ"));
+	const lineToPerigee = chart.addLineSeries()
+		.setName('Line to Perigee')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: perigeeX, y: perigeeZ, z: perigeeY })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to dirty green
+		}))
 			 
-	    // draw the angular momentum vector scaled to 'a'
-	    var h = localStorage.getItem("h").split(',');
-	    h[0] = h[0]*a;
-	    h[1] = h[1]*a;
-	    h[2] = h[2]*a;
-        const angularMomentum = chart.addPointLineSeries()
-            .setName('Angular Momentum Vector')
-            .add({ x: 0, y: 0, z: 0 })
-            .add({ x: h[0], y: h[2], z: h[1] })
-        	.setStrokeStyle(new SolidLine({
-			     thickness: 2,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
-			 }))
-        	.setPointStyle( (pointStyle) => pointStyle
-        		.setShape( 'sphere' )
-        		.setFillStyle( new SolidFill({ color: ColorRGBA(255, 192, 203) }) )
-        	)
+	// Add a line series for the argument of perigee
+	const argumentOfPerigeee = chart.addLineSeries()
+		.setName('Argument of Perigeee')
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to dirty green
+		}))
+	var perigeeAngleDegrees = Number(localStorage.getItem("argumentOfPerigee"))*180/pi;
+	for (i = xValues.length-1; i >= xValues.length-perigeeAngleDegrees; i--)
+	{
+		var X = xValues[i];
+		var Y = yValues[i];
+		var Z = zValues[i];
+		var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
+		argumentOfPerigeee.add(point);
+	}
+        	
+	// draw the angular momentum vector scaled to 'a'
+	var h = localStorage.getItem("h").split(',');
+	h[0] = h[0]*a;
+	h[1] = h[1]*a;
+	h[2] = h[2]*a;
+	const angularMomentum = chart.addPointLineSeries()
+		.setName('Angular Momentum Vector')
+		.add({ x: 0, y: 0, z: 0 })
+		.add({ x: h[0], y: h[2], z: h[1] })
+		.setStrokeStyle(new SolidLine({
+			thickness: 3,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
+		}))
+		.setPointStyle( (pointStyle) => pointStyle
+			.setShape( 'sphere' )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 192, 203) }) )
+		)
 	    
-		// draw equatorial plane
-		// remembering to swap Y and Z coordinates!
-        const equatorialPlane = chart.addPointSeries()
-	    // Specify ellipsoid center coordinate.
-	    .setName('Equatorial Plane')
-	    .add({ x: 0, y: 0, z: 0 })
-	    .setColorShadingStyle(new ColorShadingStyles.Phong())
-	    .setPointStyle(new PointStyle3D.Triangulated({
-	        // Specify ellipsoid dimensions.
-	        // it looks like the size is the diameter
-	        // so we need to double earth's radius
-	        // including flattening at poles
-	        size: { x: a*2, y: 0*2, z: a*2 },
-	        fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 100, 255) })	// set colour to dark bluish with some transparency
-	    }))
-
-        // draw a solid sphere for the earth
-        const ellipsoidSeries = chart.addPointSeries()
-	    // Specify ellipsoid center coordinate.
-	    .setName('Earth')
-	    .add({ x: 0, y: 0, z: 0 })
-	    .setColorShadingStyle(new ColorShadingStyles.Phong())
-	    .setPointStyle(new PointStyle3D.Triangulated({
-	        // Specify ellipsoid dimensions.
-	        // it looks like the size is the diameter
-	        // so we need to double earth's radius
-	        // including flattening at poles
-	        size: { x: 6378*2, y: 6378*2, z: 6357*2 },
-	        fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 255, 255) })	// set colour to bluish but add some transparency
-	    }))
-
-		// Add LegendBox to panel.
-		const legend = legendPanel.addLegendBox()
-	    // Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
-    	.setAutoDispose({
-        	type: 'max-width',
-        	maxWidth: 0.30,
-    	})
-		.setPosition({
-		    x: 75,
-		    y: 60
-		})
-	    .add(chart)
-
-		// Add dynamically injected HTML elements for active transparency slider.
-		const transparencyDiv = document.createElement("div");
-		transparencyDiv.id = "block";
-		const transparencySlider = document.createElement("input");
-		transparencySlider.type = "range";
-		transparencySlider.min = 0;
-		transparencySlider.max = 255;
-		transparencySlider.value = transparencySlider.max;
-		transparencySlider.id = "slider";
-		const transparencyMarker = document.createElement("span");
-		transparencyMarker.id = "marker";
-		transparencyDiv.appendChild(transparencyMarker);
-		transparencyDiv.appendChild(transparencySlider);
-		db.engine.container.append(transparencyDiv);
+	// Add dynamically injected HTML elements for active transparency slider.
+	const transparencyDiv = document.createElement("div");
+	transparencyDiv.id = "block";
+	const transparencySlider = document.createElement("input");
+	transparencySlider.type = "range";
+	transparencySlider.min = 0;
+	transparencySlider.max = 255;
+	transparencySlider.value = transparencySlider.max;
+	transparencySlider.id = "slider";
+	const transparencyMarker = document.createElement("span");
+	transparencyMarker.id = "marker";
+	transparencyDiv.appendChild(transparencyMarker);
+	transparencyDiv.appendChild(transparencySlider);
+	db.engine.container.append(transparencyDiv);
 		
-		const animationDiv = document.createElement("div");
-		animationDiv.id = "block2";
-		const animationFlag = document.createElement("input");
-		animationFlag.type = "text";
-		animationFlag.value = "Animation On";
-		animationFlag.id = "animationFlag";
-		animationDiv.appendChild(animationFlag);
-		db.engine.container.append(animationDiv);
+	const animationDiv = document.createElement("div");
+	animationDiv.id = "block2";
+	const animationFlag = document.createElement("input");
+	animationFlag.type = "text";
+	animationFlag.value = "Animation On";
+	animationFlag.id = "animationFlag";
+	animationDiv.appendChild(animationFlag);
+	db.engine.container.append(animationDiv);
 		
-		const markerColorBlue = "rgb(0, 0, 200, 0.6)";
-		const markerColorDarkBlue = "rgb(0, 0, 150)";
-		const markerColorRed = "rgb(200, 0, 0)";
-		const markerColorDarkRed = "rgb(150, 0, 0)";
+	const markerColorBlue = "rgb(0, 0, 200, 0.6)";
+	const markerColorDarkBlue = "rgb(0, 0, 150)";
+	const markerColorRed = "rgb(200, 0, 0)";
+	const markerColorDarkRed = "rgb(150, 0, 0)";
 		
-		let currentTransparency = transparencySlider.min;
-		let interval;
+	let currentTransparency = transparencySlider.min;
+	let interval;
+	transparencyMarker.textContent = transparencySlider.value;
+
+	transparencySlider.oninput = () => {
+		currentTransparency = transparencySlider.value;
+		transparencyMarker.style.background = markerColorBlue;
+		const value =
+			((transparencySlider.value - transparencySlider.min) * 100) /
+			(transparencySlider.max - transparencySlider.min);
+		transparencySlider.style.background =
+			"linear-gradient(to right, rgba(0, 0, 255, .6)" +
+			value +
+			"%, #fff " +
+			value +
+			"%, white 100%)";
 		transparencyMarker.textContent = transparencySlider.value;
+		equatorialPlane.setPointStyle( (pointStyle) => pointStyle
+			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 100, transparencySlider.value) }) )
+	 	)
+		ellipsoidSeries.setPointStyle( (pointStyle) => pointStyle
+			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 255, transparencySlider.value) }) )
+		)
+	};
 
-		transparencySlider.oninput = () => {
-	      currentTransparency = transparencySlider.value;
-	      transparencyMarker.style.background = markerColorBlue;
-	      const value =
-	        ((transparencySlider.value - transparencySlider.min) * 100) /
-	        (transparencySlider.max - transparencySlider.min);
-	      transparencySlider.style.background =
-	        "linear-gradient(to right, rgba(0, 0, 255, .6)" +
-	        value +
-	        "%, #fff " +
-	        value +
-	        "%, white 100%)";
-	       transparencyMarker.textContent = transparencySlider.value;
-			equatorialPlane.setPointStyle( (pointStyle) => pointStyle
-     			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 100, transparencySlider.value) }) )
- 			)
-			ellipsoidSeries.setPointStyle( (pointStyle) => pointStyle
-     			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 255, transparencySlider.value) }) )
- 			)
-	    };
-
-		// change the color of the marker on hover
-	    transparencyMarker.onmouseover = () => {
-	        transparencyMarker.style.background = markerColorDarkBlue;
-	    };
+	// change the color of the marker on hover
+	transparencyMarker.onmouseover = () => {
+		transparencyMarker.style.background = markerColorDarkBlue;
+	};
 	
-	    // reset the color of the marker on mouse out
-	    transparencyMarker.onmouseout = () => {
-	        transparencyMarker.style.background = markerColorBlue;
-	    };
+	// reset the color of the marker on mouse out
+	transparencyMarker.onmouseout = () => {
+		transparencyMarker.style.background = markerColorBlue;
+	};
 	
-	    // pause/start timeline by clicking the marker
-	    transparencyMarker.onclick = () => {
-	        transparencyMarker.style.background = markerColorBlue;
-	    };
+	// pause/start timeline by clicking the marker
+	transparencyMarker.onclick = () => {
+		transparencyMarker.style.background = markerColorBlue;
+	};
 
-	    // pause/start timeline by clicking the marker
-	    let freezeData = false
-	    animationFlag.onclick = () => {
-	      if (freezeData) {
-	        freezeData = false;
-	        animationFlag.value = "Animation On";
-	        updateData();
-	      } else {
-	        freezeData = true;
-	        animationFlag.value = "Animation Off";
-	        clearInterval(interval);
-	      }
-	    };
-
-    // Animate orbit data.
-    const orbitData2 = chart.addLineSeries()
-        .setName('Orbit data 2')
-    const updateData = () => {
-        if (freezeData == false)
-        {
-        	var i = 0;
-			interval = setInterval(() => {
-        		const point = data[i];
-			 	orbitData2.clear();
-        		orbitData2.add(point);
-        		orbitData2.setStrokeStyle(new SolidLine({
-			     thickness: 10,
-			     fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to redish
-			 	}))
-			 i++;
-			 if (i >= 360)
-			 {
-			 	i = 0;
-			 }
-			}, 20);
-        }
-    }
-    updateData()
-
-
-
-	    
-	    // Dynamically inject some CSS to example.
-		function addStyle(styleString) {
-		  const style = document.createElement("style");
-		  style.textContent = styleString;
-		  document.head.append(style);
+	// pause/start timeline by clicking the marker
+	let freezeData = false
+	animationFlag.onclick = () => {
+		if (freezeData)
+		{
+			freezeData = false;
+			animationFlag.value = "Animation On";
+			updateData();
+		} 
+		else
+		{
+			freezeData = true;
+			animationFlag.value = "Animation Off";
+			clearInterval(interval);
 		}
+	};
+
+	// Animate orbit data.
+	const orbitData2 = chart.addLineSeries()
+		.setName('Point in Orbit')
+		.setStrokeStyle(new SolidLine({
+			thickness: 10,
+			fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to redish
+		}));
+	const updateData = () => 
+	{
+		if (freezeData == false)
+		{
+			var i = 0;
+			interval = setInterval(() => {
+				const point = data[i];
+				orbitData2.clear();
+				orbitData2.add(point);
+				i++;
+				if (i >= 360)
+				{
+					i = 0;
+				}
+			}, 20);
+		}
+	}
+	updateData();
+
+	// draw equatorial plane
+	// remembering to swap Y and Z coordinates!
+	const equatorialPlane = chart.addPointSeries()
+		.setName('Equatorial Plane')
+		// Specify ellipsoid center coordinate.
+		.add({ x: 0, y: 0, z: 0 })
+		.setColorShadingStyle(new ColorShadingStyles.Phong())
+		.setPointStyle(new PointStyle3D.Triangulated({
+			// Specify ellipsoid dimensions. Note we can make a circular plane by setting Y dimension to be 0.
+			// it looks like the size is the diameter
+			// so we need to double earth's radius
+			// including flattening at poles
+			size: { x: a*2, y: 0*2, z: a*2 },
+			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 100, 255) })	// set colour to dark bluish with some transparency
+		}))
+
+	// draw a solid sphere for the earth
+	const ellipsoidSeries = chart.addPointSeries()
+		.setName('Earth')
+		// Specify ellipsoid center coordinate.
+		.add({ x: 0, y: 0, z: 0 })
+		.setColorShadingStyle(new ColorShadingStyles.Phong())
+		.setPointStyle(new PointStyle3D.Triangulated({
+			// Specify ellipsoid dimensions.
+			// it looks like the size is the diameter
+			// so we need to double earth's radius
+			// including flattening at poles
+			size: { x: 6378*2, y: 6378*2, z: 6357*2 },
+			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 255, 255) })	// set colour to bluish but add some transparency
+		}))
+
+	// Add LegendBox to slider panel.
+	const legend = sliderPanel.addLegendBox()
+		// Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
+		.setAutoDispose({
+			type: 'max-width',
+			maxWidth: 0.30,
+		})
+		.setPosition({
+			x: 70,
+			y: 75
+		})
+		.add(chart)
+
+	// add text boxes to the slider panel
+	const sliderTitle = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: 50,
+			y: 25
+		})
+		.setText('Earth Transparency Level')
+            
+	const sliderMin = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: 15,
+			y: 10
+		})
+		.setText('Transparent')
+
+	const sliderMax = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: 90,
+			y: 10
+		})
+		.setText('Opaque')
+
+	// Dynamically inject some CSS to example.
+	function addStyle(styleString) {
+		const style = document.createElement("style");
+		style.textContent = styleString;
+		document.head.append(style);
+	}
 
 addStyle(`
 
@@ -537,7 +548,7 @@ addStyle(`
   #block2{
     width: 25%;
     height: 30px;
-    top: calc(50% - 13px);
+    top: calc(55% - 13px);
     right: -2px;
     position: absolute;
     display: flex;
@@ -578,7 +589,7 @@ addStyle(`
   `);
 
 	    
-    </script>
+	</script>
 </body>
 
 </html>
