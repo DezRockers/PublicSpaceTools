@@ -256,11 +256,23 @@
 			fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to dirty green
 		}))
 	var perigeeAngleDegrees = Number(localStorage.getItem("argumentOfPerigee"))*180/pi;
-	for (i = xValues.length-1; i >= xValues.length-perigeeAngleDegrees; i--)
+	// note the logic needs to account for high eccentricity where the true anomaly can be totally different to the mean anomaly
+	// and the data values have been generated based on mean anomaly increments of 1 degree
+	// we can get around this by excluding points after the sign of the z-values have changed from positve to negative (remembering the problem with Y and Z axes!)
+	// because then we have reached the line of the ascending node from which the argument of perigee is measured
+	var Z_prev = yValues[xValues.length-1];
+	var Z_sign_change = false;
+	for (i = xValues.length-1; i >= 0; i--)
 	{
 		var X = xValues[i];
 		var Y = yValues[i];
 		var Z = zValues[i];
+		if ((Y < 0) && (Z_prev > 0))
+		{
+			Z_sign_change = true;
+			break;
+		}
+		Z_prev = Y;
 		var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
 		argumentOfPerigeee.add(point);
 	}
