@@ -241,9 +241,10 @@
 		var pi = 3.1415926535897932384626433832795;
 
 		// draw line to the ascending node
-		var ascendingNode = Number(localStorage.getItem("ascendingNode"));	// degrees
-		X = a * Math.cos(ascendingNode*pi/180);
-		Y = a * Math.sin(ascendingNode*pi/180);
+		var ascendingNode = Number(localStorage.getItem("ascendingNode"));	// radians
+		var ascendingNodeDistance = Number(localStorage.getItem("ascendingNodeDistance"));	// km
+		X = ascendingNodeDistance * Math.cos(ascendingNode);
+		Y = ascendingNodeDistance * Math.sin(ascendingNode);
         const lineToAcsendingNode = chart.addLineSeries()
             .setName('Line to Ascending Node')
             .add({ x: 0, y: 0, z: 0 })
@@ -251,6 +252,35 @@
         	.setStrokeStyle(new SolidLine({
 			     thickness: 2,
 			     fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+			 }))
+			 
+        // Add a point series for the ascending node angle
+        const ascendingNodeAngle = chart.addLineSeries()
+            .setName('Ascending Node Angle')
+        	.setStrokeStyle(new SolidLine({
+			     thickness: 2,
+			     fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+			 }))
+			 
+        for (i = 0; i < ascendingNode*180/pi; i++)
+        {
+        	var X = a * Math.cos(i*pi/180);
+        	var Y = a * Math.sin(i*pi/180);
+        	var point = {x:X/5, y:0, z:Y/5};	// scaled by factor of 5
+        	ascendingNodeAngle.add(point);
+		}
+        	
+		// draw line to the perigee
+		var perigeeX = Number(localStorage.getItem("perigeeX"));
+		var perigeeY = Number(localStorage.getItem("perigeeY"));
+		var perigeeZ = Number(localStorage.getItem("perigeeZ"));
+        const lineToPerigee = chart.addLineSeries()
+            .setName('Line to Perigee')
+            .add({ x: 0, y: 0, z: 0 })
+            .add({ x: perigeeX, y: perigeeZ, z: perigeeY })
+        	.setStrokeStyle(new SolidLine({
+			     thickness: 2,
+			     fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to ?
 			 }))
 			 
 	    // draw the angular momentum vector scaled to 'a'

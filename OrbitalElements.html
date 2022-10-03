@@ -341,8 +341,28 @@ function LoopOrbit()
 	localStorage.setItem("xValues", xValues);
 	localStorage.setItem("yValues", yValues);
 	localStorage.setItem("zValues", zValues);
-	localStorage.setItem("semiMajorAxis", document.getElementById("a").value);
-	localStorage.setItem("ascendingNode", document.getElementById("Omega").value);
+	
+	var a = document.getElementById("a").value;
+	var Omega = DegreesToRadians(document.getElementById("Omega").value);	// radians
+	var i = DegreesToRadians(document.getElementById("i").value);			// radians
+	var w = DegreesToRadians(document.getElementById("w").value);			// radians
+	
+	// derive the perigee vector for display purposes
+	var perigee = a*(1-e);
+	var px = perigee * (Math.cos(w)*Math.cos(Omega) - Math.sin(w)*Math.cos(i)*Math.sin(Omega));
+	var py = perigee * (Math.cos(w)*Math.sin(Omega) + Math.sin(w)*Math.cos(i)*Math.cos(Omega));
+	var pz = perigee * Math.sin(w)*Math.sin(i);
+	
+	localStorage.setItem("semiMajorAxis", a);
+	localStorage.setItem("ascendingNode", Omega);	// radians
+	localStorage.setItem("perigeeX", px);
+	localStorage.setItem("perigeeY", py);
+	localStorage.setItem("perigeeZ", pz);
+	
+	// derive the asecending node distance for display purposes
+	// the ascending node is where v =-w 
+	var R = a*(1-e*e) / (1.0 + e * Math.cos(-w))
+	localStorage.setItem("ascendingNodeDistance", R);	// km
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 
