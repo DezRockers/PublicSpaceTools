@@ -24,7 +24,6 @@ a:active {
   text-decoration: underline;
 }
 </style>
-</style>
 
 <script src="generic.js"></script>
 
@@ -152,9 +151,9 @@ function TC_frame( bytes )
 // Generate the file download URL and assign it to the link
 function GenerateReport()
 {
-	var report = "Date created : " + new Date() + "\n";
+	var report = "TC Frame Report created on : " + new Date() + "\n";
 	report = report + "Input TC Frame (hex bytes) : " + document.getElementById("inputString").value + "\n";
-	report = report + "TC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
+	report = report + "\nTC Frame Version Number : " + document.getElementById("versionNumber").value + "\n";
 	report = report + "TC Frame Bypass Flag : " + document.getElementById("bypassFlag").value + "\n";
 	report = report + "TC Frame Command Control Flag : " + document.getElementById("controlCommandFlag").value + "\n";
 	report = report + "TC Frame Command Control Meaning : " + document.getElementById("interpretation").value + "\n";
@@ -168,6 +167,7 @@ function GenerateReport()
 	report = report + "TC Frame MAP ID : " + document.getElementById("mapId").value + "\n";
 	report = report + "TC Frame CRC (hex bytes) : " + document.getElementById("frameCrc").value + "\n";
 	report = report + "Contained TC Packet (hex bytes) : " + document.getElementById("tcPacket").value + "\n";
+	report = report + "\nTC Frame Other Useful Data : \n";
 	report = report + "TC Frame Total Length (decimal) : " + document.getElementById("totalFrameLength").value + "\n";
 	report = report + "TC Frame Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
 	report = report + "TC Frame User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";

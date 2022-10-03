@@ -2,6 +2,30 @@
 <html>
 <head>
 
+<style>
+a:link {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:visited {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:hover {
+  color: red;
+  background-color: white;
+  text-decoration: underline;
+}
+a:active {
+  color: green;
+  background-color: white;
+  text-decoration: underline;
+}
+</style>
+
+
 <script src="generic.js"></script>
 
 <script type="text/javascript">
@@ -114,6 +138,37 @@ function TC_packet( bytes )
 	document.getElementById("userDataLength").value = bytes.length - packetStartByte - 2;
 	document.getElementById("totalTrailerLength").value = 2;
 
+	GenerateReport();
+}
+
+// Generate the file download URL and assign it to the link
+function GenerateReport()
+{
+	var report = "TC Packet Report created on: " + new Date() + "\n";
+	report = report + "Input TC Packet (hex bytes) : " + document.getElementById("inputString").value + "\n";
+	report = report + "\nTC Packet Version Number : " + document.getElementById("packetVersionNumber").value + "\n";
+	report = report + "TC Packet Type : " + document.getElementById("packetType").value + "\n";
+	report = report + "TC Packet Secondary Header Flag : " + document.getElementById("secondaryHeaderFlag").value + "\n";
+	report = report + "TC Packet APID (hex): " + document.getElementById("apid").value + "\n";
+	report = report + "TC Packet Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
+	report = report + "TC Packet Sequence Count : " + document.getElementById("packetSequenceCount").value + "\n";
+	report = report + "TC Packet Data Length - 7 (decimal): " + document.getElementById("packetDataLength").value + "\n";
+	report = report + "\nTC Packet Secondary Header Fields : \n";
+	report = report + "TC Packet PUS Version Number : " + document.getElementById("pusVersionNumber").value + "\n";
+	report = report + "TC Packet Acknowledgment Flags : " + document.getElementById("ackFlags").value + "\n";
+	report = report + "TC Packet Service Type (hex): " + document.getElementById("serviceType").value + "\n";
+	report = report + "TC Packet Service Subtype (hex): " + document.getElementById("serviceSubtype").value + "\n";
+	report = report + "TC Packet Source Id (hex): " + document.getElementById("sourceId").value + "\n";
+	report = report + "\nTC Packet User Data Fields : \n";
+	report = report + "TC Packet Data (hex bytes): " + document.getElementById("tcPacket").value + "\n";
+	report = report + "TC Packet PEC (hex bytes): " + document.getElementById("pec").value + "\n";
+	report = report + "\nTC Packet Other Useful Data : \n";
+	report = report + "TC Packet Total Packet Length (decimal): " + document.getElementById("totalFrameLength").value + "\n";
+	report = report + "TC Packet Total Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
+	report = report + "TC Packet User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";
+	report = report + "TC Packet Trailer Length (decimal) : " + document.getElementById("totalTrailerLength").value + "\n";
+
+	DownloadFile('downloadLink', report);
 }
 
 function ClearFields()
@@ -122,6 +177,9 @@ function ClearFields()
 	document.getElementById("primary").reset();
 	document.getElementById("secondary").reset();
 	document.getElementById("userdata").reset();
+
+	let target = document.getElementById('downloadLink');
+	target.style.visibility = "hidden";
 
 	// but reset the defaults
 	SetDefaults();
@@ -167,7 +225,12 @@ or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 an
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
 <button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button><br />
+<button type="button" onclick="DisplayHelp()">Help</button>
+
+<!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
+<!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
+<a id="downloadLink" href="#" download="TcPacketReport.txt" style="visibility:hidden">Download Report</a>
+
 </td>
 </tr>
 </table>
