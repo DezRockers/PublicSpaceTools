@@ -353,7 +353,9 @@ function LoopOrbit()
 	var py = perigee * (Math.cos(w)*Math.sin(Omega) + Math.sin(w)*Math.cos(i)*Math.cos(Omega));
 	var pz = perigee * Math.sin(w)*Math.sin(i);
 	
-	localStorage.setItem("semiMajorAxis", a);
+	localStorage.setItem("semiMajorAxis", a);	// km
+	localStorage.setItem("eccentricity", e);
+	localStorage.setItem("inclination", i);		// radians
 	localStorage.setItem("ascendingNode", Omega);	// radians
 	localStorage.setItem("argumentOfPerigee", w);	// radians
 	localStorage.setItem("perigeeX", px);

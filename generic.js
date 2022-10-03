@@ -1,5 +1,5 @@
 // define some generic javascript functions
-var pi = 3.1415926535897932384626433832795;
+const pi = 3.1415926535897932384626433832795;
 
 // add white space between every 2 chars of a string
 function AddSpaces()
