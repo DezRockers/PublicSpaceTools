@@ -2,6 +2,29 @@
 <html>
 <head>
 
+<style>
+a:link {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:visited {
+  color: green;
+  background-color: white;
+  text-decoration: none;
+}
+a:hover {
+  color: red;
+  background-color: white;
+  text-decoration: underline;
+}
+a:active {
+  color: green;
+  background-color: white;
+  text-decoration: underline;
+}
+</style>
+
 <script src="generic.js"></script>
 
 <script type="text/javascript">
@@ -155,6 +178,7 @@ function TM_frame( bytes )
 	document.getElementById("userDataLength").value = bytes.length - headerLength - tailLength;
 	document.getElementById("totalTrailerLength").value = tailLength;
 
+	GenerateReport();
 }
 
 function ClearFields()
@@ -170,6 +194,9 @@ function ClearFields()
 	document.getElementById("primary").reset();
 	document.getElementById("secondary").reset();
 	document.getElementById("userdata").reset();
+
+	let target = document.getElementById('downloadLink');
+	target.style.visibility = "hidden";
 
 	// but reset the defaults
 	SetDefaults();
@@ -197,6 +224,51 @@ function TmPacketToDisplay()
 	document.getElementById("tmPacketLabel").innerHTML = "TM Packet " + tmPacketToDisplay + " (hex)";
 }
 
+// Generate the file download URL and assign it to the link
+function GenerateReport()
+{
+	var report = "TM Frame Report created on : " + new Date() + "\n";
+	report = report + "Input TM Frame (hex bytes) : " + document.getElementById("inputString").value + "\n";
+
+	report = report + "\nTM Frame Primary Header Fields:\n";
+	report = report + "TM Frame Version Number (should be 0): " + document.getElementById("versionNumber").value + "\n";
+	report = report + "TM Frame Spacecraft ID (hex): " + document.getElementById("spacecraftId").value + "\n";
+	report = report + "TM Frame VC ID: " + document.getElementById("vcId").value + "\n";
+	report = report + "TM Frame OCF Flag: " + document.getElementById("ocfFlag").value + "\n";
+	report = report + "TM Frame Master Channel Frame Count (decimal): " + document.getElementById("masterChannelFrameCount").value + "\n";
+	report = report + "TM Frame Virtual Channel Frame Count (decimal): " + document.getElementById("virtualChannelFrameCount").value + "\n";
+	report = report + "TM Frame Secondary Header Flag: " + document.getElementById("secondaryHeaderFlag").value + "\n";
+	report = report + "TM Frame Sync Flag: " + document.getElementById("syncFlag").value + "\n";
+	report = report + "TM Frame Packet Order Flag: " + document.getElementById("packetOrderFlag").value + "\n";
+	report = report + "TM Frame Segment Length Id: " + document.getElementById("segmentLengthId").value + "\n";
+	report = report + "TM Frame First Header Pointer (hex): " + document.getElementById("firstHeaderPointer").value + "\n";
+
+	report = report + "\nTM Frame Secondary Header Fields:\n";
+	report = report + "TM Frame Secondary Header Version Number: " + document.getElementById("secondaryHeaderVersionNumber").value + "\n";
+	report = report + "TM Frame Secondary Header Length - 1 (decimal): " + document.getElementById("secondaryHeaderLength").value + "\n";
+	report = report + "TM Frame Secondary Header Data Field (hex): " + document.getElementById("secondaryHeaderData").value + "\n";
+
+	report = report + "\nTM Frame User Data Fields:\n";
+	report = report + "TM Frame TM user data (hex): " + document.getElementById("tfData").value + "\n";
+	report = report + "TM Frame Operational Control Field (hex): " + document.getElementById("ocf").value + "\n";
+	report = report + "TM Frame Frame Error Control Field (hex): " + document.getElementById("fecf").value + "\n";
+
+	report = report + "\nTM Frame Number of Contained TM Packets: " + document.getElementById("numTmPackets").value + "\n";
+	for (i = 1; i <= document.getElementById("numTmPackets").value; i++)
+	{
+		report = report + "TM Frame TM Packet Number " + i + ":\n";
+		report = report + "TM Frame TM Packet Contents: " + tmPacket[i-1] + "\n\n";
+	}
+
+	report = report + "\nTM Frame Other Useful Data:\n";
+	report = report + "TM Frame Total Frame Length (decimal): " + document.getElementById("totalFrameLength").value + "\n";
+	report = report + "TM Frame Total Header Length (decimal): " + document.getElementById("totalHeaderLength").value + "\n";
+	report = report + "TM Frame Total User Data Length (decimal): " + document.getElementById("userDataLength").value + "\n";
+	report = report + "TM Frame Total Trailer Length (decimal): " + document.getElementById("totalTrailerLength").value + "\n";
+
+	DownloadFile('downloadLink', report);
+}
+
 
 </script>
 </head>
@@ -220,7 +292,11 @@ Input the TM string as either non-delimited hexadecimal bytes and then click 'Ad
 <button type="button" onclick="AddSpaces()">Add Spaces to TM String</button>
 <button type="button" onclick="DisplayTmFields()">Display TM Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button><br />
+<button type="button" onclick="DisplayHelp()">Help</button>
+<!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
+<!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
+<a id="downloadLink" href="#" download="TmFrameReport.txt" style="visibility:hidden">Download Report</a>
+
 </td>
 </tr>
 </table>
