@@ -47,6 +47,7 @@
 	<script src="lightningchart/dist/lcjs.iife.js"></script>
 
 	<script src="generic.js"></script>
+	<script src="lightningChartGeneric.js"></script>
 
 	<!--Actual chart related script tag-->
 	<script>
@@ -93,7 +94,7 @@
 	})
 		.setTitle('Vectors') // Set chart title
             
-	chart.setCameraLocation({x:1,y:1,z:-1});
+	chart.setCameraLocation({x:1.1,y:1.1,z:-0.9});
 
             
 	// get each axis
@@ -105,19 +106,19 @@
 	//axisX.setTitle("X-axis");
 	//axisY.setTitle("Z-axis");
 	//axisZ.setTitle("Y-axis");
-            
+
 	axisX.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
 	axisY.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
 	axisZ.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
 
 	// retrieve the position vectors back from localStorage by splitting on commas
 	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
-	var data = new Array();
 	const v1Vector = localStorage.getItem("v1Vector").split(',');
 	const v2Vector = localStorage.getItem("v2Vector").split(',');
 	const v3Vector = localStorage.getItem("v3Vector").split(',');
 	const thetaDeg = Number(localStorage.getItem("thetaDeg")).toFixed(2);
 	
+	// round points to 3 decimal places
 	const point1 = {x:Number(v1Vector[0]).toFixed(3), y:Number(v1Vector[2]).toFixed(3), z:Number(v1Vector[1]).toFixed(3)};
 	const point2 = {x:Number(v2Vector[0]).toFixed(3), y:Number(v2Vector[2]).toFixed(3), z:Number(v2Vector[1]).toFixed(3)};
 	const point3 = {x:Number(v3Vector[0]).toFixed(3), y:Number(v3Vector[2]).toFixed(3), z:Number(v3Vector[1]).toFixed(3)};
@@ -146,6 +147,15 @@
 	axisX.setInterval(-Max, Max, false, true);
 	axisY.setInterval(-Max, Max, false, true);
 	axisZ.setInterval(-Max, Max, false, true); 
+
+	// define colours
+	const white = ColorRGBA(255, 255, 255);
+	const green = ColorRGBA(0, 255, 0);
+	const yellow = ColorRGBA(255, 255, 0);
+	const red = ColorRGBA(255, 0, 0);
+	const blue = ColorRGBA(100, 216, 230);	// light blue
+	const pink = ColorRGBA(255, 192, 203);
+	const orange = ColorRGBA(255, 127, 0);
         
 	// draw our own axes
 	const Xaxis = chart.addPointLineSeries()
@@ -153,12 +163,12 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: Max, y: 0, z: 0 })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 255) })	// set colour to white
+			thickness: 4,
+			fillStyle: new SolidFill({ color: white })	// set colour to white
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
 			.setShape( 'sphere' )
-			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 255) }) )
+			.setFillStyle( new SolidFill({ color: white }) )
 		)
 
 	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
@@ -167,12 +177,12 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: 0, y: 0, z: Max })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(0, 255, 0) })	// set colour to green
+			thickness: 4,
+			fillStyle: new SolidFill({ color: green })	// set colour to green
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
 			.setShape( 'sphere' )
-			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 255, 0) }) )
+			.setFillStyle( new SolidFill({ color: green }) )
 		)
 
 	const Zaxis = chart.addPointLineSeries()
@@ -180,12 +190,12 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: 0, y: Max, z: 0 })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(255, 255, 0) })	// set colour to yellow
+			thickness: 4,
+			fillStyle: new SolidFill({ color: yellow })	// set colour to yellow
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
 			.setShape( 'sphere' )
-			.setFillStyle( new SolidFill({ color: ColorRGBA(255, 255, 0) }) )
+			.setFillStyle( new SolidFill({ color: yellow }) )
 		)
 
 	// draw line to the vector 1
@@ -194,8 +204,8 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add(point1)
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to red
+			thickness: 4,
+			fillStyle: new SolidFill({ color: red })	// set colour to red
 		}))
 			 
 	// draw line to the vector 2
@@ -204,50 +214,20 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add(point2)
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 255) })	// set colour to blue
+			thickness: 4,
+			fillStyle: new SolidFill({ color: blue })	// set colour to blue
 		}))
 			 
 	// draw line to vector 3
 	const lineToV3 = chart.addLineSeries()
-		.setName('Line to V (Cross Prouct)')
+		.setName('Line to V (Cross Product)')
 		.add({ x: 0, y: 0, z: 0 })
 		.add(point3)
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
-			fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
+			thickness: 4,
+			fillStyle: new SolidFill({ color: pink })	// set colour to pink
 		}))
 	    
-	// now define some utility functions
-	const ScalePoint = (scale, point) => 
-	{
-		var p = {x:0, y:0, z:0};
-		p.x = scale * point.x;
-		p.y = scale * point.y;
-		p.z = scale * point.z;
-		return p;
-	}
-	const AddPoints = (p1, p2) => 
-	{
-		var point = {x:0, y:0, z:0};
-		point.x = p1.x + p2.x;
-		point.y = p1.y + p2.y;
-		point.z = p1.z + p2.z;
-		return point;
-	}
-	const NormalisePoint = (point) => 
-	{
-		var p = {x:0, y:0, z:0};
-		var r = Math.sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
-		if (r > 0)
-		{
-			p.x = point.x/r;
-			p.y = point.y/r;
-			p.z = point.z/r;
-		}
-		return p;
-	}
-
 	// draw arc for angle theta
 	var angleScaleFactor = r1/5;
 	if (thetaDeg > 1)
@@ -264,11 +244,11 @@
 		}
 		// draw arc 
 		const angleArc = chart.addLineSeries()
-			.setName('theta')
+			.setName('Angle Theta')
 			.add(data)
 			.setStrokeStyle(new SolidLine({
-				thickness: 3,
-				fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+				thickness: 4,
+				fillStyle: new SolidFill({ color: orange })	// set colour to orange
 			}))
 	    
 	}
@@ -281,7 +261,7 @@
 			maxWidth: 0.30,
 		})
 		.setPosition({
-			x: 75,
+			x: 70,
 			y: 80
 		})
 		.add(chart)
@@ -296,7 +276,8 @@
 			x: x_offset,
 			y: 50
 		})
-		.setText('V1 = [' + point1.x + ',' + point1.z + ',' + point1.y + ']');
+		.setText('V1 = [' + point1.x + ', ' + point1.z + ', ' + point1.y + ']')
+		.setTextFillStyle(new SolidFill({ color: red }));
 
 	const v2Display = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -305,7 +286,8 @@
 			x: x_offset,
 			y: 45
 		})
-		.setText('V2 = [' + point2.x + ',' + point2.z + ',' + point2.y + ']');
+		.setText('V2 = [' + point2.x + ', ' + point2.z + ', ' + point2.y + ']')
+		.setTextFillStyle(new SolidFill({ color: blue }));
 
 	const v3Display = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -314,7 +296,8 @@
 			x: x_offset,
 			y: 40
 		})
-		.setText('V = [' + point3.x + ',' + point3.z + ',' + point3.y + ']');
+		.setText('V = [' + point3.x + ', ' + point3.z + ', ' + point3.y + ']')
+		.setTextFillStyle(new SolidFill({ color: pink }));
     
 	const thetaDisplay = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -323,8 +306,117 @@
 			x: x_offset,
 			y: 35
 		})
-		.setText('theta = ' + thetaDeg + ' degs');
+		.setText('Theta = ' + thetaDeg + ' degs')
+		.setTextFillStyle(new SolidFill({ color: orange }));
     
+	// add axes toggle button		
+	const axesDiv = document.createElement("div");
+	axesDiv.id = "block";
+	const axesFlag = document.createElement("input");
+	axesFlag.type = "text";
+	axesFlag.value = "Hide Scale";
+	axesFlag.id = "axesFlag";
+	axesDiv.appendChild(axesFlag);
+	db.engine.container.append(axesDiv);
+
+	ShowAxes = () => {
+		axisX.setTitle("X-axis");
+		axisY.setTitle("Z-axis");
+		axisZ.setTitle("Y-axis");
+
+		axisX
+			.setTickStrategy(AxisTickStrategies.Numeric)
+			.setStrokeStyle(new SolidLine({thickness:2, fillStyle: new SolidFill({color: white})}));
+		axisY
+			.setTickStrategy(AxisTickStrategies.Numeric)
+			.setStrokeStyle(new SolidLine({thickness:2, fillStyle: new SolidFill({color: white})}));
+		axisZ
+			.setTickStrategy(AxisTickStrategies.Numeric)
+			.setStrokeStyle(new SolidLine({thickness:2, fillStyle: new SolidFill({color: white})}));
+	}
+
+	HideAxes = () => {
+		axisX.setTitle("");
+		axisY.setTitle("");
+		axisZ.setTitle("");
+
+		axisX.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+		axisY.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);
+		axisZ.setTickStrategy(AxisTickStrategies.Empty).setStrokeStyle(emptyLine);	
+	}
+
+	// show/hide axes
+	axesFlag.onclick = () => {
+		if (axesFlag.value == "Show Scale")
+		{
+			axesFlag.value = "Hide Scale";
+			ShowAxes();
+		} 
+		else
+		{
+			axesFlag.value = "Show Scale";
+			HideAxes();
+		}
+	};
+
+	ShowAxes();
+
+	// Dynamically inject some CSS to example.
+	function addStyle(styleString) {
+		const style = document.createElement("style");
+		style.textContent = styleString;
+		document.head.append(style);
+	}
+
+addStyle(`
+
+  * {
+    box-sizing: border-box;
+  }
+  
+  #block{
+    width: 25%;
+    height: 30px;
+    top: calc(80% - 13px);
+    right: -2px;
+    position: absolute;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 30px 10px;
+    z-index: 1;
+    box-sizing: border-box
+  }
+
+  #axesFlag {
+    background: rgb(255, 0, 0, 0.6);
+    color: white;
+    height: 30px;
+    width: 100px;
+    top: -13px;
+    position: relative;
+    border-radius: 4px;
+    text-align:center; 
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #axesFlag::after {
+    content: "";
+    text-align: center;
+    position: absolute;
+    left: 100%;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid transparent;
+    border-left: 5px solid lightgray;
+  }
+
+  #axesFlag:active {
+    transform: scale(0.9);
+  }
+
+  `);
+
 	</script>
 </body>
 

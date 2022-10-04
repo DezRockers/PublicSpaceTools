@@ -190,7 +190,7 @@ function DisplayCrossProduct()
 	localStorage.setItem("v1Vector", V1);
 	localStorage.setItem("v2Vector", V2);
 	localStorage.setItem("v3Vector", V);
-	localStorage.setItem("thetaDeg", document.getElementById("thetasin").value);
+	localStorage.setItem("thetaDeg", RadiansToDegrees(theta));
 
 	let target = document.getElementById('VisVectors');
 	target.style.visibility = "visible";
