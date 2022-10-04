@@ -85,6 +85,12 @@
 		rowSpan: 1
 	})
 
+	// update legend panel resize
+	legendPanel.onResize((chart, width, height, engineWidth, engineHeight) => {
+		block.style.width = width + 'px'
+		block.style.left = engineWidth - width + 'px'
+	})
+
 	// Create 3D chart inside Dashboard for placing vectors plot.
 	const chart = db.createChart3D({
 		columnIndex: 0,
