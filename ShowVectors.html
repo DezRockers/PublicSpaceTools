@@ -113,18 +113,20 @@
 	// retrieve the position vectors back from localStorage by splitting on commas
 	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
 	var data = new Array();
-	var v1Vector = localStorage.getItem("v1Vector").split(',');
-	var v2Vector = localStorage.getItem("v2Vector").split(',');
-	var v3Vector = localStorage.getItem("v3Vector").split(',');
-	var point1 = {x:v1Vector[0], y:v1Vector[2], z:v1Vector[1]};
-	var point2 = {x:v2Vector[0], y:v2Vector[2], z:v2Vector[1]};
-	var point3 = {x:v3Vector[0], y:v3Vector[2], z:v3Vector[1]};
+	const v1Vector = localStorage.getItem("v1Vector").split(',');
+	const v2Vector = localStorage.getItem("v2Vector").split(',');
+	const v3Vector = localStorage.getItem("v3Vector").split(',');
+	const thetaDeg = Number(localStorage.getItem("thetaDeg")).toFixed(2);
+	
+	const point1 = {x:Number(v1Vector[0]).toFixed(3), y:Number(v1Vector[2]).toFixed(3), z:Number(v1Vector[1]).toFixed(3)};
+	const point2 = {x:Number(v2Vector[0]).toFixed(3), y:Number(v2Vector[2]).toFixed(3), z:Number(v2Vector[1]).toFixed(3)};
+	const point3 = {x:Number(v3Vector[0]).toFixed(3), y:Number(v3Vector[2]).toFixed(3), z:Number(v3Vector[1]).toFixed(3)};
        	
 	// compute max values for axis scaling
 	var Max = 0.0;
-	var r1 = Math.sqrt(v1Vector[0]*v1Vector[0] + v1Vector[1]*v1Vector[1] + v1Vector[2]*v1Vector[2]);
-	var r2 = Math.sqrt(v2Vector[0]*v2Vector[0] + v2Vector[1]*v2Vector[1] + v2Vector[2]*v2Vector[2]);
-	var r3 = Math.sqrt(v3Vector[0]*v3Vector[0] + v3Vector[1]*v3Vector[1] + v3Vector[2]*v3Vector[2]);
+	const r1 = Math.sqrt(v1Vector[0]*v1Vector[0] + v1Vector[1]*v1Vector[1] + v1Vector[2]*v1Vector[2]);
+	const r2 = Math.sqrt(v2Vector[0]*v2Vector[0] + v2Vector[1]*v2Vector[1] + v2Vector[2]*v2Vector[2]);
+	const r3 = Math.sqrt(v3Vector[0]*v3Vector[0] + v3Vector[1]*v3Vector[1] + v3Vector[2]*v3Vector[2]);
 	if (r1 > Max)
 	{
 		Max = r1;
@@ -190,7 +192,7 @@
 	const lineToV1 = chart.addLineSeries()
 		.setName('Line to V1')
 		.add({ x: 0, y: 0, z: 0 })
-		.add({ x: point1.x, y: point1.y, z: point1.z })
+		.add(point1)
 		.setStrokeStyle(new SolidLine({
 			thickness: 3,
 			fillStyle: new SolidFill({ color: ColorRGBA(255, 0, 0) })	// set colour to red
@@ -200,7 +202,7 @@
 	const lineToV2 = chart.addLineSeries()
 		.setName('Line to V2')
 		.add({ x: 0, y: 0, z: 0 })
-		.add({ x: point2.x, y: point2.y, z: point2.z })
+		.add(point2)
 		.setStrokeStyle(new SolidLine({
 			thickness: 3,
 			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 255) })	// set colour to blue
@@ -210,12 +212,67 @@
 	const lineToV3 = chart.addLineSeries()
 		.setName('Line to V (Cross Prouct)')
 		.add({ x: 0, y: 0, z: 0 })
-		.add({ x: point3.x, y: point3.y, z: point3.z })
+		.add(point3)
 		.setStrokeStyle(new SolidLine({
 			thickness: 3,
 			fillStyle: new SolidFill({ color: ColorRGBA(255, 192, 203) })	// set colour to pink
 		}))
 	    
+	// now define some utility functions
+	const ScalePoint = (scale, point) => 
+	{
+		var p = {x:0, y:0, z:0};
+		p.x = scale * point.x;
+		p.y = scale * point.y;
+		p.z = scale * point.z;
+		return p;
+	}
+	const AddPoints = (p1, p2) => 
+	{
+		var point = {x:0, y:0, z:0};
+		point.x = p1.x + p2.x;
+		point.y = p1.y + p2.y;
+		point.z = p1.z + p2.z;
+		return point;
+	}
+	const NormalisePoint = (point) => 
+	{
+		var p = {x:0, y:0, z:0};
+		var r = Math.sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
+		if (r > 0)
+		{
+			p.x = point.x/r;
+			p.y = point.y/r;
+			p.z = point.z/r;
+		}
+		return p;
+	}
+
+	// draw arc for angle theta
+	var angleScaleFactor = r1/5;
+	if (thetaDeg > 1)
+	{
+		var data = new Array();
+		for (i = 0; i < thetaDeg; i++)
+		{
+			var pointA = ScalePoint((thetaDeg-i)/thetaDeg, point1);
+			var pointB = ScalePoint((i)/thetaDeg, point2);
+			var point = AddPoints(pointA, pointB);
+			point = NormalisePoint(point);
+			point = ScalePoint(angleScaleFactor, point);
+			data[i] = point;
+		}
+		// draw arc 
+		const angleArc = chart.addLineSeries()
+			.setName('theta')
+			.add(data)
+			.setStrokeStyle(new SolidLine({
+				thickness: 3,
+				fillStyle: new SolidFill({ color: ColorRGBA(255, 127, 0) })	// set colour to orange
+			}))
+	    
+	}
+
 	// Add LegendBox to slider panel.
 	const legend = legendPanel.addLegendBox()
 		// Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
@@ -224,11 +281,49 @@
 			maxWidth: 0.30,
 		})
 		.setPosition({
-			x: 50,
-			y: 75
+			x: 75,
+			y: 80
 		})
 		.add(chart)
 
+	// add text boxes to the legend panel
+	// but remembring the Y<->Z reversal
+	const x_offset = 50;
+	const v1Display = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: x_offset,
+			y: 50
+		})
+		.setText('V1 = [' + point1.x + ',' + point1.z + ',' + point1.y + ']');
+
+	const v2Display = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: x_offset,
+			y: 45
+		})
+		.setText('V2 = [' + point2.x + ',' + point2.z + ',' + point2.y + ']');
+
+	const v3Display = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: x_offset,
+			y: 40
+		})
+		.setText('V = [' + point3.x + ',' + point3.z + ',' + point3.y + ']');
+    
+	const thetaDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: x_offset,
+			y: 35
+		})
+		.setText('theta = ' + thetaDeg + ' degs');
     
 	</script>
 </body>
