@@ -469,11 +469,18 @@
 			type: 'max-width',
 			maxWidth: 0.30,
 		})
+		.setTitleFont(fontSettings => fontSettings.setSize(14))	// set legend title font size
 		.setPosition({
 			x: 100,
 			y: 75
 		})
-		.add(chart)
+		.add(chart);
+
+	// set each entry font size
+	// needs to be done after the declaration call for some reason
+	legend.setEntries((entry) => entry				
+		.setTextFont(fontSettings => fontSettings.setSize(14))
+		)
 
 	// add text boxes to the slider panel
 	const x_offset = 25;
@@ -484,6 +491,7 @@
 			x: x_offset,
 			y: 90
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Semi-Major Axis = ' + localStorage.getItem("semiMajorAxis") + ' km');
 
 	const eccentricityDisplay = sliderPanel.addUIElement(
@@ -493,6 +501,7 @@
 			x: x_offset,
 			y: 85
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Eccentricity = ' + localStorage.getItem("eccentricity"));
 
 	const inclinationDisplay = sliderPanel.addUIElement(
@@ -502,6 +511,7 @@
 			x: x_offset,
 			y: 80
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Inclination = ' + RadiansToDegrees(localStorage.getItem("inclination")) + ' degrees');
 
 	const ascendingNodeDisplay = sliderPanel.addUIElement(
@@ -511,6 +521,7 @@
 			x: x_offset,
 			y: 75
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Ascending Node = ' + RadiansToDegrees(localStorage.getItem("ascendingNode")) + ' degrees');
 
 	const argumentOfPerigeeDisplay = sliderPanel.addUIElement(
@@ -520,6 +531,7 @@
 			x: x_offset,
 			y: 70
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Argument of Perigee = ' + RadiansToDegrees(localStorage.getItem("argumentOfPerigee")) + ' degrees');
 
 	const trueAnomalyDisplay = sliderPanel.addUIElement(
@@ -529,6 +541,7 @@
 			x: x_offset,
 			y: 65
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('True Anomaly = variable degrees');
 
 	const sliderTitle = sliderPanel.addUIElement(
@@ -538,6 +551,7 @@
 			x: 50,
 			y: 25
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Earth Transparency Level')
             
 	const sliderMin = sliderPanel.addUIElement(
@@ -547,6 +561,7 @@
 			x: 15,
 			y: 10
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Transparent')
 
 	const sliderMax = sliderPanel.addUIElement(
@@ -556,6 +571,7 @@
 			x: 90,
 			y: 10
 		})
+		.setTextFont(fontSettings => fontSettings.setSize(14))
 		.setText('Opaque')
 
 	// Dynamically inject some CSS to example.

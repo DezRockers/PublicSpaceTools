@@ -260,11 +260,18 @@
 			type: 'max-width',
 			maxWidth: 0.30,
 		})
+		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
-			x: 70,
+			x: 75,
 			y: 80
 		})
-		.add(chart)
+		.add(chart);
+
+	// set each entry font size
+	// needs to be done after the declaration call for some reason
+	legend.setEntries((entry) => entry				
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		)
 
 	// add text boxes to the legend panel
 	// but remembring the Y<->Z reversal
@@ -276,7 +283,8 @@
 			x: x_offset,
 			y: 50
 		})
-		.setText('V1 = [' + point1.x + ', ' + point1.z + ', ' + point1.y + ']')
+		.setText("V1 = [" + point1.x + ", " + point1.z + ", " + point1.y + "]")
+		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: red }));
 
 	const v2Display = legendPanel.addUIElement(
@@ -286,7 +294,8 @@
 			x: x_offset,
 			y: 45
 		})
-		.setText('V2 = [' + point2.x + ', ' + point2.z + ', ' + point2.y + ']')
+		.setText("V2 = [" + point2.x + ", " + point2.z + ", " + point2.y + "]")
+		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: blue }));
 
 	const v3Display = legendPanel.addUIElement(
@@ -296,7 +305,8 @@
 			x: x_offset,
 			y: 40
 		})
-		.setText('V = [' + point3.x + ', ' + point3.z + ', ' + point3.y + ']')
+		.setText("V = [" + point3.x + ", " + point3.z + ", " + point3.y + "]")
+		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: pink }));
     
 	const thetaDisplay = legendPanel.addUIElement(
@@ -307,6 +317,7 @@
 			y: 35
 		})
 		.setText('Theta = ' + thetaDeg + ' degs')
+		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: orange }));
     
 	// add axes toggle button		
