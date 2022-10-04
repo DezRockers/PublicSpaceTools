@@ -92,6 +92,12 @@
 		rowSpan: 1
 	});
 
+	// update slider size on panel resize
+	sliderPanel.onResize((chart, width, height, engineWidth, engineHeight) => {
+		block.style.width = width + 'px'
+		block.style.left = engineWidth - width + 'px'
+	})
+
 	// Create 3D chart inside Dashboard for placing orbital plot.
 	const chart = db.createChart3D({
 		columnIndex: 0,
@@ -310,11 +316,8 @@
 	transparencyMarker.id = "marker";
 	transparencyDiv.appendChild(transparencyMarker);
 	transparencyDiv.appendChild(transparencySlider);
-	db.engine.container.append(transparencyDiv);
 
 	// add animation toggle button		
-	const animationDiv = document.createElement("div");
-	animationDiv.id = "block2";
 	const animationFlag = document.createElement("input");
 	animationFlag.type = "text";
 	animationFlag.value = "Animation On";
@@ -326,9 +329,10 @@
 	help.value = "Help";
 	help.id = "help";
 
-	animationDiv.appendChild(animationFlag);
-	animationDiv.appendChild(help);
-	db.engine.container.append(animationDiv);
+	transparencyDiv.appendChild(animationFlag);
+	transparencyDiv.appendChild(help);
+
+	db.engine.container.append(transparencyDiv);
 		
 	const markerColorBlue = "rgb(0, 0, 200, 0.6)";
 	const markerColorDarkBlue = "rgb(0, 0, 150)";
@@ -589,7 +593,7 @@ addStyle(`
   
   #block{
     width: 25%;
-    height: 30px;
+    height: 100px;
     top: calc(80% - 13px);
     right: -2px;
     position: absolute;
@@ -652,26 +656,13 @@ addStyle(`
     transform: scale(0.9);
   }
 
-  #block2{
-    width: 25%;
-    height: 30px;
-    top: calc(55% - 13px);
-    right: -2px;
-    position: absolute;
-    display: flex;
-    justify-content: space-evenly;
-    padding: 30px 10px;
-    z-index: 1;
-    box-sizing: border-box
-  }
-
   #animationFlag {
     background: rgb(255, 0, 0, 0.6);
     color: white;
     height: 30px;
     width: 100px;
-    top: -13px;
-    position: relative;
+    top: -160px;
+    position: absolute;
     border-radius: 4px;
     text-align:center; 
     display: flex;
@@ -698,12 +689,12 @@ addStyle(`
     color: white;
     height: 30px;
     width: 50px;
-    top: -13px;
-    position: relative;
+    top: -100px;
+    position: absolute;
     border-radius: 4px;
     text-align:center; 
     display: flex;
-    align-items: right;
+    align-items: left;
     justify-content: center;
     cursor: pointer;
   }
