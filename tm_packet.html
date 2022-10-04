@@ -2,6 +2,8 @@
 <html>
 <head>
 
+<link rel="stylesheet" href="styles.css">
+
 <script src="generic.js"></script>
 
 <script type="text/javascript">
@@ -129,11 +131,12 @@ function TM_packet( bytes )
 	document.getElementById("tmPacket").value = tmPacket;
 	document.getElementById("pec").value = pec.toString(16).toUpperCase();
 
-	document.getElementById("totalFrameLength").value = bytes.length;
+	document.getElementById("totalPacketLength").value = bytes.length;
 	document.getElementById("totalHeaderLength").value = packetStartByte;
 	document.getElementById("userDataLength").value = bytes.length - packetStartByte - 2;
 	document.getElementById("totalTrailerLength").value = 2;
 
+	GenerateReport();
 }
 
 function ClearFields()
@@ -142,6 +145,9 @@ function ClearFields()
 	document.getElementById("primary").reset();
 	document.getElementById("secondary").reset();
 	document.getElementById("userdata").reset();
+
+	let target = document.getElementById('downloadLink');
+	target.style.visibility = "hidden";
 
 	// but reset the defaults
 	SetDefaults();
@@ -162,6 +168,50 @@ function SetDefaults()
 	document.getElementById("pFieldLength").value = 1;
 	document.getElementById("timeFieldLength").value = 7;
 	document.getElementById("spareLength").value = 0;
+}
+
+// Generate the file download URL and assign it to the link
+function GenerateReport()
+{
+	var report = "TM Packet Report created on : " + new Date() + "\n";
+	report = report + "Input TM Packet (hex bytes) : " + document.getElementById("inputString").value + "\n";
+	report = report + "TM Packet message type counter length (input) : " + document.getElementById("msgTypeCntrLength").value + "\n";
+	report = report + "TM Packet destination Id length (input) : " + document.getElementById("destIdLength").value + "\n";
+	report = report + "TM Packet P-field length (input) : " + document.getElementById("pFieldLength").value + "\n";
+	report = report + "TM Packet T-field length (input) : " + document.getElementById("timeFieldLength").value + "\n";
+	report = report + "TM Packet Spare field length (input) : " + document.getElementById("spareLength").value + "\n";
+
+	report = report + "\nTM Packet Primary Header Fields : \n";
+	report = report + "TM Packet Version Number : " + document.getElementById("packetVersionNumber").value + "\n";
+	report = report + "TM Packet Type (0 for TM) : " + document.getElementById("packetType").value + "\n";
+	report = report + "TM Packet Secondary Header Flag : " + document.getElementById("secondaryHeaderFlag").value + "\n";
+	report = report + "TM Packet Application Process ID (hex) : " + document.getElementById("apid").value + "\n";
+	report = report + "TM Packet Sequence Flags : " + document.getElementById("sequenceFlags").value + "\n";
+	report = report + "TM Packet Sequence Count (hex) : " + document.getElementById("packetSequenceCount").value + "\n";
+	report = report + "TM Packet Data Length - 7 (decimal) : " + document.getElementById("packetDataLength").value + "\n";
+
+	report = report + "\nTM Packet Secondary Header Fields : \n";
+	report = report + "TM Packet PUS Version Number : " + document.getElementById("pusVersionNumber").value + "\n";
+	report = report + "TM Packet Time Reference (hex) : " + document.getElementById("timeRef").value + "\n";
+	report = report + "TM Packet Service Type ID (hex) : " + document.getElementById("serviceType").value + "\n";
+	report = report + "TM Packet Service Subtype ID (hex) : " + document.getElementById("serviceSubtype").value + "\n";
+	report = report + "TM Packet Message Type Counter (decimal) : " + document.getElementById("messageTypeCounter").value + "\n";
+	report = report + "TM Packet Destination ID (hex) : " + document.getElementById("destinationId").value + "\n";
+	report = report + "TM Packet Time P-Field (hex) : " + document.getElementById("pField").value + "\n";
+	report = report + "TM Packet Time T-Field (hex) : " + document.getElementById("timeField").value + "\n";
+	report = report + "TM Packet Spare Field (hex) : " + document.getElementById("spare").value + "\n";
+
+	report = report + "\nTM Packet Content Fields : \n";
+	report = report + "TM Packet Data (hex) : " + document.getElementById("tmPacket").value + "\n";
+	report = report + "TM Packet Error Control Field (hex) : " + document.getElementById("pec").value + "\n";
+
+	report = report + "\nTM Packet Other Useful Data : \n";
+	report = report + "TM Packet Total Packet Length (decimal) : " + document.getElementById("totalPacketLength").value + "\n";
+	report = report + "TM Packet Total Header Length (decimal) : " + document.getElementById("totalHeaderLength").value + "\n";
+	report = report + "TM Packet Total User Data Length (decimal) : " + document.getElementById("userDataLength").value + "\n";
+	report = report + "TM Packet Total Trailer Length (decimal) : " + document.getElementById("totalTrailerLength").value + "\n";
+
+	DownloadFile('downloadLink', report);
 }
 
 
@@ -192,7 +242,11 @@ Input the TM string as either non-delimited hexadecimal bytes and then click 'Ad
 <button type="button" onclick="AddSpaces()">Add Spaces to TM String</button>
 <button type="button" onclick="DisplayTmFields()">Display TM Fields</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button><br />
+<button type="button" onclick="DisplayHelp()">Help</button>
+<!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
+<!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
+<a id="downloadLink" href="#" download="TmPacketReport.txt" style="visibility:hidden">Download Report</a>
+
 </td>
 </tr>
 </table>
@@ -235,7 +289,7 @@ TM Packet Contents<br />
 <input type="text" id="pec" maxLength=10 size=10/>Packet Error Control Field (hex)<br /><br />
 
 Other Useful Data<br />
-<input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Packet Length (decimal)<br />
+<input type="text" id="totalPacketLength" maxLength=10 size=10/>Total Packet Length (decimal)<br />
 <input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
 <input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)
