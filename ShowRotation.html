@@ -293,23 +293,27 @@
 		{
 			var i = 0;
 			interval = setInterval(() => {
-				const point1 = {x:0, y:0, z:0};
-				const point2 = data[i];
-				rotatingVector.clear();
-				rotatingVector.add(point1);
-				rotatingVector.add(point2);
-
-				interpolatedColourRed = 255;
-				interpolatedColourGreen = 127 * (data.length - i)/data.length + 192 * i/data.length;
-				interpolatedColourBlue = 0 * (data.length - i)/data.length + 203 * i/data.length;
-
-				rotatingVector.setStrokeStyle(new SolidLine({
-					thickness: 3,
-					fillStyle: new SolidFill({ color: ColorRGBA(interpolatedColourRed, interpolatedColourGreen, interpolatedColourBlue) })	// set colour to redish
-				}));
-
+			
+				if (i < data.length)
+				{
+					const point1 = {x:0, y:0, z:0};
+					const point2 = data[i];
+					rotatingVector.clear();
+					rotatingVector.add(point1);
+					rotatingVector.add(point2);
+	
+					interpolatedColourRed = 255;
+					interpolatedColourGreen = 127 * (data.length - i)/data.length + 192 * i/data.length;
+					interpolatedColourBlue = 0 * (data.length - i)/data.length + 203 * i/data.length;
+	
+					rotatingVector.setStrokeStyle(new SolidLine({
+						thickness: 3,
+						fillStyle: new SolidFill({ color: ColorRGBA(interpolatedColourRed, interpolatedColourGreen, interpolatedColourBlue) })	// set colour to redish
+					}));
+				}
 				i++;
-				if (i >= data.length)
+				// add a delay
+				if (i >= data.length+100)
 				{
 					i = 0;
 				}
