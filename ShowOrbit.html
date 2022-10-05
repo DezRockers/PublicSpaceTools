@@ -72,23 +72,15 @@
 
 	// Create Dashboard and Charts.
 	const db = lightningChart().Dashboard({
-		numberOfColumns: 4,
+		numberOfColumns: 5,
 		numberOfRows: 1,
 	});
  
-	// Create UI panel inside Dashboard for placing legend.
-	//const legendPanel = db.createUIPanel({
-	//	columnIndex: 3,
-	//	rowIndex: 0,
-	//	columnSpan: 1,
-	//	rowSpan: 1
-	//})
-
 	// Create UI panel inside Dashboard for placing transparency slider.
 	const sliderPanel = db.createUIPanel({
 		columnIndex: 3,
 		rowIndex: 0,
-		columnSpan: 1,
+		columnSpan: 2,
 		rowSpan: 1
 	});
 
