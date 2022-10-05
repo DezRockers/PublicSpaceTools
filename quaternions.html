@@ -1,9 +1,11 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
-<script type="text/javascript">
 
-var pi = 3.1415926535897932384626433832795;
+<!-- include generic.js for some quaternion functions -->
+<script src="generic.js"></script>
+
+<script type="text/javascript">
 
 function Compute()
 {
@@ -594,6 +596,10 @@ document.getElementById("quaternionOut").reset();
 document.getElementById("rotationMatrix").reset();
 document.getElementById("transposeMatrix").reset();
 document.getElementById("eulerAngles").reset();
+document.getElementById("vectorIn").reset();
+document.getElementById("vectorOut").reset();
+let target = document.getElementById('VisRotation');
+	target.style.visibility = "hidden";
 }
 
 function ClearAllTable2()
@@ -604,6 +610,137 @@ document.getElementById("quaternionResult").reset();
 document.getElementById("matrix1").reset();
 document.getElementById("matrix2").reset();
 document.getElementById("matrixResult").reset();
+}
+
+
+function VectorRotationByQuaternion()
+{
+	var q = new Array();
+	var v = new Array();
+
+	q[0] = document.getElementById("q0_out").value;
+	q[1] = document.getElementById("q1_out").value;
+	q[2] = document.getElementById("q2_out").value;
+	q[3] = document.getElementById("q3_out").value;
+
+	v[0] = document.getElementById("v0").value;
+	v[1] = document.getElementById("v1").value;
+	v[2] = document.getElementById("v2").value;
+
+	var vout = QuaternionVectorRotation(q,v);
+
+	document.getElementById("v0_out").value = vout[0];
+	document.getElementById("v1_out").value = vout[1];
+	document.getElementById("v2_out").value = vout[2];
+
+	VectorRotationDisplay(q,v);
+
+	//var txt = "Output vector = " + vout;
+	//alert(txt);
+
+}
+
+function VectorRotationByMatrix()
+{
+	var M = Matrix(3,3);
+	var v = new Array();
+
+	M[0][0] = document.getElementById("a11").value;
+	M[0][1] = document.getElementById("a12").value;
+	M[0][2] = document.getElementById("a13").value;
+	M[1][0] = document.getElementById("a21").value;
+	M[1][1] = document.getElementById("a22").value;
+	M[1][2] = document.getElementById("a23").value;
+	M[2][0] = document.getElementById("a31").value;
+	M[2][1] = document.getElementById("a32").value;
+	M[2][2] = document.getElementById("a33").value;
+
+	v[0] = document.getElementById("v0").value;
+	v[1] = document.getElementById("v1").value;
+	v[2] = document.getElementById("v2").value;
+
+	var vout = MatrixVectorRotation(M,v);
+
+	document.getElementById("v0_out").value = vout[0];
+	document.getElementById("v1_out").value = vout[1];
+	document.getElementById("v2_out").value = vout[2];
+
+	//var txt = "Output vector = " + vout;
+	//alert(txt);
+
+}
+
+// function to derive a set of rotation points for display purposes
+function VectorRotationDisplay(q,v)
+{
+	// get the quaternion rotation angle in degrees
+	var angleDegs = QuaternionRotationAngleDeg(q);
+
+	// get the quaternion axis of rotation
+	var r = QuaternionRotationAxis(q);
+
+	// then derive a set of rotation points for all angles between 0 and angleDegs in 1 degree increments
+	var xPoints = new Array();
+	var yPoints = new Array();
+	var zPoints = new Array();
+	var vtemp = new Array();
+	var qtemp = new Array();
+	if (angleDegs > 1)
+	{
+		for (i = 0; i <= angleDegs; i++)
+		{
+			// effectively the angle of rotation of the quaternion
+			qtemp[0] = Math.cos(DegreesToRadians(i/2));
+			qtemp[1] = r[0] * Math.sin(DegreesToRadians(i/2));
+			qtemp[2] = r[1] * Math.sin(DegreesToRadians(i/2));
+			qtemp[3] = r[2] * Math.sin(DegreesToRadians(i/2));
+			vtemp = QuaternionVectorRotation(qtemp,v);
+			xPoints[i] = vtemp[0];
+			yPoints[i] = vtemp[1];
+			zPoints[i] = vtemp[2];
+		}
+	}
+	else if (angleDegs < -1)
+	{
+		for (i = 0; i >= angleDegs; i--)
+		{
+			// effectively the angle of rotation of the quaternion
+			qtemp[0] = Math.cos(DegreesToRadians(i/2));
+			qtemp[1] = r[0] * Math.sin(DegreesToRadians(i/2));
+			qtemp[2] = r[1] * Math.sin(DegreesToRadians(i/2));
+			qtemp[3] = r[2] * Math.sin(DegreesToRadians(i/2));
+			vtemp = QuaternionVectorRotation(qtemp,v);
+			xPoints[-i] = vtemp[0];
+			yPoints[-i] = vtemp[1];
+			zPoints[-i] = vtemp[2];
+		}
+	}
+
+	let target = document.getElementById('VisRotation');
+	target.style.visibility = "visible";
+
+	// update local storage for passing between html pages
+	localStorage.setItem("xPoints", xPoints);
+	localStorage.setItem("yPoints", yPoints);
+	localStorage.setItem("zPoints", zPoints);
+	localStorage.setItem("rotationAxis", r);
+	localStorage.setItem("rotationAngle", angleDegs);
+	localStorage.setItem("initialVector", v);
+
+	var vout = new Array();
+	vout[0] = document.getElementById('v0_out').value;
+	vout[1] = document.getElementById('v1_out').value;
+	vout[2] = document.getElementById('v2_out').value;
+	localStorage.setItem("finalVector", vout);
+
+}
+
+function Help()
+{
+	var txt = "Press 'Rotate Vector by Quaternion Out' to rotate the input vector by the output quaternion.\n\n";
+	var txt = txt + "Press 'Rotate Vector by Attitude Matrix' to rotate the input vector by the attitude matrix.\n\n";
+	var txt = txt + "Note that the resulting vector should be the same in both cases.\n";
+	alert(txt);
 }
 
 </script>
@@ -629,10 +766,6 @@ Quaternion In<br />
 <button type="button" onclick="ComputeMatrix()">Compute All</button><br />
 <button type="button" onclick="ClearAll()">Clear All</button><br />
 <button type="button" onclick="window.open('rotation.html', '_blank');">Help</button><br />
-<br />
-<br />
-<br />
-<br />
 </td>
 
 <td style="vertical-align:top;">
@@ -660,8 +793,8 @@ Rotation Matrix for frame rotation&emsp;<br />
 <input type="text" id="t32" maxLength=10 size=7  />
 <input type="text" id="t33" maxLength=10 size=7  />
 </form>
-<button type="button" onclick="ComputeEulerAngles()">Compute All</button><br />
-<button type="button" onclick="NormalizeInputMatrix()">Normalize Matrix</button><br />
+<button type="button" onclick="ComputeEulerAngles()">Compute All</button>
+<button type="button" onclick="NormalizeInputMatrix()">Normalize Matrix</button>
 </td>
 
 <td style="vertical-align:top;">
@@ -683,6 +816,28 @@ Quaternion Out (Normalized)<br />
 </form>
 </td>
 
+<td style="vertical-align:top;">
+<form id = "vectorIn" style="color:Silver;">
+Vector In<br />
+<input type="text" id="v0" size=21/>v<sub>0</sub><br />
+<input type="text" id="v1" size=21/>v<sub>1</sub><br />
+<input type="text" id="v2" size=21/>v<sub>2</sub><br />
+</form>
+<button type="button" onclick="VectorRotationByQuaternion()">Rotate Vector by Quaternion Out</button><br />
+<button type="button" onclick="VectorRotationByMatrix()">Rotate Vector by Attitude Matrix</button><br />
+<button type="button" onclick="Help()">Help</button><br />
+</td>
+
+<td style="vertical-align:top;">
+<form id = "vectorOut" style="color:Silver;">
+Rotated Vector<br />
+<input type="text" id="v0_out" size=21/>v<sub>0</sub><br />
+<input type="text" id="v1_out" size=21/>v<sub>1</sub><br />
+<input type="text" id="v2_out" size=21/>v<sub>2</sub><br />
+</form>
+<button type="button" id="VisRotation" style="visibility:hidden" onclick="window.open('ShowRotation.html', '_blank');">Visualise Rotation</button><br />
+</td>
+
 </tr>
 
 </table>
@@ -696,7 +851,7 @@ Quaternion Out (Normalized)<br />
 
 <td style="vertical-align:top;">
 <form id = "quaternion1" style="color:Silver;">
-Quaternion 1<br />
+Quaternion 1 (input)<br />
 <input type="text" id="q0_1" size=21/>q<sub>0</sub> (scalar)<br />
 <input type="text" id="q1_1" size=21/>q<sub>1</sub><br />
 <input type="text" id="q2_1" size=21/>q<sub>2</sub><br />
@@ -706,7 +861,7 @@ Quaternion 1<br />
 
 <td style="vertical-align:top;">
 <form id = "quaternion2" style="color:Silver;">
-Quaternion 2<br />
+Quaternion 2 (input)<br />
 <input type="text" id="q0_2" size=21/>q<sub>0</sub> (scalar)<br />
 <input type="text" id="q1_2" size=21/>q<sub>1</sub><br />
 <input type="text" id="q2_2" size=21/>q<sub>2</sub><br />
@@ -719,11 +874,10 @@ Quaternion 2<br />
 Quaternion Result = q<sub>1</sub>xq<sub>2</sub><br />
 <input type="text" id="q0_result" size=21/>q<sub>0</sub> (scalar)<br />
 <input type="text" id="q1_result" size=21/>q<sub>1</sub><br />
-<input type="text" id="q2_result" size=21/>q<sub>2</sub><br />
-<input type="text" id="q3_result" size=21/>q<sub>3</sub><br />
+<input type="text" id="q2_result" size=21/>q<sub>2</sub><button type="button" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
+<input type="text" id="q3_result" size=21/>q<sub>3</sub><button type="button" onclick="ClearAllTable2()">Clear All</button>
 </form>
-<button type="button" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
-<button type="button" onclick="ClearAllTable2()">Clear All</button><br />
+
 </td>
 
 </tr>
@@ -742,7 +896,6 @@ Matrix 1<br />
 <input type="text" id="a31_1" maxLength=10 size=7  />
 <input type="text" id="a32_1" maxLength=10 size=7  />
 <input type="text" id="a33_1" maxLength=10 size=7  /><br />
-<br />
 </form>
 </td>
 
@@ -758,7 +911,6 @@ Matrix 2<br />
 <input type="text" id="a31_2" maxLength=10 size=7  />
 <input type="text" id="a32_2" maxLength=10 size=7  />
 <input type="text" id="a33_2" maxLength=10 size=7  /><br />
-<br />
 </form>
 </td>
 
@@ -767,7 +919,7 @@ Matrix 2<br />
 Matrix Result= M<sub>1</sub> x M<sub>2</sub><br />
 <input type="text" id="a11_result" maxLength=10 size=7  />
 <input type="text" id="a12_result" maxLength=10 size=7  />
-<input type="text" id="a13_result" maxLength=10 size=7  /><br />
+<input type="text" id="a13_result" maxLength=10 size=7  /><button type="button" onclick="MultiplyMatrices()">Multiply Matrices</button><br />
 <input type="text" id="a21_result" maxLength=10 size=7  />
 <input type="text" id="a22_result" maxLength=10 size=7  />
 <input type="text" id="a23_result" maxLength=10 size=7  /><br />
@@ -775,7 +927,6 @@ Matrix Result= M<sub>1</sub> x M<sub>2</sub><br />
 <input type="text" id="a32_result" maxLength=10 size=7  />
 <input type="text" id="a33_result" maxLength=10 size=7  />
 </form>
-<button type="button" onclick="MultiplyMatrices()">Multiply Matrices</button><br />
 </td>
 
 </tr>

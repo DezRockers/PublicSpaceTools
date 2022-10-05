@@ -70,3 +70,116 @@ function Download(link, txt, evt)
 {
 	document.getElementById(link).href = generateTextFileUrl(txt);
 }
+
+// add some quaternion related functions
+// first multiply 2 quaternions
+function QuaternionMultiplication(q1, q2)
+{
+	// declare the resultant quaternion where q[0] is the scalar element
+	var q = new Array();
+
+	q[0] = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3];
+	q[1] = q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2];
+	q[2] = q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1];
+	q[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0];
+
+	return q;
+}
+
+// return a homogeneous vector (i.e. a quaternion) from a vector
+// the weight is the first element
+function HomogeneousVector(v)
+{
+	var q = new Array();
+	q[0] = 1;
+	q[1] = v[0];
+	q[2] = v[1];
+	q[3] = v[2];
+	return q;
+}
+
+// return a vector from a homogeneous vector
+function Vectorise(h)
+{
+	var v = new Array(0,0,0);
+	if (h[0] != 0)
+	{
+		v[0] = h[1]/h[0];
+		v[1] = h[2]/h[0];
+		v[2] = h[3]/h[0];
+	}
+	return v;
+}
+
+// invert a quaternion
+function InvertQuaternion(q)
+{
+	var qout = new Array();
+	qout[0] = q[0];
+	qout[1] = -q[1];
+	qout[2] = -q[2];
+	qout[3] = -q[3];
+	return qout;
+}
+
+// rotate a vector by a quaternion
+// p' = qpq^-1
+function QuaternionVectorRotation(q,v)
+{
+	// first homegenise vector v
+	var p = HomogeneousVector(v);
+	var qinv = InvertQuaternion(q);
+	var pout = QuaternionMultiplication(q, QuaternionMultiplication(p,qinv));
+	var vout = Vectorise(pout);
+	return vout;	
+}
+
+// function to create a new m x n matrix
+function Matrix(m,n)
+{
+    var mat = new Array(m);
+    var i = 0;
+
+    for (i = 0; i < m; i++)
+    {
+        mat[i] = new Array(n);
+    }
+
+    return mat;
+}
+
+// rotate a vector ny a matrix
+function MatrixVectorRotation(M,v)
+{
+	var vout = new Array(0 ,0, 0);
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			vout[i] = vout[i] + M[i][j]*v[j];
+		}
+	}
+	return vout;
+}
+
+// get the quaternion rotation angle in degrees
+function QuaternionRotationAngleDeg(q)
+{
+	var angleRad = 2.0 * Math.acos(q[0]);
+	return RadiansToDegrees(angleRad);
+}
+
+// get the quaternion rotation axis r
+function QuaternionRotationAxis(q)
+{
+	var angleRad = 2.0 * Math.acos(q[0]);
+	var r = new Array(0,0,0);
+	if (angleRad != 0)
+	{
+		sinAngle_over_2 = Math.sin(angleRad/2.0);
+		r[0] = q[1]/sinAngle_over_2;
+		r[1] = q[2]/sinAngle_over_2;
+		r[2] = q[3]/sinAngle_over_2;
+	}
+	return r;
+}
