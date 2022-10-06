@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Space Tools Orbital Anomalies</title>
+		<link rel="icon" href="icon.jpg">
+	<meta charset="utf-8" />
+	<!-- Automatically support high DPI devices -->
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+	<!-- Flexbox styling to have the chart and header fill the page.
+	Chart will take as much space as possible. -->
+	<style>
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+		}
+
+		.box {
+			display: flex;
+			flex-flow: column;
+			height: 100%;
+		}
+
+		.box .row.header {
+			flex: 0 1 auto;
+		}
+
+		.box .row.content {
+			flex: 1 1 auto;
+		}
+	</style>
+
+</head>
+
+<body class="box">
+	<h1 class="row header">Using LightningChart<sup>&#174;</sup> JS in Space Tools Orbital Anomalies Page</h1>
+
+	<!-- Create div to render the chart into-->
+	<div id="target" class="row content"></div>
+
+	<!--IIFE assembly (lcjs.iife.js) is a standalone JS file, 
+	which does not need any build tools, 
+	such as NPM, to be installed-->
+	<!--Script source must be defined in it's own script tag-->
+	<script src="lightningchart/dist/lcjs.iife.js"></script>
+
+	<script src="generic.js"></script>
+
+	<!--Actual chart related script tag-->
+	<script>
+	// Replace the contents of this script tag if you want to test code from our examples:
+	// https://www.arction.com/lightningchart-js-interactive-examples/
+
+	// Extract required parts from LightningChartJS.
+	const {
+		lightningChart,
+		PointShape,
+		ColorShadingStyles,
+		ColorRGBA,
+		SolidFill,
+		SolidLine,
+		AxisTickStrategies,
+		emptyLine,
+		emptyFill,
+		UIElementBuilders,
+		UIBackrounds,
+		UIOrigins,
+		UIPanel,
+		Themes
+	} = lcjs //Note: @arction/lcjs is not needed here, when using IIFE assembly
+
+	// Create Dashboard and Charts.
+	const db = lightningChart().Dashboard({
+		numberOfColumns: 5,
+		numberOfRows: 1,
+		theme: Themes.lightNew,
+	});
+ 
+	// Create UI panel inside Dashboard for placing legend.
+	const legendPanel = db.createUIPanel({
+		columnIndex: 2,
+		rowIndex: 0,
+		columnSpan: 3,
+		rowSpan: 1
+	});
+
+	// update legend panel resize
+	legendPanel.onResize((chart, width, height, engineWidth, engineHeight) => {
+		block.style.width = width + 'px'
+		block.style.left = engineWidth - width + 'px'
+	})
+
+	// Create XY chart inside Dashboard for placing orbital anomalies.
+	const chart = db.createChartXY({
+		columnIndex: 0,
+		rowIndex: 0,
+		columnSpan: 2,
+		rowSpan: 1
+	})
+	.setTitle('Orbital Anomalies') // Set chart title
+            
+	const dummyDiv = document.createElement("div");
+	dummyDiv.id = "block";
+	// add animation toggle button		
+	const animationFlag = document.createElement("input");
+	animationFlag.type = "text";
+	animationFlag.value = "Animation On";
+	animationFlag.id = "animationFlag";
+
+	// add help button
+	const help = document.createElement("input");
+	help.type = "text";
+	help.value = "Help";
+	help.id = "help";
+
+	dummyDiv.appendChild(animationFlag);
+	dummyDiv.appendChild(help);
+
+	db.engine.container.append(dummyDiv);
+
+	// define colours
+	const white = ColorRGBA(255, 255, 255);
+	const green = ColorRGBA(0, 255, 0);
+	const yellow = ColorRGBA(255, 255, 0);
+	const red = ColorRGBA(255, 0, 0);
+	const darkred = ColorRGBA(200, 0, 0);
+	const blue = ColorRGBA(100, 216, 230);	// light blue
+	const darkblue = ColorRGBA(0, 0, 200);
+	const pink = ColorRGBA(255, 192, 203);
+	const orange = ColorRGBA(255, 127, 0);
+	const black = ColorRGBA(0, 0, 0);
+        
+	// retrieve the x,y coordinates of the various orbital angles
+	var dataE = new Array();	// series for the eccentric anomaly
+	var dataM = new Array();	// series for the mean anomaly
+	var dataf = new Array();	// series for the true anomaly
+	var xEccentricAnomaly = localStorage.getItem("xEccentricAnomaly").split(',');
+	var yEccentricAnomaly = localStorage.getItem("yEccentricAnomaly").split(',');
+	var xMeanAnomaly = localStorage.getItem("xMeanAnomaly").split(',');
+	var yMeanAnomaly = localStorage.getItem("yMeanAnomaly").split(',');
+	var xTrueAnomaly = localStorage.getItem("xTrueAnomaly").split(',');
+	var yTrueAnomaly = localStorage.getItem("yTrueAnomaly").split(',');
+
+	// get semi-major axis for scaling
+	const a = Number(localStorage.getItem("semiMajorAxis")).toFixed(3);
+	const b = Number(localStorage.getItem("semiMinorAxis")).toFixed(3);
+	const e = Number(localStorage.getItem("eccentricity")).toFixed(5);
+	chart.getDefaultAxisX()
+		.setInterval(-a, a, true, true);
+	chart.getDefaultAxisY()
+		.setInterval(-a, a, true, true);
+
+	for (i = 0; i < xEccentricAnomaly.length; i++)
+	{
+		dataE[i] = {x: xEccentricAnomaly[i], y: yEccentricAnomaly[i] };
+		dataM[i] = {x: xMeanAnomaly[i], y: yMeanAnomaly[i] };
+		dataf[i] = {x: xTrueAnomaly[i], y: yTrueAnomaly[i] };
+	}
+
+	// define point line series for the various angles
+	const eccentricPointSeries = chart
+		.addPointLineSeries({pointShape: PointShape.Circle})
+		.setPointSize(2)
+		.setPointFillStyle( new SolidFill({color: darkred }))
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: darkred })
+		}))
+		.setName("Auxiliary Circle")
+		.add(dataE);
+
+	const truePointSeries = chart
+		.addPointLineSeries({pointShape: PointShape.Circle})
+		.setPointSize(2)
+		.setPointFillStyle( new SolidFill({color: darkblue }))
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: darkblue })
+		}))
+		.setName("Orbital Ellipse")
+		.add(dataf);
+
+
+	// define line series for the x and Y axes
+	const xAxis = chart
+		.addLineSeries()
+		.setStrokeStyle(new SolidLine({
+			thickness: 1,
+			fillStyle: new SolidFill({ color: black })
+		}))
+		.setName("X Axis")
+		.add({x:-a, y:0})
+		.add({x:a, y:0})
+
+	const yAxis = chart
+		.addLineSeries()
+		.setStrokeStyle(new SolidLine({
+			thickness: 1,
+			fillStyle: new SolidFill({ color: black })
+		}))
+		.setName("Y Axis")
+		.add({x:0, y:-a})
+		.add({x:0, y:a})
+
+
+
+	// Animate the anomalies.
+	const eccentricPointSeries2 = chart.addLineSeries()
+		.setName('Line to Eccentric Anomaly')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: red })
+		}));
+	const meanPointSeries2 = chart.addLineSeries()
+		.setName('Line to Mean Anomaly')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: orange })
+		}));
+	const truePointSeries2 = chart.addLineSeries()
+		.setName('Line to True Anomaly')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: blue })
+		}));
+
+	const eccentricAnomalyAnglePointSeries = chart.addLineSeries()
+		.setName('Eccentric Anomaly angle')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: red })
+		}));
+	const meanAnomalyAnglePointSeries = chart.addLineSeries()
+		.setName('Mean Anomaly angle')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: orange })
+		}));
+
+	const trueAnomalyAnglePointSeries = chart.addLineSeries()
+		.setName('True Anomaly angle')
+		.setStrokeStyle(new SolidLine({
+			thickness: 2,
+			fillStyle: new SolidFill({ color: blue })
+		}));
+
+	// add text boxes to the legend panel
+	const eccentricAnomalyDegs = localStorage.getItem("eccentricAnomalyDegs").split(",");
+	const meanAnomalyDegs = localStorage.getItem("meanAnomalyDegs").split(",");
+	const trueAnomalyDegs = localStorage.getItem("trueAnomalyDegs").split(",");
+	const x_offset = 50;
+	const y_offset = 90;
+
+	// get focus for true anomaly display
+	const focus = Number(localStorage.getItem("focus"));
+
+	const labelFocus = chart
+		.addUIElement(UIElementBuilders.TextBox, { x: chart.getDefaultAxisX(), y: chart.getDefaultAxisY() })
+		.setMouseInteractions(false)
+		.setPosition({x: focus, y: -a/25})
+		.setText("focus")
+
+
+	const focusDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset + 5
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText("Focus of ellipse = [" + focus + ", 0] km")
+
+	const semiMajorAxisDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Semi Major Axis = ' + a + ' km');
+
+	const semiMinorAxisDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset-5
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Semi Minor Axis = ' + b + ' km');
+
+	const eccentricityDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset-10
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Eccentricity = ' + e);
+
+	const eccentricAnomalyDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset-15
+		})
+		.setTextFillStyle(new SolidFill({ color: red }))
+		.setTextFont(fontSettings => fontSettings.setSize(18));
+		
+	const meanAnomalyDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset-20
+		})
+		.setTextFillStyle(new SolidFill({ color: orange }))
+		.setTextFont(fontSettings => fontSettings.setSize(18));
+		
+	const trueAnomalyDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: y_offset-25
+		})
+		.setTextFillStyle(new SolidFill({ color: blue }))
+		.setTextFont(fontSettings => fontSettings.setSize(18));
+		
+
+
+	// pause/start timeline by clicking the marker
+	let interval;
+	let freezeData = false
+	var i = 0;
+	animationFlag.onclick = () => {
+		if (freezeData)
+		{
+			freezeData = false;
+			animationFlag.value = "Animation On";
+			updateData();
+		} 
+		else
+		{
+			freezeData = true;
+			animationFlag.value = "Animation Off";
+			clearInterval(interval);
+		}
+	};
+
+	const updateData = () => 
+	{
+		if (freezeData == false)
+		{
+			interval = setInterval(() => {
+
+				var point1 = {x: 0, y: 0};
+				var point2 = dataE[i];
+				var point3 = {x: dataE[i].x, y: 0};
+				eccentricPointSeries2.clear();
+				eccentricPointSeries2.add(point1);
+				eccentricPointSeries2.add(point2);
+				eccentricPointSeries2.add(point3);
+
+				eccentricAnomalyAnglePointSeries.add({x: dataE[i].x/10, y: dataE[i].y/10});	// scale to show angle
+
+				var point1 = {x: 0, y: 0};
+				var point2 = dataM[i];
+				var point3 = {x: dataM[i].x, y: 0};
+				meanPointSeries2.clear();
+				meanPointSeries2.add(point1);
+				meanPointSeries2.add(point2);
+				meanPointSeries2.add(point3);
+
+				meanAnomalyAnglePointSeries.add({x: dataM[i].x/9, y: dataM[i].y/9});	// scale to show angle
+
+				var point1 = {x: focus, y: 0};
+				var point2 = dataf[i];
+				var point3 = {x: dataf[i].x, y: 0};
+				truePointSeries2.clear();
+				truePointSeries2.add(point1);
+				truePointSeries2.add(point2);
+				truePointSeries2.add(point3);
+
+				var xcoord = (focus*7/8 + dataf[i].x/8);
+				trueAnomalyAnglePointSeries.add({x: xcoord, y: dataf[i].y/8});	// scale to show angle
+
+				eccentricAnomalyDisplay
+					.setText('Eccentric Anomaly = ' + Number(eccentricAnomalyDegs[i]).toFixed(3) + ' degs');
+				meanAnomalyDisplay
+					.setText('Mean Anomaly = ' + Number(meanAnomalyDegs[i]).toFixed(3) + ' degs');
+				trueAnomalyDisplay
+					.setText('True Anomaly = ' + Number(trueAnomalyDegs[i]).toFixed(3) + ' degs');
+
+				i++;
+				if (i >= dataE.length)
+				{
+					i = 0;
+					eccentricAnomalyAnglePointSeries.clear();
+					meanAnomalyAnglePointSeries.clear();
+					trueAnomalyAnglePointSeries.clear();
+				}
+			}, 200);
+		}
+	}
+	updateData();
+
+	// help button
+	help.onclick = () => {
+		var txt = "Toggle the Animation On/Off button to start/stop the orbital angle update.\n";
+		txt = txt + "Note that the animation resumes from where it was previously stopped.\n";
+		txt = txt + "The animation rate accounts for the eccentricity though any variation in speed may only be observed for highly eccentric orbits.\n\n";
+		txt = txt + "Hover over an item in the legend display to highlight that item in the 2D Orbital Anomalies Plot.\n\n";
+		alert(txt);
+	};
+
+	// Add LegendBox to legend panel.
+	const legend = legendPanel.addLegendBox()
+		// Dispose example UI elements automatically if they take too much space. This is to avoid bad UI on mobile / etc. devices.
+		.setAutoDispose({
+			type: 'max-width',
+			maxWidth: 0.30,
+		})
+		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
+		.setPosition({
+			x: 25,
+			y: 75
+		})
+		.add(chart);
+
+	// set each entry font size
+	// needs to be done after the declaration call for some reason
+	legend.setEntries((entry) => entry				
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		)
+
+	// Dynamically inject some CSS to example.
+	function addStyle(styleString) {
+		const style = document.createElement("style");
+		style.textContent = styleString;
+		document.head.append(style);
+	}
+
+addStyle(`
+
+  * {
+    box-sizing: border-box;
+  }
+  
+  #block{
+    width: 25%;
+    height: 200px;
+    top: calc(80% - 13px);
+    right: -2px;
+    position: absolute;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 30px 10px;
+    z-index: 1;
+    box-sizing: border-box
+  }
+
+  #animationFlag {
+    background: rgb(200, 0, 0, 0.6);
+    color: white;
+    height: 30px;
+    width: 100px;
+    top: -290px;
+    position: absolute;
+    border-radius: 4px;
+    text-align:center; 
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #animationFlag::after {
+    content: "";
+    text-align: center;
+    position: absolute;
+    left: 100%;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid transparent;
+    border-left: 5px solid lightgray;
+  }
+
+  #animationFlag:active {
+    transform: scale(0.9);
+  }
+
+  #help {
+    background: rgb(0, 200, 0, 0.6);
+    color: white;
+    height: 30px;
+    width: 50px;
+    top: -240px;
+    position: absolute;
+    border-radius: 4px;
+    text-align:center; 
+    display: flex;
+    align-items: left;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #help::after {
+    content: "";
+    text-align: center;
+    position: absolute;
+    left: 100%;
+    border-bottom: 5px solid transparent;
+    border-top: 5px solid transparent;
+    border-left: 5px solid lightgray;
+  }
+
+  #help:active {
+    transform: scale(0.9);
+  }
+
+  `);
+
+
+
+	</script>
+</body>
+
+</html>

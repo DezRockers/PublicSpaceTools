@@ -216,8 +216,10 @@ document.getElementById("zdot").value = V[2];
 function ClearElements()
 {
 document.getElementById("keplerian").reset();
-let target = document.getElementById('VisOrbit');
-	target.style.visibility = "hidden";
+let target1 = document.getElementById('VisOrbit');
+	target1.style.visibility = "hidden";
+let target2 = document.getElementById('VisAnomalies');
+	target2.style.visibility = "hidden";
 }
 
 function ClearCartesians()
@@ -262,8 +264,10 @@ function ComputeCartesians()
 	// loop round an entire orbit for display purposes
 	LoopOrbit();
 	
-	let target = document.getElementById('VisOrbit');
-	target.style.visibility = "visible";
+	let target1 = document.getElementById('VisOrbit');
+	target1.style.visibility = "visible";
+	let target2 = document.getElementById('VisAnomalies');
+	target2.style.visibility = "visible";
 }
 
 // get the Eccentric anomaly from the true anonmlay in radians
@@ -319,20 +323,59 @@ function LoopOrbit()
 	var E = EAfromTA(DegreesToRadians(initialf), e);	// radians
 	var M = MAfromEA(E, e);	// radians
 	var f;
-	
+	var r;
+	var a = document.getElementById("a").value;
+	var Omega = DegreesToRadians(document.getElementById("Omega").value);	// radians
+	var i = DegreesToRadians(document.getElementById("i").value);			// radians
+	var w = DegreesToRadians(document.getElementById("w").value);			// radians
+
+	// store some varaibles for the 3D plotting of the orbit	
 	var xValues = new Array();
 	var yValues = new Array();
 	var zValues = new Array();
+
+	// store some values for the 2D plotting of the orbtial anomalies
+	var xEccentricAnomaly = new Array();
+	var yEccentricAnomaly = new Array();
+	var xMeanAnomaly = new Array();
+	var yMeanAnomaly = new Array();
+	var xTrueAnomaly = new Array();
+	var yTrueAnomaly = new Array();
+	var eccentricAnomalyDegs = new Array();
+	var meanAnomalyDegs = new Array();
+	var trueAnomalyDegs = new Array();
 	
-	for (i = 0; i < 360; i++)
+	// focus of the elllipse (x-coord)
+	var focus = a*e;
+	localStorage.setItem("focus", focus);	// km
+	
+	for (i = 0; i <= 360; i++)
 	{
-		M = M + DegreesToRadians(1);
 		E = EAfromMA(M, e);	// radians
 		f = TAfromEA(E, e);	// radians
 		document.getElementById("f").value = RadiansToDegrees(f);
 		xValues[i] = Number(ComputeX());
 		yValues[i] = Number(ComputeY());
 		zValues[i] = Number(ComputeZ());
+
+		r = a*(1-e*e)/(1+e*Math.cos(f));
+
+		xEccentricAnomaly[i] = a*Math.cos(E);
+		yEccentricAnomaly[i] = a*Math.sin(E);
+		xMeanAnomaly[i] = a*Math.cos(M);
+		yMeanAnomaly[i] = a*Math.sin(M);
+		xTrueAnomaly[i] = r*Math.cos(f) + focus;	// we need to shift the x-values by the focus for correct display purposes
+		yTrueAnomaly[i] = r*Math.sin(f);
+
+		meanAnomalyDegs[i] = i;
+		eccentricAnomalyDegs[i] = RadiansToDegrees(E);
+		// put true anomaly in range 0 - 2pi
+		if (f < 0)
+		{
+			f = f + 2*pi;
+		}
+		trueAnomalyDegs[i] = RadiansToDegrees(f);
+		M = M + DegreesToRadians(1);
 	}
 	
 	document.getElementById("f").value = initialf;
@@ -342,17 +385,27 @@ function LoopOrbit()
 	localStorage.setItem("yValues", yValues);
 	localStorage.setItem("zValues", zValues);
 	
-	var a = document.getElementById("a").value;
-	var Omega = DegreesToRadians(document.getElementById("Omega").value);	// radians
-	var i = DegreesToRadians(document.getElementById("i").value);			// radians
-	var w = DegreesToRadians(document.getElementById("w").value);			// radians
-	
+	localStorage.setItem("xEccentricAnomaly", xEccentricAnomaly);
+	localStorage.setItem("yEccentricAnomaly", yEccentricAnomaly);
+	localStorage.setItem("xMeanAnomaly", xMeanAnomaly);
+	localStorage.setItem("yMeanAnomaly", yMeanAnomaly);
+	localStorage.setItem("xTrueAnomaly", xTrueAnomaly);
+	localStorage.setItem("yTrueAnomaly", yTrueAnomaly);
+
+	localStorage.setItem("eccentricAnomalyDegs", eccentricAnomalyDegs);
+	localStorage.setItem("meanAnomalyDegs", meanAnomalyDegs);
+	localStorage.setItem("trueAnomalyDegs", trueAnomalyDegs);
+
 	// derive the perigee vector for display purposes
 	var perigee = a*(1-e);
 	var px = perigee * (Math.cos(w)*Math.cos(Omega) - Math.sin(w)*Math.cos(i)*Math.sin(Omega));
 	var py = perigee * (Math.cos(w)*Math.sin(Omega) + Math.sin(w)*Math.cos(i)*Math.cos(Omega));
 	var pz = perigee * Math.sin(w)*Math.sin(i);
-	
+
+	// derive the semi-minor axis
+	var b = a * Math.sqrt(1 - e*e);
+	localStorage.setItem("semiMinorAxis", b);	// km
+
 	localStorage.setItem("semiMajorAxis", a);	// km
 	localStorage.setItem("eccentricity", e);
 	localStorage.setItem("inclination", i);		// radians
@@ -790,7 +843,8 @@ Keplerian Elements<br />
 <button type="button" onclick="ComputeCartesians()">Convert Keplerian Values</button><br />
 <button type="button" onclick="ClearElements()">Clear Elements</button><br />
 <button type="button" onclick="window.open('PosVel.html', '_blank');">Help</button><br />
-<button type="button" id="VisOrbit" style="visibility:hidden" onclick="window.open('ShowOrbit.html', '_blank');">Visualise Orbit</button><br />
+<button type="button" id="VisOrbit" style="visibility:hidden" onclick="window.open('ShowOrbit.html', '_blank');">Visualise Orbit in 3D</button><br />
+<button type="button" id="VisAnomalies" style="visibility:hidden" onclick="window.open('ShowAnomalies.html', '_blank');">Visualise Orbital angles in 2D</button><br />
 </td>
 
 <td style="vertical-align:top;">
