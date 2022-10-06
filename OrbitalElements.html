@@ -398,27 +398,27 @@ function LoopOrbit()
 
 	// derive the perigee vector for display purposes
 	var perigee = a*(1-e);
-	var px = perigee * (Math.cos(w)*Math.cos(Omega) - Math.sin(w)*Math.cos(i)*Math.sin(Omega));
-	var py = perigee * (Math.cos(w)*Math.sin(Omega) + Math.sin(w)*Math.cos(i)*Math.cos(Omega));
-	var pz = perigee * Math.sin(w)*Math.sin(i);
+	var px = perigee * (Math.cos(w)*Math.cos(Omega) - Math.sin(w)*Math.cos(inc)*Math.sin(Omega));
+	var py = perigee * (Math.cos(w)*Math.sin(Omega) + Math.sin(w)*Math.cos(inc)*Math.cos(Omega));
+	var pz = perigee * Math.sin(w)*Math.sin(inc);
 
 	// derive the semi-minor axis
 	var b = a * Math.sqrt(1 - e*e);
 	localStorage.setItem("semiMinorAxis", Number(b).toFixed(3));	// km
 
-	localStorage.setItem("semiMajorAxis", Number(a).toFixed(3));	// km
-	localStorage.setItem("eccentricity", Number(e).toFixed(3));
-	localStorage.setItem("inclination", Number(inc).toFixed(3));		// radians
-	localStorage.setItem("ascendingNode", Number(Omega).toFixed(3));	// radians
-	localStorage.setItem("argumentOfPerigee", Number(w).toFixed(3));	// radians
-	localStorage.setItem("perigeeX", Number(px).toFixed(3));
-	localStorage.setItem("perigeeY", Number(py).toFixed(3));
-	localStorage.setItem("perigeeZ", Number(pz).toFixed(3));
+	localStorage.setItem("semiMajorAxis", a);	// km
+	localStorage.setItem("eccentricity", e);
+	localStorage.setItem("inclination", inc);		// radians
+	localStorage.setItem("ascendingNode", Omega);	// radians
+	localStorage.setItem("argumentOfPerigee", w);	// radians
+	localStorage.setItem("perigeeX", px);
+	localStorage.setItem("perigeeY", py);
+	localStorage.setItem("perigeeZ", pz);
 	
 	// derive the asecending node distance for display purposes
 	// the ascending node is where v =-w 
 	var R = a*(1-e*e) / (1.0 + e * Math.cos(-w))
-	localStorage.setItem("ascendingNodeDistance", Number(R).toFixed(3));	// km
+	localStorage.setItem("ascendingNodeDistance", R);	// km
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 

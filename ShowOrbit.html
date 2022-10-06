@@ -262,22 +262,39 @@
 	// we can get around this by excluding points after the sign of the z-values have changed from positve to negative (remembering the problem with Y and Z axes!)
 	// because then we have reached the line of the ascending node from which the argument of perigee is measured
 	var Z_prev = yValues[xValues.length-1];
+	var Y_prev = zValues[xValues.length-1];
 	var Z_sign_change = false;
-	for (i = xValues.length-1; i >= 0; i--)
+	if (perigeeAngleDegrees > 0)
 	{
-		var X = xValues[i];
-		var Y = yValues[i];
-		var Z = zValues[i];
-		if ((Y < 0) && (Z_prev > 0))
+		for (i = xValues.length-1; i >= 0; i--)
 		{
-			Z_sign_change = true;
-			break;
+			var X = xValues[i];
+			var Y = yValues[i];
+			var Z = zValues[i];
+			if ((Y < 0) && (Z_prev > 0))
+			{
+				Z_sign_change = true;
+				break;
+			}
+			else if ((Y == Z_prev) && (ascendingNode == 0)) // this means inclination is 0
+			{
+				if ((Z < 0) && (Y_prev > 0))
+				{
+					break;
+				}
+				var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
+				argumentOfPerigee.add(point);
+			}
+			else
+			{ 
+				var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
+				argumentOfPerigee.add(point);
+			}
+			Z_prev = Y;
+			Y_prev = Z;
 		}
-		Z_prev = Y;
-		var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
-		argumentOfPerigee.add(point);
 	}
-        	
+	        	
 	// draw the angular momentum vector scaled to 'a'
 	var h = localStorage.getItem("h").split(',');
 	h[0] = h[0]*a;
@@ -383,7 +400,7 @@
 			y: 90
 		})
 		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Semi-Major Axis = ' + localStorage.getItem("semiMajorAxis") + ' km');
+		.setText('Semi-Major Axis = ' + Number(localStorage.getItem("semiMajorAxis")).toFixed(3) + ' km');
 
 	const eccentricityDisplay = sliderPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -394,7 +411,7 @@
 			y: 85
 		})
 		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Eccentricity = ' + localStorage.getItem("eccentricity"));
+		.setText('Eccentricity = ' + Number(localStorage.getItem("eccentricity")).toFixed(3));
 
 	const inclinationDisplay = sliderPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -405,7 +422,7 @@
 			y: 80
 		})
 		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Inclination = ' + RadiansToDegrees(localStorage.getItem("inclination")) + ' degrees');
+		.setText('Inclination = ' + Number(RadiansToDegrees(localStorage.getItem("inclination"))).toFixed(3) + ' degrees');
 
 	const ascendingNodeDisplay = sliderPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -416,7 +433,7 @@
 			y: 75
 		})
 		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Ascending Node = ' + RadiansToDegrees(localStorage.getItem("ascendingNode")) + ' degrees');
+		.setText('Ascending Node = ' + Number(RadiansToDegrees(localStorage.getItem("ascendingNode"))).toFixed(3) + ' degrees');
 
 	const argumentOfPerigeeDisplay = sliderPanel.addUIElement(
 		UIElementBuilders.TextBox
@@ -427,7 +444,7 @@
 			y: 70
 		})
 		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Argument of Perigee = ' + perigeeAngleDegrees + ' degrees');
+		.setText('Argument of Perigee = ' + Number(perigeeAngleDegrees).toFixed(3) + ' degrees');
 
 
 	const trueAnomalyDisplay = sliderPanel.addUIElement(
@@ -544,7 +561,7 @@
 			// so we need to double earth's radius
 			// including flattening at poles
 			size: { x: a*2, y: 0*2, z: a*2 },
-			fillStyle: new SolidFill({ color: ColorRGBA(0, 0, 100, 0.5*255) })	// set colour to dark bluish with some transparency
+			fillStyle: new SolidFill({ color: ColorRGBA(30, 30, 150, 0.75*255) })	// set colour to dark bluish with some transparency
 		}))
 
 	// draw a solid sphere for the earth
