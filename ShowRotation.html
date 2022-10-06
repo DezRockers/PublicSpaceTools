@@ -372,6 +372,7 @@
 	const v1Display = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
 	)
+		.setMouseInteractions(false)
 		.setPosition({
 			x: x_offset,
 			y: 30
@@ -383,6 +384,7 @@
 	const v2Display = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
 	)
+		.setMouseInteractions(false)
 		.setPosition({
 			x: x_offset,
 			y: 25
@@ -394,6 +396,7 @@
 	const rotationAxisDisplay = legendPanel.addUIElement(
 		UIElementBuilders.TextBox
 	)
+		.setMouseInteractions(false)
 		.setPosition({
 			x: x_offset,
 			y: 20
@@ -409,6 +412,7 @@
 			x: x_offset,
 			y: 15
 		})
+		.setMouseInteractions(false)
 		.setText("Rotation Angle = " + Number(localStorage.getItem("rotationAngle")).toFixed(3) + " degs")
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: red }));
