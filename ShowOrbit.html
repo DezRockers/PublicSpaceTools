@@ -123,6 +123,7 @@
 	var xValues = localStorage.getItem("xValues").split(',');
 	var yValues = localStorage.getItem("zValues").split(',');
 	var zValues = localStorage.getItem("yValues").split(',');
+	const trueAnomalyDegs = localStorage.getItem("trueAnomalyDegs").split(",");
        	
 	// compute max values for axis scaling
 	var Max = 0.0;
@@ -249,13 +250,13 @@
 		}))
 			 
 	// Add a line series for the argument of perigee
-	const argumentOfPerigeee = chart.addLineSeries()
+	const argumentOfPerigee = chart.addLineSeries()
 		.setName('Argument of Perigeee')
 		.setStrokeStyle(new SolidLine({
 			thickness: 3,
 			fillStyle: new SolidFill({ color: ColorRGBA(127, 127, 0) })	// set colour to dirty green
 		}))
-	var perigeeAngleDegrees = Number(localStorage.getItem("argumentOfPerigee"))*180/pi;
+	var perigeeAngleDegrees = Number(localStorage.getItem("argumentOfPerigee")*180/pi).toFixed(3);
 	// note the logic needs to account for high eccentricity where the true anomaly can be totally different to the mean anomaly
 	// and the data values have been generated based on mean anomaly increments of 1 degree
 	// we can get around this by excluding points after the sign of the z-values have changed from positve to negative (remembering the problem with Y and Z axes!)
@@ -274,7 +275,7 @@
 		}
 		Z_prev = Y;
 		var point = {x:X/5, y:Y/5, z:Z/5};	// scaled by factor of 5
-		argumentOfPerigeee.add(point);
+		argumentOfPerigee.add(point);
 	}
         	
 	// draw the angular momentum vector scaled to 'a'
@@ -371,6 +372,107 @@
 		transparencyMarker.style.background = markerColorBlue;
 	};
 
+	// add text boxes to the slider panel
+	const x_offset = 25;
+	const semiMajorAxisDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 90
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Semi-Major Axis = ' + localStorage.getItem("semiMajorAxis") + ' km');
+
+	const eccentricityDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 85
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Eccentricity = ' + localStorage.getItem("eccentricity"));
+
+	const inclinationDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 80
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Inclination = ' + RadiansToDegrees(localStorage.getItem("inclination")) + ' degrees');
+
+	const ascendingNodeDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 75
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Ascending Node = ' + RadiansToDegrees(localStorage.getItem("ascendingNode")) + ' degrees');
+
+	const argumentOfPerigeeDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 70
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Argument of Perigee = ' + perigeeAngleDegrees + ' degrees');
+
+
+	const trueAnomalyDisplay = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 65
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+
+	const sliderTitle = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: 50,
+			y: 25
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Earth Transparency Level')
+            
+	const sliderMin = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: 15,
+			y: 10
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Transparent')
+
+	const sliderMax = sliderPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: 90,
+			y: 10
+		})
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setText('Opaque')
+
 	// pause/start timeline by clicking the marker
 	let freezeData = false
 	animationFlag.onclick = () => {
@@ -404,6 +506,8 @@
 				const point = data[i];
 				orbitData2.clear();
 				orbitData2.add(point);
+				trueAnomalyDisplay
+					.setText('True Anomaly = ' + Number(trueAnomalyDegs[i]).toFixed(3) + ' degs');
 				i++;
 				if (i >= 360)
 				{
@@ -465,7 +569,7 @@
 			type: 'max-width',
 			maxWidth: 0.30,
 		})
-		.setTitleFont(fontSettings => fontSettings.setSize(14))	// set legend title font size
+		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
 			x: 100,
 			y: 75
@@ -475,100 +579,8 @@
 	// set each entry font size
 	// needs to be done after the declaration call for some reason
 	legend.setEntries((entry) => entry				
-		.setTextFont(fontSettings => fontSettings.setSize(14))
+		.setTextFont(fontSettings => fontSettings.setSize(18))
 		)
-
-	// add text boxes to the slider panel
-	const x_offset = 25;
-	const semiMajorAxisDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 90
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Semi-Major Axis = ' + localStorage.getItem("semiMajorAxis") + ' km');
-
-	const eccentricityDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 85
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Eccentricity = ' + localStorage.getItem("eccentricity"));
-
-	const inclinationDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 80
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Inclination = ' + RadiansToDegrees(localStorage.getItem("inclination")) + ' degrees');
-
-	const ascendingNodeDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 75
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Ascending Node = ' + RadiansToDegrees(localStorage.getItem("ascendingNode")) + ' degrees');
-
-	const argumentOfPerigeeDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 70
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Argument of Perigee = ' + RadiansToDegrees(localStorage.getItem("argumentOfPerigee")) + ' degrees');
-
-	const trueAnomalyDisplay = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: x_offset,
-			y: 65
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('True Anomaly = variable degrees');
-
-	const sliderTitle = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: 50,
-			y: 25
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Earth Transparency Level')
-            
-	const sliderMin = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: 15,
-			y: 10
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Transparent')
-
-	const sliderMax = sliderPanel.addUIElement(
-		UIElementBuilders.TextBox
-	)
-		.setPosition({
-			x: 90,
-			y: 10
-		})
-		.setTextFont(fontSettings => fontSettings.setSize(14))
-		.setText('Opaque')
 
 	// Dynamically inject some CSS to example.
 	function addStyle(styleString) {

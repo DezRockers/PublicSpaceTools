@@ -318,16 +318,16 @@ function EAfromMA(M,e)
 // loop round an entire orbit in terms of Mean anomaly
 function LoopOrbit()
 {
-	var initialf = Number(document.getElementById("f").value);	// degrees
+	var initialf = Number(document.getElementById("f").value).toFixed(3);	// degrees
 	var e = Number(document.getElementById("e").value);
 	var E = EAfromTA(DegreesToRadians(initialf), e);	// radians
 	var M = MAfromEA(E, e);	// radians
 	var f;
 	var r;
-	var a = document.getElementById("a").value;
-	var Omega = DegreesToRadians(document.getElementById("Omega").value);	// radians
-	var i = DegreesToRadians(document.getElementById("i").value);			// radians
-	var w = DegreesToRadians(document.getElementById("w").value);			// radians
+	var a = Number(document.getElementById("a").value);
+	var Omega = Number(DegreesToRadians(document.getElementById("Omega").value));	// radians
+	var inc = Number(DegreesToRadians(document.getElementById("i").value));			// radians
+	var w = Number(DegreesToRadians(document.getElementById("w").value));			// radians
 
 	// store some varaibles for the 3D plotting of the orbit	
 	var xValues = new Array();
@@ -404,21 +404,21 @@ function LoopOrbit()
 
 	// derive the semi-minor axis
 	var b = a * Math.sqrt(1 - e*e);
-	localStorage.setItem("semiMinorAxis", b);	// km
+	localStorage.setItem("semiMinorAxis", Number(b).toFixed(3));	// km
 
-	localStorage.setItem("semiMajorAxis", a);	// km
-	localStorage.setItem("eccentricity", e);
-	localStorage.setItem("inclination", i);		// radians
-	localStorage.setItem("ascendingNode", Omega);	// radians
-	localStorage.setItem("argumentOfPerigee", w);	// radians
-	localStorage.setItem("perigeeX", px);
-	localStorage.setItem("perigeeY", py);
-	localStorage.setItem("perigeeZ", pz);
+	localStorage.setItem("semiMajorAxis", Number(a).toFixed(3));	// km
+	localStorage.setItem("eccentricity", Number(e).toFixed(3));
+	localStorage.setItem("inclination", Number(inc).toFixed(3));		// radians
+	localStorage.setItem("ascendingNode", Number(Omega).toFixed(3));	// radians
+	localStorage.setItem("argumentOfPerigee", Number(w).toFixed(3));	// radians
+	localStorage.setItem("perigeeX", Number(px).toFixed(3));
+	localStorage.setItem("perigeeY", Number(py).toFixed(3));
+	localStorage.setItem("perigeeZ", Number(pz).toFixed(3));
 	
 	// derive the asecending node distance for display purposes
 	// the ascending node is where v =-w 
 	var R = a*(1-e*e) / (1.0 + e * Math.cos(-w))
-	localStorage.setItem("ascendingNodeDistance", R);	// km
+	localStorage.setItem("ascendingNodeDistance", Number(R).toFixed(3));	// km
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 
