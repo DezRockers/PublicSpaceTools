@@ -250,8 +250,8 @@
 	const eccentricAnomalyDegs = localStorage.getItem("eccentricAnomalyDegs").split(",");
 	const meanAnomalyDegs = localStorage.getItem("meanAnomalyDegs").split(",");
 	const trueAnomalyDegs = localStorage.getItem("trueAnomalyDegs").split(",");
-	const x_offset = 50;
-	const y_offset = 90;
+	const x_offset = 75;
+	const y_offset = 85;
 
 	// get focus for true anomaly display
 	const focus = Number(localStorage.getItem("focus"));
@@ -436,7 +436,7 @@
 		})
 		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
-			x: 25,
+			x: 30,
 			y: 75
 		})
 		.add(chart);
@@ -463,7 +463,7 @@ addStyle(`
   #block{
     width: 25%;
     height: 200px;
-    top: calc(80% - 13px);
+    top: calc(50% - 13px);
     right: -2px;
     position: absolute;
     display: flex;
