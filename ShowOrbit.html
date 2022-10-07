@@ -367,7 +367,7 @@
 			"%, white 100%)";
 		transparencyMarker.textContent = transparencySlider.value;
 		equatorialPlane.setPointStyle( (pointStyle) => pointStyle
-			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 100, 0.5*transparencySlider.value) }) )
+			.setFillStyle( new SolidFill({ color: ColorRGBA(30, 30, 150, 0.75*transparencySlider.value) }) )
 	 	)
 		ellipsoidSeries.setPointStyle( (pointStyle) => pointStyle
 			.setFillStyle( new SolidFill({ color: ColorRGBA(0, 0, 255, transparencySlider.value) }) )
