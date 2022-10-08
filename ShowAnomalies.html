@@ -73,16 +73,16 @@
 
 	// Create Dashboard and Charts.
 	const db = lightningChart().Dashboard({
-		numberOfColumns: 5,
+		numberOfColumns: 7,
 		numberOfRows: 1,
 		theme: Themes.lightNew,
 	});
  
 	// Create UI panel inside Dashboard for placing legend.
 	const legendPanel = db.createUIPanel({
-		columnIndex: 2,
+		columnIndex: 3,
 		rowIndex: 0,
-		columnSpan: 3,
+		columnSpan: 4,
 		rowSpan: 1
 	});
 
@@ -96,11 +96,11 @@
 	const chart = db.createChartXY({
 		columnIndex: 0,
 		rowIndex: 0,
-		columnSpan: 2,
+		columnSpan: 3,
 		rowSpan: 1
 	})
 	.setTitle('Orbital Anomalies') // Set chart title
-            
+
 	const dummyDiv = document.createElement("div");
 	dummyDiv.id = "block";
 	// add animation toggle button		
@@ -203,8 +203,6 @@
 		.setName("Y Axis")
 		.add({x:0, y:-a})
 		.add({x:0, y:a})
-
-
 
 	// Animate the anomalies.
 	const eccentricPointSeries2 = chart.addLineSeries()
@@ -436,7 +434,7 @@
 		})
 		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
-			x: 30,
+			x: 35,
 			y: 75
 		})
 		.add(chart);
@@ -446,6 +444,8 @@
 	legend.setEntries((entry) => entry				
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		)
+		
+	
 
 	// Dynamically inject some CSS to example.
 	function addStyle(styleString) {
