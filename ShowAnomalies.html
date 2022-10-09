@@ -73,16 +73,16 @@
 
 	// Create Dashboard and Charts.
 	const db = lightningChart().Dashboard({
-		numberOfColumns: 7,
+		numberOfColumns: 31,
 		numberOfRows: 1,
 		theme: Themes.lightNew,
 	});
  
 	// Create UI panel inside Dashboard for placing legend.
 	const legendPanel = db.createUIPanel({
-		columnIndex: 3,
+		columnIndex: 15,
 		rowIndex: 0,
-		columnSpan: 4,
+		columnSpan: 16,
 		rowSpan: 1
 	});
 
@@ -96,7 +96,7 @@
 	const chart = db.createChartXY({
 		columnIndex: 0,
 		rowIndex: 0,
-		columnSpan: 3,
+		columnSpan: 15,
 		rowSpan: 1
 	})
 	.setTitle('Orbital Anomalies') // Set chart title
@@ -131,6 +131,7 @@
 	const pink = ColorRGBA(255, 192, 203);
 	const orange = ColorRGBA(255, 127, 0);
 	const black = ColorRGBA(0, 0, 0);
+	const grey = ColorRGBA(140, 140, 140);
         
 	// retrieve the x,y coordinates of the various orbital angles
 	var dataE = new Array();	// series for the eccentric anomaly
@@ -146,7 +147,7 @@
 	// get semi-major axis for scaling
 	const a = Number(localStorage.getItem("semiMajorAxis")).toFixed(3);
 	const b = Number(localStorage.getItem("semiMinorAxis")).toFixed(3);
-	const e = Number(localStorage.getItem("eccentricity")).toFixed(5);
+	const e = Number(localStorage.getItem("eccentricity")).toFixed(3);
 	chart.getDefaultAxisX()
 		.setInterval(-a, a, true, true);
 	chart.getDefaultAxisY()
@@ -198,7 +199,7 @@
 		.addLineSeries()
 		.setStrokeStyle(new SolidLine({
 			thickness: 1,
-			fillStyle: new SolidFill({ color: black })
+			fillStyle: new SolidFill({ color: grey })
 		}))
 		.setName("Y Axis")
 		.add({x:0, y:-a})
@@ -421,6 +422,7 @@
 		var txt = "Toggle the Animation On/Off button to start/stop the orbital angle update.\n";
 		txt = txt + "Note that the animation resumes from where it was previously stopped.\n";
 		txt = txt + "The animation rate accounts for the eccentricity though any variation in speed may only be observed for highly eccentric orbits.\n\n";
+		txt = txt + "The X and Y axes are defined to be in the orbital plane with X pointing to the point of perigee and Y being orthogonal to X.\n\n";
 		txt = txt + "Hover over an item in the legend display to highlight that item in the 2D Orbital Anomalies Plot.\n\n";
 		alert(txt);
 	};
@@ -444,9 +446,7 @@
 	legend.setEntries((entry) => entry				
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		)
-		
 	
-
 	// Dynamically inject some CSS to example.
 	function addStyle(styleString) {
 		const style = document.createElement("style");
@@ -463,7 +463,7 @@ addStyle(`
   #block{
     width: 25%;
     height: 200px;
-    top: calc(50% - 13px);
+    top: calc(100% - 13px);
     right: -2px;
     position: absolute;
     display: flex;
@@ -479,12 +479,13 @@ addStyle(`
     height: 30px;
     width: 100px;
     top: -290px;
+    right: 150px;
     position: absolute;
     border-radius: 4px;
     text-align:center; 
     display: flex;
-    align-items: left;
-    justify-content: center;
+    align-items: right;
+    justify-content: right;
     cursor: pointer;
   }
   #animationFlag::after {
@@ -507,6 +508,7 @@ addStyle(`
     height: 30px;
     width: 50px;
     top: -240px;
+    right: 170px;
     position: absolute;
     border-radius: 4px;
     text-align:center; 
