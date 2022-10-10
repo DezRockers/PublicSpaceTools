@@ -75,7 +75,7 @@
 
 	// Create Dashboard and Charts.
 	const db = lightningChart().Dashboard({
-		numberOfColumns: 4,
+		numberOfColumns: 5,
 		numberOfRows: 1,
 	});
  
@@ -83,7 +83,7 @@
 	const legendPanel = db.createUIPanel({
 		columnIndex: 3,
 		rowIndex: 0,
-		columnSpan: 1,
+		columnSpan: 2,
 		rowSpan: 1
 	});
 
@@ -155,17 +155,80 @@
 		data[i] = point;
 	}
 	// scale Max to give a margin
-	Max = Max * 1.5;
+	Max = Max * 1.25;
 
 	// Add a line series for the rotated points
 	const rotatedPoints = chart.addLineSeries()
-		.setName('Rotation Path')
+		.setName('Quaternion Rotation Path')
 		.add(data)
 		.setStrokeStyle(new SolidLine({
-			thickness: 2,
-			fillStyle: new SolidFill({ color: red })	// set colour to dark redish
+			thickness: 5,
+			fillStyle: new SolidFill({ color: blue })
 		}))
         	
+	// retrieve the rotation vectors back from localStorage by splitting on commas
+	// note lightningchart is not right handed so we need to convert axes! Y->Z and Z->Y
+	var xValuesPsi = localStorage.getItem("xPointsPsi").split(',');
+	var yValuesPsi = localStorage.getItem("zPointsPsi").split(',');
+	var zValuesPsi = localStorage.getItem("yPointsPsi").split(',');
+	var xValuesTheta = localStorage.getItem("xPointsTheta").split(',');
+	var yValuesTheta = localStorage.getItem("zPointsTheta").split(',');
+	var zValuesTheta = localStorage.getItem("yPointsTheta").split(',');
+	var xValuesPhi = localStorage.getItem("xPointsPhi").split(',');
+	var yValuesPhi = localStorage.getItem("zPointsPhi").split(',');
+	var zValuesPhi = localStorage.getItem("yPointsPhi").split(',');
+
+	var xValuesPsi_xAxis = localStorage.getItem("xPointsPsi_xAxis").split(',');
+	var yValuesPsi_xAxis = localStorage.getItem("zPointsPsi_xAxis").split(',');
+	var zValuesPsi_xAxis = localStorage.getItem("yPointsPsi_xAxis").split(',');
+	var xValuesPsi_yAxis = localStorage.getItem("xPointsPsi_yAxis").split(',');
+	var yValuesPsi_yAxis = localStorage.getItem("zPointsPsi_yAxis").split(',');
+	var zValuesPsi_yAxis = localStorage.getItem("yPointsPsi_yAxis").split(',');
+
+	var xValuesTheta_yAxis = localStorage.getItem("xPointsTheta_yAxis").split(',');
+	var yValuesTheta_yAxis = localStorage.getItem("zPointsTheta_yAxis").split(',');
+	var zValuesTheta_yAxis = localStorage.getItem("yPointsTheta_yAxis").split(',');
+	var xValuesTheta_zAxis = localStorage.getItem("xPointsTheta_zAxis").split(',');
+	var yValuesTheta_zAxis = localStorage.getItem("zPointsTheta_zAxis").split(',');
+	var zValuesTheta_zAxis = localStorage.getItem("yPointsTheta_zAxis").split(',');
+
+	var xValuesPhi_xAxis = localStorage.getItem("xPointsPhi_xAxis").split(',');
+	var yValuesPhi_xAxis = localStorage.getItem("zPointsPhi_xAxis").split(',');
+	var zValuesPhi_xAxis = localStorage.getItem("yPointsPhi_xAxis").split(',');
+	var xValuesPhi_yAxis = localStorage.getItem("xPointsPhi_yAxis").split(',');
+	var yValuesPhi_yAxis = localStorage.getItem("zPointsPhi_yAxis").split(',');
+	var zValuesPhi_yAxis = localStorage.getItem("yPointsPhi_yAxis").split(',');
+
+	var dataPsi = new Array();
+	var dataTheta = new Array();
+	var dataPhi = new Array();
+
+	var dataPsi_xAxis = new Array();
+	var dataPsi_yAxis = new Array();
+	var dataTheta_yAxis = new Array();
+	var dataTheta_zAxis = new Array();
+	var dataPhi_xAxis = new Array();
+	var dataPhi_yAxis = new Array();
+
+	var i = 0;
+	for (i = 0; i < xValuesPsi.length; i++)
+	{
+		dataPsi[i] = {x:xValuesPsi[i], y:yValuesPsi[i], z:zValuesPsi[i]};
+		dataPsi_xAxis[i] = {x:xValuesPsi_xAxis[i], y:yValuesPsi_xAxis[i], z:zValuesPsi_xAxis[i]};
+		dataPsi_yAxis[i] = {x:xValuesPsi_yAxis[i], y:yValuesPsi_yAxis[i], z:zValuesPsi_yAxis[i]};
+	}
+	for (i = 0; i < xValuesTheta.length; i++)
+	{
+		dataTheta[i] = {x:xValuesTheta[i], y:yValuesTheta[i], z:zValuesTheta[i]};
+		dataTheta_yAxis[i] = {x:xValuesTheta_yAxis[i], y:yValuesTheta_yAxis[i], z:zValuesTheta_yAxis[i]};
+		dataTheta_zAxis[i] = {x:xValuesTheta_zAxis[i], y:yValuesTheta_zAxis[i], z:zValuesTheta_zAxis[i]};
+	}
+	for (i = 0; i < xValuesPhi.length; i++)
+	{
+		dataPhi[i] = {x:xValuesPhi[i], y:yValuesPhi[i], z:zValuesPhi[i]};
+		dataPhi_xAxis[i] = {x:xValuesPhi_xAxis[i], y:yValuesPhi_xAxis[i], z:zValuesPhi_xAxis[i]};
+		dataPhi_yAxis[i] = {x:xValuesPhi_yAxis[i], y:yValuesPhi_yAxis[i], z:zValuesPhi_yAxis[i]};
+	}
 	// then scale the axes
 	axisX.setInterval(-Max, Max, false, true);
 	axisY.setInterval(-Max, Max, false, true);
@@ -177,7 +240,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: Max, y: 0, z: 0 })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: white })	// set colour to white
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
@@ -191,7 +254,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: 0, y: 0, z: Max })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: green })	// set colour to green
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
@@ -204,7 +267,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: 0, y: Max, z: 0 })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: yellow })	// set colour to yellow
 		}))
 		.setPointStyle( (pointStyle) => pointStyle
@@ -219,7 +282,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: rotationAxis[0], y: rotationAxis[2], z: rotationAxis[1] })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: blue })
 		}))
 			 
@@ -230,7 +293,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: initialVector[0], y: initialVector[2], z: initialVector[1] })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: orange })
 		}))
 			 
@@ -241,7 +304,7 @@
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: finalVector[0], y: finalVector[2], z: finalVector[1] })
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: pink })
 		}))
 			 
@@ -259,11 +322,14 @@
 
 	// pause/start timeline by clicking the button
 	let freezeData = false;
+	let interval;
+	let interval2;
 	animationFlag.onclick = () => {
 		if (freezeData)
 		{
 			freezeData = false;
 			animationFlag.value = "Animation On";
+			clearInterval(interval2);
 			updateData();
 		} 
 		else
@@ -271,6 +337,7 @@
 			freezeData = true;
 			animationFlag.value = "Animation Off";
 			clearInterval(interval);
+			updateDataEuler();
 		}
 	};
 
@@ -284,7 +351,7 @@
 	const rotatingVector = chart.addLineSeries()
 		.setName('Rotating Vector')
 		.setStrokeStyle(new SolidLine({
-			thickness: 3,
+			thickness: 5,
 			fillStyle: new SolidFill({ color: orange })	// set colour to redish
 		}));
 	const updateData = () => 
@@ -307,7 +374,7 @@
 					interpolatedColourBlue = 0 * (data.length - i)/data.length + 203 * i/data.length;
 	
 					rotatingVector.setStrokeStyle(new SolidLine({
-						thickness: 3,
+						thickness: 5,
 						fillStyle: new SolidFill({ color: ColorRGBA(interpolatedColourRed, interpolatedColourGreen, interpolatedColourBlue) })	// set colour to redish
 					}));
 				}
@@ -321,6 +388,126 @@
 		}
 	}
 	updateData();
+
+	
+	// Add a line series for the rotated points
+	const rotatedPointsEuler = chart.addLineSeries()
+		.setName('Euler Rotation Path')
+		.add(dataPsi)
+		.add(dataTheta)
+		.add(dataPhi)
+		.setStrokeStyle(new SolidLine({
+			thickness: 5,
+			fillStyle: new SolidFill({ color: red })	// set colour to dark redish
+		}))
+        	
+	// Animate the vector rotation.
+	//const rotatingxAxis = chart.addLineSeries()
+	//	.setName('Rotating X axis')
+	//	.setStrokeStyle(new SolidLine({
+	//		thickness: 5,
+	//		fillStyle: new SolidFill({ color: white })
+	//	}));
+	//const rotatingyAxis = chart.addLineSeries()
+	//	.setName('Rotating Y axis')
+	//	.setStrokeStyle(new SolidLine({
+	//		thickness: 5,
+	//		fillStyle: new SolidFill({ color: green })
+	//	}));
+	//const rotatingzAxis = chart.addLineSeries()
+	//	.setName('Rotating Z axis')
+	//	.setStrokeStyle(new SolidLine({
+	//		thickness: 5,
+	//		fillStyle: new SolidFill({ color: yellow })
+	//	}));
+	const updateDataEuler = () => 
+	{
+		//if (freezeData == false)
+		{
+			var ii = 0;
+			var jj = 0;
+			var kk = 0;
+			interval2 = setInterval(() => {
+			rotatingVector
+				.setStrokeStyle(new SolidLine({
+					thickness: 5,
+					fillStyle: new SolidFill({ color: red })	// set colour to redish
+				}));
+			
+				// first do rotation around Z-axis by psi
+				if (ii < dataPsi.length)
+				{
+					const point1 = {x:0, y:0, z:0};
+					const point2 = dataPsi[ii];
+					const pointx = dataPsi_xAxis[ii];
+					const pointy = dataPsi_yAxis[ii];
+					rotatingVector.clear();
+					rotatingVector.add(point1);
+					rotatingVector.add(point2);
+					//rotatingxAxis.clear();
+					//rotatingxAxis.add(point1);
+					//rotatingxAxis.add(pointx);
+					//rotatingyAxis.clear();
+					//rotatingyAxis.add(point1);
+					//rotatingyAxis.add(pointy);
+				}
+				else if (ii >= dataPsi.length+100)
+				{
+					// then do rotation around X-axis by theta
+					if (jj < dataTheta.length)
+					{
+						const point1 = {x:0, y:0, z:0};
+						const point2 = dataTheta[jj];
+						const pointy = dataTheta_yAxis[jj];
+						const pointz = dataTheta_zAxis[jj];
+						rotatingVector.clear();
+						rotatingVector.add(point1);
+						rotatingVector.add(point2);
+						//rotatingyAxis.clear();
+						//rotatingyAxis.add(point1);
+						//rotatingyAxis.add(pointy);
+						//rotatingzAxis.clear();
+						//rotatingzAxis.add(point1);
+						//rotatingzAxis.add(pointz);
+					}
+					else if (jj >= dataTheta.length+100)
+					{
+						// then do rotation around Z-axis by phi
+						if (kk < dataPhi.length)
+						{
+							const point1 = {x:0, y:0, z:0};
+							const point2 = dataPhi[kk];
+							const pointx = dataPhi_xAxis[kk];
+							const pointy = dataPhi_yAxis[kk];
+							rotatingVector.clear();
+							rotatingVector.add(point1);
+							rotatingVector.add(point2);
+							//rotatingxAxis.clear();
+							//rotatingxAxis.add(point1);
+							//rotatingxAxis.add(pointx);
+							//rotatingyAxis.clear();
+							//rotatingyAxis.add(point1);
+							//rotatingyAxis.add(pointy);
+						}
+						else if (kk >= dataPhi.length+100)
+						{
+							// reset everything so that we start again
+							ii = -1;
+							jj = -1;
+							kk = -1;
+							//rotatingxAxis.clear();
+							//rotatingyAxis.clear();
+							//rotatingzAxis.clear();
+						}
+						kk++;
+					}
+					jj++;
+				}
+				ii++;
+				// add a delay
+			}, 30);
+		}
+	}
 
 	// help button
 	help.onclick = () => {
@@ -355,8 +542,8 @@
 		})
 		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
-			x: 65,
-			y: 80
+			x: 40,
+			y: 70
 		})
 		.add(chart);
 
@@ -415,7 +602,7 @@
 		.setMouseInteractions(false)
 		.setText("Rotation Angle = " + Number(localStorage.getItem("rotationAngle")).toFixed(3) + " degs")
 		.setTextFont(fontSettings => fontSettings.setSize(18))
-		.setTextFillStyle(new SolidFill({ color: red }));
+		.setTextFillStyle(new SolidFill({ color: blue }));
 
 	ShowAxes = () => {
 		axisX.setTitle("X-axis");
@@ -475,7 +662,7 @@ addStyle(`
   #block{
     width: 25%;
     height: 100px;
-    top: calc(65% - 13px);
+    top: calc(80% - 13px);
     right: -2px;
     position: absolute;
     display: flex;
@@ -490,7 +677,8 @@ addStyle(`
     color: white;
     height: 30px;
     width: 100px;
-    top: -160px;
+    top: -400px;
+    right: 20px;
     position: absolute;
     border-radius: 4px;
     text-align:center; 
@@ -518,7 +706,8 @@ addStyle(`
     color: white;
     height: 30px;
     width: 50px;
-    top: -50px;
+    top: -300px;
+    right: 20px;
     position: absolute;
     border-radius: 4px;
     text-align:center; 
@@ -546,7 +735,8 @@ addStyle(`
     color: white;
     height: 30px;
     width: 100px;
-    top: -110px;
+    top: -350px;
+    right: 20px;
     position: absolute;
     border-radius: 4px;
     text-align:center; 

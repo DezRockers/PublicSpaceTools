@@ -183,3 +183,65 @@ function QuaternionRotationAxis(q)
 	}
 	return r;
 }
+
+// function to derive a rotation matrix about a particular axis by the specified angle in degrees
+// Axis 1 = X-axis
+// Axis 2 = Y-axis
+// Axis 3 = Z-axis
+// input angle is in degrees
+function RotationMatrixAboutAxis(axis, angleDegs)
+{
+	var angleRads = DegreesToRadians(angleDegs);
+	var cosangle = Math.cos(angleRads);
+	var sinangle = Math.sin(angleRads);
+
+	var mat = Matrix(3,3);
+	switch (axis)
+	{
+		case 1:
+			mat[0][0] = 1.0;
+			mat[0][1] = 0.0;
+			mat[0][2] = 0.0;
+			mat[1][0] = 0.0;
+			mat[1][1] = cosangle;
+			mat[1][2] = -sinangle;
+			mat[2][0] = 0.0;
+			mat[2][1] = sinangle;
+			mat[2][2] = cosangle;
+			break;
+		case 2:
+			mat[0][0] = cosangle;
+			mat[0][1] = 0.0;
+			mat[0][2] = -sinangle;
+			mat[1][0] = 0.0;
+			mat[1][1] = 1.0;
+			mat[1][2] = 0.0;
+			mat[2][0] = sinangle;
+			mat[2][1] = 0.0;
+			mat[2][2] = cosangle;
+			break;
+		case 3:
+			mat[0][0] = cosangle;
+			mat[0][1] = -sinangle;
+			mat[0][2] = 0.0;
+			mat[1][0] = sinangle;
+			mat[1][1] = cosangle;
+			mat[1][2] = 0.0;
+			mat[2][0] = 0.0;
+			mat[2][1] = 0.0;
+			mat[2][2] = 1.0;
+			break;
+		default:
+			mat[0][0] = 1.0;
+			mat[0][1] = 0.0;
+			mat[0][2] = 0.0;
+			mat[1][0] = 0.0;
+			mat[1][1] = 1.0;
+			mat[1][2] = 0.0;
+			mat[2][0] = 0.0;
+			mat[2][1] = 0.0;
+			mat[2][2] = 1.0;
+			break;
+	}
+	return mat;
+}
