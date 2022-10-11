@@ -212,11 +212,11 @@ function RotationMatrixAboutAxis(axis, angleDegs)
 		case 2:
 			mat[0][0] = cosangle;
 			mat[0][1] = 0.0;
-			mat[0][2] = -sinangle;
+			mat[0][2] = sinangle;
 			mat[1][0] = 0.0;
 			mat[1][1] = 1.0;
 			mat[1][2] = 0.0;
-			mat[2][0] = sinangle;
+			mat[2][0] = -sinangle;
 			mat[2][1] = 0.0;
 			mat[2][2] = cosangle;
 			break;

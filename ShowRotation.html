@@ -100,7 +100,7 @@
 		columnSpan: 3,
 		rowSpan: 1
 	})
-		.setTitle('Rotation') // Set chart title
+		.setTitle('Quaternion Rotation') // Set chart title
             
 	chart.setCameraLocation({x:1,y:1,z:-1});
 
@@ -356,12 +356,14 @@
 		animationFlag.value = "Animation On";
 		if (rotationTypeFlag.value == "Quaternion Rotation")
 		{
+			chart.setTitle('Euler Rotation') // Set chart title
 			rotationTypeFlag.value = "Euler Rotation";
 			clearInterval(interval);
 			updateDataEuler();
 		} 
 		else
 		{
+			chart.setTitle('Quaternion Rotation') // Set chart title
 			rotationTypeFlag.value = "Quaternion Rotation";
 			clearInterval(interval2);
 			updateData();
@@ -458,7 +460,7 @@
 			rotatingVector
 				.setStrokeStyle(new SolidLine({
 					thickness: 5,
-					fillStyle: new SolidFill({ color: red })	// set colour to redish
+					fillStyle: new SolidFill({ color: orange })
 				}));
 			
 				// first do rotation around Z-axis by psi
@@ -540,6 +542,7 @@
 	help.onclick = () => {
 		var txt = "Toggle the Animate On/Off button to start/stop the vector rotation update.\n";
 		txt = txt + "Note that animation resumes from the initial vector rather than from where it was previosuly stopped.\n\n";
+		txt = txt + "The animation can be displayed as either quaternion rotation or euler angle rotation.\n\n";
 		txt = txt + "Hover over an item in the legend display to highlight that item in the 3D Rotation Plot.\n\n";
 		txt = txt + "Use the mouse controls within the 3D Rotation Plot to vary the viewing angle as well as zooming in or out.\n";
 		txt = txt + "Reload the page to reset the view.\n";
@@ -570,8 +573,8 @@
 		})
 		.setTitleFont(fontSettings => fontSettings.setSize(18))	// set legend title font size
 		.setPosition({
-			x: 40,
-			y: 75
+			x: 50,
+			y: 70
 		})
 		.add(chart);
 
@@ -632,6 +635,18 @@
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: blue }));
 
+	const eulerAngleDisplay = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setPosition({
+			x: x_offset,
+			y: 10
+		})
+		.setMouseInteractions(false)
+		.setText("Euler Angles = [" + Number(localStorage.getItem("psi")).toFixed(3) + ", " + Number(localStorage.getItem("theta")).toFixed(3) + ", " + Number(localStorage.getItem("phi")).toFixed(3) + "] degs")
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setTextFillStyle(new SolidFill({ color: red }));
+
 	ShowAxes = () => {
 		axisX.setTitle("X-axis");
 		axisY.setTitle("Z-axis");
@@ -690,7 +705,7 @@ addStyle(`
   #block{
     width: 25%;
     height: 300px;
-    top: calc(65% - 13px);
+    top: calc(70% - 13px);
     right: -2px;
     position: absolute;
     display: flex;

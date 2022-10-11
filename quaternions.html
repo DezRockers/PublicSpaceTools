@@ -1061,7 +1061,7 @@ function Help()
 	var txt = "Press 'Rotate Vector by Quaternion Out' to rotate the input vector by the output quaternion.\n\n";
 	txt = txt + "Press 'Rotate Vector by Attitude Matrix' to rotate the input vector by the attitude matrix.\n\n";
 	txt = txt + "Press 'Rotate Vector by 313 Euler Angles' to rotate the input vector by psi degrees about Z, \n";
-	txt = txt + "then theta degrees about the new X and then phi degrees about the new Z.\n\n";
+	txt = txt + "then theta degrees about X and then phi degrees about Z.\n\n";
 	txt = txt + "Note that the resulting vector should be the same in all cases.\n";
 	alert(txt);
 }
@@ -1123,9 +1123,9 @@ Rotation Matrix for frame rotation&emsp;<br />
 <td style="vertical-align:top;">
 <form id = "eulerAngles" style="color:Silver;">
 3-1-3 Euler Angles<br />
-<input type="text" id="phi" size=21/>&phi; (degs)<br />
-<input type="text" id="theta" size=21/>&theta; (degs)<br />
 <input type="text" id="psi" size=21/>&psi; (degs)<br />
+<input type="text" id="theta" size=21/>&theta; (degs)<br />
+<input type="text" id="phi" size=21/>&phi; (degs)<br />
 </form>
 <br /><button type="button" onclick="ComputeQuaternion()">Compute All</button><br />
 </td>
