@@ -419,6 +419,12 @@ function LoopOrbit()
 	// the ascending node is where v =-w 
 	var R = a*(1-e*e) / (1.0 + e * Math.cos(-w))
 	localStorage.setItem("ascendingNodeDistance", R);	// km
+
+	var txt = "px = " + px;
+	txt = txt + "\npy = " + py;
+	txt = txt + "\npz = " + pz;
+	//alert(txt);
+
 }
 
 // function to compute the Keplerian elements given the Cartesian coordinates 

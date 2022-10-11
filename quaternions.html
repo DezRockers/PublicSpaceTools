@@ -378,15 +378,13 @@ function ComputeMatrix()
 	UpdateTransposeMatrix();
 
 	// convert attitude matrix to 3-1-3 Euler angles in radians
-	// note that the attitude matrix is the transpose of the DCM
-	// that is needed by the EulerAnglesFromMatrix function
 	var E = new Array();
-	E = EulerAnglesFromMatrix(Transpose(M));
+	E = EulerAnglesFromMatrix((M));
 
 	// convert angles in radians to degrees for output to text boxes
-	document.getElementById("phi").value = Math.round(RadiansToDegrees(E[0])*1000000)/1000000;
+	document.getElementById("psi").value = Math.round(RadiansToDegrees(E[0])*1000000)/1000000;
 	document.getElementById("theta").value = Math.round(RadiansToDegrees(E[1])*1000000)/1000000;
-	document.getElementById("psi").value = Math.round(RadiansToDegrees(E[2])*1000000)/1000000;
+	document.getElementById("phi").value = Math.round(RadiansToDegrees(E[2])*1000000)/1000000;
 
 	// convert 3-1-3 Euler angles in radians to quaternion for completeness and circular testing
 	q = QuaternionFromEulerAngles(E);
@@ -437,15 +435,13 @@ function ComputeEulerAngles()
 	M[2][2] = Math.round(document.getElementById("a33").value*1000000)/1000000;
 
 	// convert attitude matrix to 3-1-3 Euler angles in radians
-	// note that the attitude matrix is the transpose of the DCM
-	// that is needed by the EulerAnglesFromMatrix function
 	var E = new Array();
-	E = EulerAnglesFromMatrix(Transpose(M));
+	E = EulerAnglesFromMatrix(M);
 
 	// convert angles in radians to degrees for output to text boxes
-	document.getElementById("phi").value = Math.round(RadiansToDegrees(E[0])*1000000)/1000000;
+	document.getElementById("psi").value = Math.round(RadiansToDegrees(E[0])*1000000)/1000000;
 	document.getElementById("theta").value = Math.round(RadiansToDegrees(E[1])*1000000)/1000000;
-	document.getElementById("psi").value = Math.round(RadiansToDegrees(E[2])*1000000)/1000000;
+	document.getElementById("phi").value = Math.round(RadiansToDegrees(E[2])*1000000)/1000000;
 
 	// convert 3-1-3 Euler angles in radians to quaternion for completeness and circular testing
 	q = QuaternionFromEulerAngles(E);
@@ -455,6 +451,17 @@ function ComputeEulerAngles()
 	document.getElementById("q3_out").value = Math.round(q[3]*1000000)/1000000;
 
 	document.getElementById("quaternionIn").reset();
+
+	// sanity check
+	var M1 = RotationMatrixAboutAxis(3, RadiansToDegrees(E[0]));
+	var M2 = RotationMatrixAboutAxis(1, RadiansToDegrees(E[1]));
+	var M3 = RotationMatrixAboutAxis(3, RadiansToDegrees(E[2]));
+
+	M = MatrixProduct(M3, MatrixProduct(M2, M1));
+	var txt = M[0][0] + ", " + M[0][1] + ", " + M[0][2] + "\n";
+	txt = txt + M[1][0] + ", " + M[1][1] + ", " + M[1][2] + "\n";
+	txt = txt + M[2][0] + ", " + M[2][1] + ", " + M[2][2] + "\n";
+	alert(txt);
 }
 
 function ComputeQuaternion()
@@ -462,9 +469,9 @@ function ComputeQuaternion()
 
 	// get Euler angles in radians
 	var E = new Array();
-	E[0] = DegreesToRadians(document.getElementById("phi").value);
+	E[0] = DegreesToRadians(document.getElementById("psi").value);
 	E[1] = DegreesToRadians(document.getElementById("theta").value);
-	E[2] = DegreesToRadians(document.getElementById("psi").value);
+	E[2] = DegreesToRadians(document.getElementById("phi").value);
 
 	// convert 3-1-3 Euler angles in radians to quaternion for completeness and circular testing
 	var q = new Array();
@@ -555,9 +562,9 @@ function EulerAnglesFromMatrix(M)
 	}
 	else
 	{
-		E[0] = Math.atan2(M[2][0],-M[2][1]);
+		E[0] = Math.atan2(M[2][0],M[2][1]);
 		E[1] = Math.acos(M[2][2]);
-		E[2] = Math.atan2(M[0][2],M[1][2]);
+		E[2] = Math.atan2(M[0][2],-M[1][2]);
 	}
 	return E;
 }
@@ -565,9 +572,9 @@ function EulerAnglesFromMatrix(M)
 function QuaternionFromEulerAngles(E)
 {
 	var q = new Array();
-	var phi = E[0];
+	var phi = E[2];
 	var theta = E[1];
-	var psi = E[2];
+	var psi = E[0];
 	q[0] = Math.cos(theta/2)*Math.cos((phi+psi)/2);
 	q[1] = Math.sin(theta/2)*Math.cos((phi-psi)/2);
 	q[2] = Math.sin(theta/2)*Math.sin((phi-psi)/2);
@@ -638,7 +645,7 @@ function VectorRotationByQuaternion()
 	var phi = document.getElementById("phi").value;
 	var theta = document.getElementById("theta").value;
 	var psi = document.getElementById("psi").value;
-	VectorEulerDisplay(phi, theta, psi, v);
+	VectorEulerDisplay(psi, theta, phi, v);
 
 	//var txt = "Output vector = " + vout;
 	//alert(txt);
@@ -778,7 +785,7 @@ function VectorRotationDisplay(q,v)
 
 
 // function to derive a set of 313 Euler angle rotation points for display purposes
-function VectorEulerDisplay(phi, theta, psi, v)
+function VectorEulerDisplay(psi, theta, phi, v)
 {
 	// perform each rotation in the order psi about Z, theta about X, phi about Z
 	var xAxis = [ 1,0,0 ];
