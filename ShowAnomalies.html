@@ -73,16 +73,16 @@
 
 	// Create Dashboard and Charts.
 	const db = lightningChart().Dashboard({
-		numberOfColumns: 31,
+		numberOfColumns: 5,
 		numberOfRows: 1,
 		theme: Themes.lightNew,
 	});
  
 	// Create UI panel inside Dashboard for placing legend.
 	const legendPanel = db.createUIPanel({
-		columnIndex: 15,
+		columnIndex: 2,
 		rowIndex: 0,
-		columnSpan: 16,
+		columnSpan: 3,
 		rowSpan: 1
 	});
 
@@ -96,7 +96,7 @@
 	const chart = db.createChartXY({
 		columnIndex: 0,
 		rowIndex: 0,
-		columnSpan: 15,
+		columnSpan: 2,
 		rowSpan: 1
 	})
 	.setTitle('Orbital Anomalies') // Set chart title

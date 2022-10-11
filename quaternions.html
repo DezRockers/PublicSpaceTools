@@ -784,6 +784,9 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	var xAxis = [ 1,0,0 ];
 	var yAxis = [ 0,1,0 ];
 	var zAxis = [ 0,0,1 ];
+	var txt = "X0 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Y0 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Z0 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and psi in 1 degree increments
 	var xPointsPsi = new Array();
@@ -861,6 +864,7 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	localStorage.setItem("intermediateVector1", v1);
 	xAxis = MatrixVectorRotation(M, xAxis);
 	yAxis = MatrixVectorRotation(M, yAxis);
+	zAxis = MatrixVectorRotation(M, zAxis);
 
 	localStorage.setItem("xPointsPsi_xAxis", xPointsPsi_xAxis);
 	localStorage.setItem("yPointsPsi_xAxis", yPointsPsi_xAxis);
@@ -872,6 +876,10 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	localStorage.setItem("xAxis1", xAxis);
 	localStorage.setItem("yAxis1", yAxis);
 	localStorage.setItem("zAxis1", zAxis);
+
+	txt = txt + "X1 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Y1 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Z1 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and theta in 1 degree increments
 	var xPointsTheta = new Array();
@@ -945,6 +953,7 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	M = RotationMatrixAboutAxis(1, theta);
 	v2 = MatrixVectorRotation(M, v1);
 	localStorage.setItem("intermediateVector2", v2);
+	xAxis = MatrixVectorRotation(M, xAxis);
 	yAxis = MatrixVectorRotation(M, yAxis);
 	zAxis = MatrixVectorRotation(M, zAxis);
 
@@ -958,6 +967,10 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	localStorage.setItem("xAxis2", xAxis);
 	localStorage.setItem("yAxis2", yAxis);
 	localStorage.setItem("zAxis2", zAxis);
+
+	txt = txt + "X2 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Y2 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Z2 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and phi in 1 degree increments
 	var xPointsPhi = new Array();
@@ -1033,6 +1046,7 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	localStorage.setItem("intermediateVector3", v3);
 	xAxis = MatrixVectorRotation(M, xAxis);
 	yAxis = MatrixVectorRotation(M, yAxis);
+	zAxis = MatrixVectorRotation(M, zAxis);
 
 	localStorage.setItem("xPointsPhi_xAxis", xPointsPhi_xAxis);
 	localStorage.setItem("yPointsPhi_xAxis", yPointsPhi_xAxis);
@@ -1045,7 +1059,10 @@ function VectorEulerDisplay(phi, theta, psi, v)
 	localStorage.setItem("yAxis3", yAxis);
 	localStorage.setItem("zAxis3", zAxis);
 
-
+	txt = txt + "X3 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Y3 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
+	txt = txt + "Z3 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
+	//alert(txt);
 }
 
 
