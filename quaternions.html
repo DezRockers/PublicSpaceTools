@@ -605,7 +605,9 @@ document.getElementById("transposeMatrix").reset();
 document.getElementById("eulerAngles").reset();
 document.getElementById("vectorIn").reset();
 document.getElementById("vectorOut").reset();
-let target = document.getElementById('VisRotation');
+var target = document.getElementById('VisRotation');
+	target.style.visibility = "hidden";
+target = document.getElementById('FrameRotation');
 	target.style.visibility = "hidden";
 }
 
@@ -761,7 +763,9 @@ function VectorRotationDisplay(q,v)
 		}
 	}
 
-	let target = document.getElementById('VisRotation');
+	var target = document.getElementById('VisRotation');
+	target.style.visibility = "visible";
+	target = document.getElementById('FrameRotation');
 	target.style.visibility = "visible";
 
 	// update local storage for passing between html pages
@@ -817,11 +821,13 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPsi[i] = vtemp[0];
 			yPointsPsi[i] = vtemp[1];
 			zPointsPsi[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, xAxis);
+
+			// for the frame rotation we must use the transpose matrix
+			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPsi_xAxis[i] = vtemp[0];
 			yPointsPsi_xAxis[i] = vtemp[1];
 			zPointsPsi_xAxis[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
 			xPointsPsi_yAxis[i] = vtemp[0];
 			yPointsPsi_yAxis[i] = vtemp[1];
 			zPointsPsi_yAxis[i] = vtemp[2];
@@ -836,11 +842,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPsi[-i] = vtemp[0];
 			yPointsPsi[-i] = vtemp[1];
 			zPointsPsi[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, xAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPsi_xAxis[-i] = vtemp[0];
 			yPointsPsi_xAxis[-i] = vtemp[1];
 			zPointsPsi_xAxis[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
 			xPointsPsi_yAxis[-i] = vtemp[0];
 			yPointsPsi_yAxis[-i] = vtemp[1];
 			zPointsPsi_yAxis[-i] = vtemp[2];
@@ -869,9 +875,9 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	M = RotationMatrixAboutAxis(3, psi);
 	v1 = MatrixVectorRotation(M, v);
 	localStorage.setItem("intermediateVector1", v1);
-	xAxis = MatrixVectorRotation(M, xAxis);
-	yAxis = MatrixVectorRotation(M, yAxis);
-	zAxis = MatrixVectorRotation(M, zAxis);
+	//xAxis = MatrixVectorRotation(Transpose(M), xAxis);
+	//yAxis = MatrixVectorRotation(Transpose(M), yAxis);
+	//zAxis = MatrixVectorRotation(Transpose(M), zAxis);
 
 	localStorage.setItem("xPointsPsi_xAxis", xPointsPsi_xAxis);
 	localStorage.setItem("yPointsPsi_xAxis", yPointsPsi_xAxis);
@@ -899,6 +905,7 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	var yPointsTheta_zAxis = new Array();
 	var zPointsTheta_zAxis = new Array();
 	var i = 0;
+	var M1 = RotationMatrixAboutAxis(3,-psi);
 	if (theta > 1)
 	{
 		for (i = 0; i <= theta; i++)
@@ -908,11 +915,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsTheta[i] = vtemp[0];
 			yPointsTheta[i] = vtemp[1];
 			zPointsTheta[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), yAxis);
 			xPointsTheta_yAxis[i] = vtemp[0];
 			yPointsTheta_yAxis[i] = vtemp[1];
 			zPointsTheta_yAxis[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, zAxis);
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), zAxis);
 			xPointsTheta_zAxis[i] = vtemp[0];
 			yPointsTheta_zAxis[i] = vtemp[1];
 			zPointsTheta_zAxis[i] = vtemp[2];
@@ -927,11 +934,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsTheta[-i] = vtemp[0];
 			yPointsTheta[-i] = vtemp[1];
 			zPointsTheta[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
 			xPointsTheta_yAxis[-i] = vtemp[0];
 			yPointsTheta_yAxis[-i] = vtemp[1];
 			zPointsTheta_yAxis[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, zAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), zAxis);
 			xPointsTheta_zAxis[-i] = vtemp[0];
 			yPointsTheta_zAxis[-i] = vtemp[1];
 			zPointsTheta_zAxis[-i] = vtemp[2];
@@ -960,9 +967,9 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	M = RotationMatrixAboutAxis(1, theta);
 	v2 = MatrixVectorRotation(M, v1);
 	localStorage.setItem("intermediateVector2", v2);
-	xAxis = MatrixVectorRotation(M, xAxis);
-	yAxis = MatrixVectorRotation(M, yAxis);
-	zAxis = MatrixVectorRotation(M, zAxis);
+	xAxis = MatrixVectorRotation(Transpose(M), xAxis);
+	yAxis = MatrixVectorRotation(Transpose(M), yAxis);
+	zAxis = MatrixVectorRotation(Transpose(M), zAxis);
 
 	localStorage.setItem("xPointsTheta_yAxis", xPointsTheta_yAxis);
 	localStorage.setItem("yPointsTheta_yAxis", yPointsTheta_yAxis);
@@ -999,11 +1006,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPhi[i] = vtemp[0];
 			yPointsPhi[i] = vtemp[1];
 			zPointsPhi[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, xAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPhi_xAxis[i] = vtemp[0];
 			yPointsPhi_xAxis[i] = vtemp[1];
 			zPointsPhi_xAxis[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
 			xPointsPhi_yAxis[i] = vtemp[0];
 			yPointsPhi_yAxis[i] = vtemp[1];
 			zPointsPhi_yAxis[i] = vtemp[2];
@@ -1018,11 +1025,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPhi[-i] = vtemp[0];
 			yPointsPhi[-i] = vtemp[1];
 			zPointsPhi[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, xAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPhi_xAxis[-i] = vtemp[0];
 			yPointsPhi_xAxis[-i] = vtemp[1];
 			zPointsPhi_xAxis[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(M, yAxis);
+			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
 			xPointsPhi_yAxis[-i] = vtemp[0];
 			yPointsPhi_yAxis[-i] = vtemp[1];
 			zPointsPhi_yAxis[-i] = vtemp[2];
@@ -1051,9 +1058,9 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	M = RotationMatrixAboutAxis(3, phi);
 	v3 = MatrixVectorRotation(M, v2);
 	localStorage.setItem("intermediateVector3", v3);
-	xAxis = MatrixVectorRotation(M, xAxis);
-	yAxis = MatrixVectorRotation(M, yAxis);
-	zAxis = MatrixVectorRotation(M, zAxis);
+	xAxis = MatrixVectorRotation(Transpose(M), xAxis);
+	yAxis = MatrixVectorRotation(Transpose(M), yAxis);
+	zAxis = MatrixVectorRotation(Transpose(M), zAxis);
 
 	localStorage.setItem("xPointsPhi_xAxis", xPointsPhi_xAxis);
 	localStorage.setItem("yPointsPhi_xAxis", yPointsPhi_xAxis);
@@ -1183,7 +1190,8 @@ Rotated Vector<br />
 <input type="text" id="v1_out" size=21/>v<sub>1</sub><br />
 <input type="text" id="v2_out" size=21/>v<sub>2</sub><br />
 </form>
-<button type="button" id="VisRotation" style="visibility:hidden" onclick="window.open('ShowRotation.html', '_blank');">Visualise Rotation</button><br />
+<button type="button" id="VisRotation" style="visibility:hidden" onclick="window.open('ShowRotation.html', '_blank');">Visualise Vector Rotation</button><br />
+<button type="button" id="FrameRotation" style="visibility:hidden" onclick="window.open('FrameRotation.html', '_blank');">Visualise Frame Rotation</button><br />
 </td>
 
 </tr>
