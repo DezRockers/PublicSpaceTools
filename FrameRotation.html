@@ -47,6 +47,7 @@
 	<script src="lightningchart/dist/lcjs.iife.js"></script>
 
 	<script src="generic.js"></script>
+	<script src="lightningChartGeneric.js"></script>
 
 	<!--Actual chart related script tag-->
 	<script>
@@ -252,13 +253,15 @@
 	// Add a line series for the inital vector
 	var initialVector = localStorage.getItem("initialVector").split(',');
 	const initialVectorLine = chart.addLineSeries()
-		.setName('Initial Vector')
+		.setName('Vector')
 		.add({ x: 0, y: 0, z: 0 })
 		.add({ x: initialVector[0], y: initialVector[2], z: initialVector[1] })
 		.setStrokeStyle(new SolidLine({
 			thickness: 5,
 			fillStyle: new SolidFill({ color: orange })
 		}))
+			 
+	var finalVector = localStorage.getItem("finalVector").split(',');
 			 
 	// add animation toggle button
 	const animationFlag = document.createElement("input");
@@ -271,25 +274,6 @@
 	help.type = "text";
 	help.value = "Help";
 	help.id = "help";
-
-	// pause/start timeline by clicking the button
-	let freezeData = false;
-	let interval;
-	let interval2;
-	animationFlag.onclick = () => {
-		if (freezeData)
-		{
-			freezeData = false;
-			animationFlag.value = "Animation On";
-			updateData();
-		} 
-		else
-		{
-			freezeData = true;
-			animationFlag.value = "Animation Off";
-			clearInterval(interval);
-		}
-	};
 
 	// Animate the axes rotation.
 	const rotatingXaxis = chart.addLineSeries()
@@ -313,6 +297,27 @@
 			fillStyle: new SolidFill({ color: yellow })
 		}));
 
+	// pause/start timeline by clicking the button
+	let freezeData = false;
+	let interval;
+	animationFlag.onclick = () => {
+		if (freezeData)
+		{
+			freezeData = false;
+			animationFlag.value = "Animation On";
+			rotatingXaxis.clear();
+			rotatingYaxis.clear();
+			rotatingZaxis.clear();
+			updateData();
+		} 
+		else
+		{
+			freezeData = true;
+			animationFlag.value = "Animation Off";
+			clearInterval(interval);
+		}
+	};
+
 	const updateData = () => 
 	{
 		if (freezeData == false)
@@ -322,12 +327,12 @@
 			var kk = 0;
 			interval = setInterval(() => {
 			
-				// first do rotation around Z-axis by psi
-				if (ii < dataPsi_xAxis.length)
+				// first do rotation around Z-axis by -phi
+				if (ii < dataPhi_xAxis.length)
 				{
 					const point1 = {x:0, y:0, z:0};
-					const pointx = dataPsi_xAxis[ii];
-					const pointy = dataPsi_yAxis[ii];
+					const pointx = ScalePoint(Max, dataPhi_xAxis[ii]);
+					const pointy = ScalePoint(Max, dataPhi_yAxis[ii]);
 					rotatingXaxis.clear();
 					rotatingXaxis.add(point1);
 					rotatingXaxis.add(pointx);
@@ -335,14 +340,14 @@
 					rotatingYaxis.add(point1);
 					rotatingYaxis.add(pointy);
 				}
-				else if (ii >= dataPsi_xAxis.length+100)
+				else if (ii >= dataPhi_xAxis.length+100)
 				{
-					// then do rotation around X-axis by theta
+					// then do rotation around X-axis by -theta
 					if (jj < dataTheta_yAxis.length)
 					{
 						const point1 = {x:0, y:0, z:0};
-						const pointy = dataTheta_yAxis[jj];
-						const pointz = dataTheta_zAxis[jj];
+						const pointy = ScalePoint(Max, dataTheta_yAxis[jj]);
+						const pointz = ScalePoint(Max, dataTheta_zAxis[jj]);
 						rotatingYaxis.clear();
 						rotatingYaxis.add(point1);
 						rotatingYaxis.add(pointy);
@@ -352,12 +357,12 @@
 					}
 					else if (jj >= dataTheta_yAxis.length+100)
 					{
-						// then do rotation around Z-axis by phi
-						if (kk < dataPhi_xAxis.length)
+						// then do rotation around Z-axis by -psi
+						if (kk < dataPsi_xAxis.length)
 						{
 							const point1 = {x:0, y:0, z:0};
-							const pointx = dataPhi_xAxis[kk];
-							const pointy = dataPhi_yAxis[kk];
+							const pointx = ScalePoint(Max, dataPsi_xAxis[kk]);
+							const pointy = ScalePoint(Max, dataPsi_yAxis[kk]);
 							rotatingXaxis.clear();
 							rotatingXaxis.add(point1);
 							rotatingXaxis.add(pointx);
@@ -365,15 +370,15 @@
 							rotatingYaxis.add(point1);
 							rotatingYaxis.add(pointy);
 						}
-						else if (kk >= dataPhi_xAxis.length+100)
+						else if (kk >= dataPsi_xAxis.length+100)
 						{
 							// reset everything so that we start again
 							ii = -1;
 							jj = -1;
 							kk = -1;
-							//rotatingxAxis.clear();
-							//rotatingyAxis.clear();
-							//rotatingzAxis.clear();
+							rotatingXaxis.clear();
+							rotatingYaxis.clear();
+							rotatingZaxis.clear();
 						}
 						kk++;
 					}
@@ -384,12 +389,12 @@
 			}, 30);
 		}
 	}
+	updateData();
 
 	// help button
 	help.onclick = () => {
-		var txt = "Toggle the Animate On/Off button to start/stop the vector rotation update.\n";
-		txt = txt + "Note that animation resumes from the initial vector rather than from where it was previosuly stopped.\n\n";
-		txt = txt + "The animation can be displayed as either quaternion rotation or euler angle rotation.\n\n";
+		var txt = "Toggle the Animate On/Off button to start/stop the frame rotation update.\n";
+		txt = txt + "Note that animation resumes from the initial frame rather than from where it was previosuly stopped.\n\n";
 		txt = txt + "Hover over an item in the legend display to highlight that item in the 3D Rotation Plot.\n\n";
 		txt = txt + "Use the mouse controls within the 3D Rotation Plot to vary the viewing angle as well as zooming in or out.\n";
 		txt = txt + "Reload the page to reset the view.\n";
@@ -441,7 +446,19 @@
 			x: x_offset,
 			y: 30
 		})
-		.setText("Inital Vector = [" + Number(initialVector[0]).toFixed(3) + ", " + Number(initialVector[1]).toFixed(3) + ", " + Number(initialVector[2]).toFixed(3) + "]")
+		.setText("Vector in Initial Frame = [" + Number(initialVector[0]).toFixed(3) + ", " + Number(initialVector[1]).toFixed(3) + ", " + Number(initialVector[2]).toFixed(3) + "]")
+		.setTextFont(fontSettings => fontSettings.setSize(18))
+		.setTextFillStyle(new SolidFill({ color: orange }));
+
+	const v2Display = legendPanel.addUIElement(
+		UIElementBuilders.TextBox
+	)
+		.setMouseInteractions(false)
+		.setPosition({
+			x: x_offset,
+			y: 25
+		})
+		.setText("Vector in Rotated Frame = [" + Number(finalVector[0]).toFixed(3) + ", " + Number(finalVector[1]).toFixed(3) + ", " + Number(finalVector[2]).toFixed(3) + "]")
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: orange }));
 
@@ -450,10 +467,10 @@
 	)
 		.setPosition({
 			x: x_offset,
-			y: 10
+			y: 20
 		})
 		.setMouseInteractions(false)
-		.setText("Euler Angles = [" + Number(localStorage.getItem("psi")).toFixed(3) + ", " + Number(localStorage.getItem("theta")).toFixed(3) + ", " + Number(localStorage.getItem("phi")).toFixed(3) + "] degs")
+		.setText("Euler Angles (psi, theta, phi) = [" + Number(localStorage.getItem("psi")).toFixed(3) + ", " + Number(localStorage.getItem("theta")).toFixed(3) + ", " + Number(localStorage.getItem("phi")).toFixed(3) + "] degs")
 		.setTextFont(fontSettings => fontSettings.setSize(18))
 		.setTextFillStyle(new SolidFill({ color: red }));
 

@@ -648,6 +648,7 @@ function VectorRotationByQuaternion()
 	var theta = document.getElementById("theta").value;
 	var psi = document.getElementById("psi").value;
 	VectorEulerDisplay(psi, theta, phi, v);
+	FrameEulerDisplay(psi, theta, phi, v);
 
 	//var txt = "Output vector = " + vout;
 	//alert(txt);
@@ -792,23 +793,11 @@ function VectorRotationDisplay(q,v)
 function VectorEulerDisplay(psi, theta, phi, v)
 {
 	// perform each rotation in the order psi about Z, theta about X, phi about Z
-	var xAxis = [ 1,0,0 ];
-	var yAxis = [ 0,1,0 ];
-	var zAxis = [ 0,0,1 ];
-	var txt = "X0 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Y0 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Z0 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and psi in 1 degree increments
 	var xPointsPsi = new Array();
 	var yPointsPsi = new Array();
 	var zPointsPsi = new Array();
-	var xPointsPsi_xAxis = new Array();
-	var yPointsPsi_xAxis = new Array();
-	var zPointsPsi_xAxis = new Array();
-	var xPointsPsi_yAxis = new Array();
-	var yPointsPsi_yAxis = new Array();
-	var zPointsPsi_yAxis = new Array();
 	var vtemp = new Array();
 	var M = Matrix(3,3);
 	var i = 0;
@@ -821,16 +810,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPsi[i] = vtemp[0];
 			yPointsPsi[i] = vtemp[1];
 			zPointsPsi[i] = vtemp[2];
-
-			// for the frame rotation we must use the transpose matrix
-			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
-			xPointsPsi_xAxis[i] = vtemp[0];
-			yPointsPsi_xAxis[i] = vtemp[1];
-			zPointsPsi_xAxis[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
-			xPointsPsi_yAxis[i] = vtemp[0];
-			yPointsPsi_yAxis[i] = vtemp[1];
-			zPointsPsi_yAxis[i] = vtemp[2];
 		}
 	}
 	else if (psi < -1)
@@ -842,14 +821,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPsi[-i] = vtemp[0];
 			yPointsPsi[-i] = vtemp[1];
 			zPointsPsi[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
-			xPointsPsi_xAxis[-i] = vtemp[0];
-			yPointsPsi_xAxis[-i] = vtemp[1];
-			zPointsPsi_xAxis[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
-			xPointsPsi_yAxis[-i] = vtemp[0];
-			yPointsPsi_yAxis[-i] = vtemp[1];
-			zPointsPsi_yAxis[-i] = vtemp[2];
 		}
 	}
 	else
@@ -857,12 +828,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 		xPointsPsi[0] = v[0];
 		yPointsPsi[0] = v[1];
 		zPointsPsi[0] = v[2];
-		xPointsPsi_xAxis[0] = xAxis[0];
-		yPointsPsi_xAxis[0] = xAxis[1];
-		zPointsPsi_xAxis[0] = xAxis[2];
-		xPointsPsi_yAxis[0] = yAxis[0];
-		yPointsPsi_yAxis[0] = yAxis[1];
-		zPointsPsi_yAxis[0] = yAxis[2];
 	}
 
 	// update local storage for passing between html pages
@@ -875,37 +840,12 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	M = RotationMatrixAboutAxis(3, psi);
 	v1 = MatrixVectorRotation(M, v);
 	localStorage.setItem("intermediateVector1", v1);
-	//xAxis = MatrixVectorRotation(Transpose(M), xAxis);
-	//yAxis = MatrixVectorRotation(Transpose(M), yAxis);
-	//zAxis = MatrixVectorRotation(Transpose(M), zAxis);
-
-	localStorage.setItem("xPointsPsi_xAxis", xPointsPsi_xAxis);
-	localStorage.setItem("yPointsPsi_xAxis", yPointsPsi_xAxis);
-	localStorage.setItem("zPointsPsi_xAxis", zPointsPsi_xAxis);
-	localStorage.setItem("xPointsPsi_yAxis", xPointsPsi_yAxis);
-	localStorage.setItem("yPointsPsi_yAxis", yPointsPsi_yAxis);
-	localStorage.setItem("zPointsPsi_yAxis", zPointsPsi_yAxis);
-
-	localStorage.setItem("xAxis1", xAxis);
-	localStorage.setItem("yAxis1", yAxis);
-	localStorage.setItem("zAxis1", zAxis);
-
-	txt = txt + "X1 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Y1 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Z1 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and theta in 1 degree increments
 	var xPointsTheta = new Array();
 	var yPointsTheta = new Array();
 	var zPointsTheta = new Array();
-	var xPointsTheta_yAxis = new Array();
-	var yPointsTheta_yAxis = new Array();
-	var zPointsTheta_yAxis = new Array();
-	var xPointsTheta_zAxis = new Array();
-	var yPointsTheta_zAxis = new Array();
-	var zPointsTheta_zAxis = new Array();
 	var i = 0;
-	var M1 = RotationMatrixAboutAxis(3,-psi);
 	if (theta > 1)
 	{
 		for (i = 0; i <= theta; i++)
@@ -915,14 +855,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsTheta[i] = vtemp[0];
 			yPointsTheta[i] = vtemp[1];
 			zPointsTheta[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), yAxis);
-			xPointsTheta_yAxis[i] = vtemp[0];
-			yPointsTheta_yAxis[i] = vtemp[1];
-			zPointsTheta_yAxis[i] = vtemp[2];
-			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), zAxis);
-			xPointsTheta_zAxis[i] = vtemp[0];
-			yPointsTheta_zAxis[i] = vtemp[1];
-			zPointsTheta_zAxis[i] = vtemp[2];
 		}
 	}
 	else if (theta < -1)
@@ -934,14 +866,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsTheta[-i] = vtemp[0];
 			yPointsTheta[-i] = vtemp[1];
 			zPointsTheta[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(Transpose(M), yAxis);
-			xPointsTheta_yAxis[-i] = vtemp[0];
-			yPointsTheta_yAxis[-i] = vtemp[1];
-			zPointsTheta_yAxis[-i] = vtemp[2];
-			vtemp = MatrixVectorRotation(Transpose(M), zAxis);
-			xPointsTheta_zAxis[-i] = vtemp[0];
-			yPointsTheta_zAxis[-i] = vtemp[1];
-			zPointsTheta_zAxis[-i] = vtemp[2];
 		}
 	}
 	else
@@ -949,12 +873,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 		xPointsTheta[0] = v1[0];
 		yPointsTheta[0] = v1[1];
 		zPointsTheta[0] = v1[2];
-		xPointsTheta_yAxis[0] = yAxis[0];
-		yPointsTheta_yAxis[0] = yAxis[1];
-		zPointsTheta_yAxis[0] = yAxis[2];
-		xPointsTheta_zAxis[0] = zAxis[0];
-		yPointsTheta_zAxis[0] = zAxis[1];
-		zPointsTheta_zAxis[0] = zAxis[2];
 	}
 
 	// update local storage for passing between html pages
@@ -967,35 +885,11 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	M = RotationMatrixAboutAxis(1, theta);
 	v2 = MatrixVectorRotation(M, v1);
 	localStorage.setItem("intermediateVector2", v2);
-	xAxis = MatrixVectorRotation(Transpose(M), xAxis);
-	yAxis = MatrixVectorRotation(Transpose(M), yAxis);
-	zAxis = MatrixVectorRotation(Transpose(M), zAxis);
-
-	localStorage.setItem("xPointsTheta_yAxis", xPointsTheta_yAxis);
-	localStorage.setItem("yPointsTheta_yAxis", yPointsTheta_yAxis);
-	localStorage.setItem("zPointsTheta_yAxis", zPointsTheta_yAxis);
-	localStorage.setItem("xPointsTheta_zAxis", xPointsTheta_zAxis);
-	localStorage.setItem("yPointsTheta_zAxis", yPointsTheta_zAxis);
-	localStorage.setItem("zPointsTheta_zAxis", zPointsTheta_zAxis);
-
-	localStorage.setItem("xAxis2", xAxis);
-	localStorage.setItem("yAxis2", yAxis);
-	localStorage.setItem("zAxis2", zAxis);
-
-	txt = txt + "X2 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Y2 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Z2 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
 
 	// then derive a set of rotation points for all angles between 0 and phi in 1 degree increments
 	var xPointsPhi = new Array();
 	var yPointsPhi = new Array();
 	var zPointsPhi = new Array();
-	var xPointsPhi_xAxis = new Array();
-	var yPointsPhi_xAxis = new Array();
-	var zPointsPhi_xAxis = new Array();
-	var xPointsPhi_yAxis = new Array();
-	var yPointsPhi_yAxis = new Array();
-	var zPointsPhi_yAxis = new Array();
 	var i = 0;
 	if (phi > 1)
 	{
@@ -1006,6 +900,65 @@ function VectorEulerDisplay(psi, theta, phi, v)
 			xPointsPhi[i] = vtemp[0];
 			yPointsPhi[i] = vtemp[1];
 			zPointsPhi[i] = vtemp[2];
+		}
+	}
+	else if (phi < -1)
+	{
+		for (i = 0; i >= phi; i--)
+		{
+			M = RotationMatrixAboutAxis(3, i);
+			vtemp = MatrixVectorRotation(M, v2);
+			xPointsPhi[-i] = vtemp[0];
+			yPointsPhi[-i] = vtemp[1];
+			zPointsPhi[-i] = vtemp[2];
+		}
+	}
+	else
+	{
+		xPointsPhi[0] = v2[0];
+		yPointsPhi[0] = v2[1];
+		zPointsPhi[0] = v2[2];
+	}
+
+	// update local storage for passing between html pages
+	localStorage.setItem("xPointsPhi", xPointsPhi);
+	localStorage.setItem("yPointsPhi", yPointsPhi);
+	localStorage.setItem("zPointsPhi", zPointsPhi);
+	localStorage.setItem("phi", phi);	// degrees
+
+	var v3 = new Array();
+	M = RotationMatrixAboutAxis(3, phi);
+	v3 = MatrixVectorRotation(M, v2);
+	localStorage.setItem("intermediateVector3", v3);
+
+}
+
+// function to derive a set of 313 Euler angle rotation for the frame for display purposes
+function FrameEulerDisplay(phi, theta, psi, v)
+{
+	// perform each rotation in the order -phi about Z, -theta about X, -psi about Z
+	// because the frame rotation is the transpose of the vector rotation
+	var xAxis = [ 1,0,0 ];
+	var yAxis = [ 0,1,0 ];
+	var zAxis = [ 0,0,1 ];
+
+	// then derive a set of rotation points for all angles between 0 and psi in 1 degree increments
+	var xPointsPhi_xAxis = new Array();
+	var yPointsPhi_xAxis = new Array();
+	var zPointsPhi_xAxis = new Array();
+	var xPointsPhi_yAxis = new Array();
+	var yPointsPhi_yAxis = new Array();
+	var zPointsPhi_yAxis = new Array();
+	var vtemp = new Array();
+	var M = Matrix(3,3);
+	var i = 0;
+	if (phi > 1)
+	{
+		for (i = 0; i <= phi; i++)
+		{
+			M = RotationMatrixAboutAxis(3, i);
+
+			// for the frame rotation we must use the transpose matrix
 			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPhi_xAxis[i] = vtemp[0];
 			yPointsPhi_xAxis[i] = vtemp[1];
@@ -1021,10 +974,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 		for (i = 0; i >= phi; i--)
 		{
 			M = RotationMatrixAboutAxis(3, i);
-			vtemp = MatrixVectorRotation(M, v2);
-			xPointsPhi[-i] = vtemp[0];
-			yPointsPhi[-i] = vtemp[1];
-			zPointsPhi[-i] = vtemp[2];
 			vtemp = MatrixVectorRotation(Transpose(M), xAxis);
 			xPointsPhi_xAxis[-i] = vtemp[0];
 			yPointsPhi_xAxis[-i] = vtemp[1];
@@ -1037,9 +986,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	}
 	else
 	{
-		xPointsPhi[0] = v2[0];
-		yPointsPhi[0] = v2[1];
-		zPointsPhi[0] = v2[2];
 		xPointsPhi_xAxis[0] = xAxis[0];
 		yPointsPhi_xAxis[0] = xAxis[1];
 		zPointsPhi_xAxis[0] = xAxis[2];
@@ -1049,19 +995,6 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	}
 
 	// update local storage for passing between html pages
-	localStorage.setItem("xPointsPhi", xPointsPhi);
-	localStorage.setItem("yPointsPhi", yPointsPhi);
-	localStorage.setItem("zPointsPhi", zPointsPhi);
-	localStorage.setItem("phi", phi);	// degrees
-
-	var v3 = new Array();
-	M = RotationMatrixAboutAxis(3, phi);
-	v3 = MatrixVectorRotation(M, v2);
-	localStorage.setItem("intermediateVector3", v3);
-	xAxis = MatrixVectorRotation(Transpose(M), xAxis);
-	yAxis = MatrixVectorRotation(Transpose(M), yAxis);
-	zAxis = MatrixVectorRotation(Transpose(M), zAxis);
-
 	localStorage.setItem("xPointsPhi_xAxis", xPointsPhi_xAxis);
 	localStorage.setItem("yPointsPhi_xAxis", yPointsPhi_xAxis);
 	localStorage.setItem("zPointsPhi_xAxis", zPointsPhi_xAxis);
@@ -1069,14 +1002,124 @@ function VectorEulerDisplay(psi, theta, phi, v)
 	localStorage.setItem("yPointsPhi_yAxis", yPointsPhi_yAxis);
 	localStorage.setItem("zPointsPhi_yAxis", zPointsPhi_yAxis);
 
-	localStorage.setItem("xAxis3", xAxis);
-	localStorage.setItem("yAxis3", yAxis);
-	localStorage.setItem("zAxis3", zAxis);
+	// then derive a set of rotation points for all angles between 0 and theta in 1 degree increments
+	var xPointsTheta_yAxis = new Array();
+	var yPointsTheta_yAxis = new Array();
+	var zPointsTheta_yAxis = new Array();
+	var xPointsTheta_zAxis = new Array();
+	var yPointsTheta_zAxis = new Array();
+	var zPointsTheta_zAxis = new Array();
+	var i = 0;
+	var M1 = RotationMatrixAboutAxis(3,-phi);
+	if (theta > 1)
+	{
+		for (i = 0; i <= theta; i++)
+		{
+			M = RotationMatrixAboutAxis(1, i);
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), yAxis);
+			xPointsTheta_yAxis[i] = vtemp[0];
+			yPointsTheta_yAxis[i] = vtemp[1];
+			zPointsTheta_yAxis[i] = vtemp[2];
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), zAxis);
+			xPointsTheta_zAxis[i] = vtemp[0];
+			yPointsTheta_zAxis[i] = vtemp[1];
+			zPointsTheta_zAxis[i] = vtemp[2];
+		}
+	}
+	else if (theta < -1)
+	{
+		for (i = 0; i >= theta; i--)
+		{
+			M = RotationMatrixAboutAxis(1, i);
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), yAxis);
+			xPointsTheta_yAxis[-i] = vtemp[0];
+			yPointsTheta_yAxis[-i] = vtemp[1];
+			zPointsTheta_yAxis[-i] = vtemp[2];
+			vtemp = MatrixVectorRotation(MatrixProduct(M1, Transpose(M)), zAxis);
+			xPointsTheta_zAxis[-i] = vtemp[0];
+			yPointsTheta_zAxis[-i] = vtemp[1];
+			zPointsTheta_zAxis[-i] = vtemp[2];
+		}
+	}
+	else
+	{
+		vtemp = MatrixVectorRotation(M1, yAxis);
+		xPointsTheta_yAxis[0] = vtemp[0];
+		yPointsTheta_yAxis[0] = vtemp[1];
+		zPointsTheta_yAxis[0] = vtemp[2];
+		vtemp = MatrixVectorRotation(M1, zAxis);
+		xPointsTheta_zAxis[0] = vtemp[0];
+		yPointsTheta_zAxis[0] = vtemp[1];
+		zPointsTheta_zAxis[0] = vtemp[2];
+	}
 
-	txt = txt + "X3 axis = [" + Number(xAxis[0]).toFixed(3) + ", " + Number(xAxis[1]).toFixed(3) + ", " + Number(xAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Y3 axis = [" + Number(yAxis[0]).toFixed(3) + ", " + Number(yAxis[1]).toFixed(3) + ", " + Number(yAxis[2]).toFixed(3) + "\n";
-	txt = txt + "Z3 axis = [" + Number(zAxis[0]).toFixed(3) + ", " + Number(zAxis[1]).toFixed(3) + ", " + Number(zAxis[2]).toFixed(3) + "\n";
-	//alert(txt);
+	// update local storage for passing between html pages
+	localStorage.setItem("xPointsTheta_yAxis", xPointsTheta_yAxis);
+	localStorage.setItem("yPointsTheta_yAxis", yPointsTheta_yAxis);
+	localStorage.setItem("zPointsTheta_yAxis", zPointsTheta_yAxis);
+	localStorage.setItem("xPointsTheta_zAxis", xPointsTheta_zAxis);
+	localStorage.setItem("yPointsTheta_zAxis", yPointsTheta_zAxis);
+	localStorage.setItem("zPointsTheta_zAxis", zPointsTheta_zAxis);
+
+	// then derive a set of rotation points for all angles between 0 and psi in 1 degree increments
+	var xPointsPsi_xAxis = new Array();
+	var yPointsPsi_xAxis = new Array();
+	var zPointsPsi_xAxis = new Array();
+	var xPointsPsi_yAxis = new Array();
+	var yPointsPsi_yAxis = new Array();
+	var zPointsPsi_yAxis = new Array();
+	var M2 = MatrixProduct(M1, RotationMatrixAboutAxis(1,-theta));
+	var i = 0;
+	if (psi > 1)
+	{
+		for (i = 0; i <= psi; i++)
+		{
+			M = RotationMatrixAboutAxis(3, i);
+			vtemp = MatrixVectorRotation(MatrixProduct(M2, Transpose(M)), xAxis);
+			xPointsPsi_xAxis[i] = vtemp[0];
+			yPointsPsi_xAxis[i] = vtemp[1];
+			zPointsPsi_xAxis[i] = vtemp[2];
+			vtemp = MatrixVectorRotation(MatrixProduct(M2, Transpose(M)), yAxis);
+			xPointsPsi_yAxis[i] = vtemp[0];
+			yPointsPsi_yAxis[i] = vtemp[1];
+			zPointsPsi_yAxis[i] = vtemp[2];
+		}
+	}
+	else if (psi < -1)
+	{
+		for (i = 0; i >= psi; i--)
+		{
+			M = RotationMatrixAboutAxis(3, i);
+			vtemp = MatrixVectorRotation(MatrixProduct(M2, Transpose(M)), xAxis);
+			xPointsPsi_xAxis[-i] = vtemp[0];
+			yPointsPsi_xAxis[-i] = vtemp[1];
+			zPointsPsi_xAxis[-i] = vtemp[2];
+			vtemp = MatrixVectorRotation(MatrixProduct(M2, Transpose(M)), yAxis);
+			xPointsPsi_yAxis[-i] = vtemp[0];
+			yPointsPsi_yAxis[-i] = vtemp[1];
+			zPointsPsi_yAxis[-i] = vtemp[2];
+		}
+	}
+	else
+	{
+		vtemp = MatrixVectorRotation(M2, xAxis);
+		xPointsPsi_xAxis[0] = vtemp[0];
+		yPointsPsi_xAxis[0] = vtemp[1];
+		zPointsPsi_xAxis[0] = vtemp[2];
+		vtemp = MatrixVectorRotation(M2, yAxis);
+		xPointsPsi_yAxis[0] = vtemp[0];
+		yPointsPsi_yAxis[0] = vtemp[1];
+		zPointsPsi_yAxis[0] = vtemp[2];
+	}
+
+	// update local storage for passing between html pages
+	localStorage.setItem("xPointsPsi_xAxis", xPointsPsi_xAxis);
+	localStorage.setItem("yPointsPsi_xAxis", yPointsPsi_xAxis);
+	localStorage.setItem("zPointsPsi_xAxis", zPointsPsi_xAxis);
+	localStorage.setItem("xPointsPsi_yAxis", xPointsPsi_yAxis);
+	localStorage.setItem("yPointsPsi_yAxis", yPointsPsi_yAxis);
+	localStorage.setItem("zPointsPsi_yAxis", zPointsPsi_yAxis);
+
 }
 
 
