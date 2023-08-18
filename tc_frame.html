@@ -34,6 +34,204 @@ function DisplayTcFields()
 	TC_frame(bytes);
 }
 
+function ConvertToTcFrame()
+{
+	var str = document.getElementById("inputCltu").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	var tcFrame = new Array();
+	
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+
+	// the CLTU has a 2 header bytes and 8 trailer bytes and a code block of 8 bytes
+	// where the last byte is the parity byte which needs to be discarded to extract the TC frame
+	
+	var tcIndex = 0;
+	for (i = 2; i < bytes.length - 8; i++)
+	{
+		if ((i-2)%8 != 7)
+		{
+			tcFrame[tcIndex] = bytes[i];
+			tcIndex++;
+		}
+	}
+
+	// there may also be padding bytes to make each code block a multiple of 8 bytes
+	// therefore we need to check the frame length from the data
+	var frame_length = (( tcFrame[2] & 0x3 )<< 8) + tcFrame[3] + 1;
+	
+    // Set the TC frame
+    var tcFrameString = "";
+	for (index = 0; index < frame_length; index++)
+	{
+		tcFrameString = tcFrameString + tcFrame[index].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+	document.getElementById("inputString").value = tcFrameString.toString(16).toUpperCase();
+
+}
+
+function ConvertToCltu()
+{
+	var str = document.getElementById("inputString").value;
+	str = trim(str);
+	var bytes = new Array();
+	var txt = "";
+	bytes = str.split(" ");
+	for (i = 0; i < bytes.length; i++)
+	{
+		txt = txt + bytes[i] + "\n";
+	}
+	//alert(txt);
+	
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+	TC_cltu(bytes);
+}
+
+// TC_cltu converts the TC frame to a CLTU using the BCH 63,56 encoding method
+function TC_cltu( bytes )
+{
+
+	var tcCltu = "";
+	var codeblockLength = 8;
+	var parityBits = new Array(7);	
+	var codeblock = new Array(8);
+	var index = 0;
+	var bit = 0;
+	var input = 0;
+	var parityByte = 0;
+	var tempVariable = 0;
+	var frameBytePos = 0;
+	var cltuBytePos = 2;
+	var lastCodeBlock = false;
+	var cltuMaxSize = 1024;
+	var cltuHeaderSize = 2;
+	
+	// create CLTU of max size
+	var cltu = new Array(cltuMaxSize);
+	
+	// build one codeblock at a time
+	while (lastCodeBlock == false)
+	{
+		for (index = 0; index < 7; index++)
+		{
+			parityBits[index] = 0;
+		}
+		for (index = 0; index < 8; index++)
+		{
+			codeblock[index] = 0;
+		}
+		
+		// Copy info from transfer frame into the codeblock
+        for (index = 0; index <= codeblockLength - 2; index++)
+        {
+	        if (frameBytePos > (bytes.length - 1))
+            {
+    	        codeblock[index + 8 - codeblockLength] = 0x55;
+            }
+            else
+            {
+                codeblock[index + 8 - codeblockLength] = bytes[frameBytePos];
+            }
+            frameBytePos++;
+        }
+
+        // Check that the full frame data has been processes
+        if (frameBytePos > (bytes.length - 1))
+        {
+        	lastCodeBlock = true;
+        }
+    	// calculate the parity bits
+        for (index = 0; index <= 6; index++)
+        {
+        	for (bit = 7; bit != -1; bit--)
+            {
+            	input = ((codeblock[index]) & (1 << bit)) >> bit;
+                tempVariable = input ^ parityBits[0];
+                parityBits[0] = tempVariable ^ parityBits[1];
+                parityBits[1] = parityBits[2];
+                parityBits[2] = parityBits[3];
+                parityBits[3] = parityBits[4];
+                parityBits[4] = parityBits[5] ^ tempVariable;
+                parityBits[5] = parityBits[6];
+                parityBits[6] = tempVariable;
+        	}
+		}
+        parityByte = 
+        	((parityBits[0] << 7) + (parityBits[1] << 6)) +
+            (((parityBits[2] << 5) + (parityBits[3] << 4)) +
+            (((parityBits[4] << 3) + (parityBits[5] << 2)) + (parityBits[6] << 1)));
+
+        //  place the parity bits into the codeblock (complement the info bits)
+        codeblock[7] = (parityByte ^ 0xFE);
+
+        // copy the codeblock into the cltu
+        for (index = (8 - codeblockLength); index <= 7; index++)
+        {
+        	if (cltuBytePos <= cltuMaxSize)
+            {
+            	cltu[cltuBytePos] = codeblock[index];
+            }
+            cltuBytePos++;
+        }
+	}
+	
+    // Create the tail which is 0xc5 ...... 0x79
+    for (index = 0; index < (codeblockLength - 1); index++)
+    {
+    	if (cltuBytePos < cltuMaxSize)
+        {
+        	cltu[cltuBytePos] = 0xC5;
+        }
+        cltuBytePos++;
+	}
+
+    // Enter 0x79
+    if (cltuBytePos < cltuMaxSize)
+    {
+    	cltu[cltuBytePos] = 0x79;
+	}
+    cltuBytePos++;
+
+    // Create CLTU of given size + 2 for header
+
+    // Set start sequence
+    cltu[0] = 0xEB;
+    cltu[1] = 0x90;
+
+    // Set the data with TC Code blocks
+	for (index = 0; index < cltuBytePos; index++)
+	{
+		tcCltu = tcCltu + cltu[index].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+	document.getElementById("inputCltu").value = tcCltu.toString(16).toUpperCase();
+}
+
 //TC_frame() extracts the TC fields from the TC frame.
 function TC_frame( bytes )
 {
@@ -158,6 +356,7 @@ function GenerateReport()
 function ClearFields()
 {
 	document.getElementById("getString").reset();
+	document.getElementById("getCltu").reset();
 	document.getElementById("outputs").reset();
 	let target = document.getElementById('downloadLink');
 	target.style.visibility = "hidden";
@@ -168,7 +367,9 @@ function DisplayHelp()
 {
 	var txt = "This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.\n";
 	txt = txt + "It assumes that the transfer sublayer below the segmentation sublayer consists of the contained TC packet data.\n";
-	txt = txt + "It uses information taken from ECSS standards document ECSS-E-ST-50-04C 31 July 2008.\n";
+	txt = txt + "The tool can also convert the TC frame to a CLTU using the BCH 63,56 encoding method.\n";
+	txt = txt + "It uses information taken from ECSS standards document ECSS-E-ST-50-04C dated 31 July 2008 and\n";
+	txt = txt + "TC Synchronization and Channel Coding - Summary of Concept and Rationale, CCSDS 230.1-G-1, dated June 2006.\n";
 	alert(txt);
 }
 
@@ -182,6 +383,8 @@ function DisplayHelp()
 This tool displays the individual fields of the input CCSDS TC frame in hexadecimal bytes.
 </p>
 
+<!-- Define a table for the Input TC string -->
+
 <table border="1" borderColor="Silver">
 <tr id="tr1">
 
@@ -194,6 +397,7 @@ or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19
 
 <button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
 <button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
+<button type="button" onclick="ConvertToCltu()">Convert TC Frame to CLTU</button>
 <button type="button" onclick="ClearFields()">Clear Fields</button>
 <button type="button" onclick="DisplayHelp()">Help</button>
 
@@ -204,6 +408,30 @@ or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19
 </td>
 </tr>
 </table>
+
+<!-- Define a table for the TC string as a CLTU -->
+
+<table border="1" borderColor="Silver">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
+<form id = "getCltu" style="color:Silver;">
+TC frame encoded as a CLTU using the BCH 63,56 encoding method<br />
+<input type="text" id="inputCltu" maxLength=1000 size=200/><br />
+</form>
+
+<button type="button" onclick="AddSpaces('inputCltu')">Add Spaces to CLTU</button>
+<button type="button" onclick="ConvertToTcFrame()">Convert CLTU to TC Frame</button>
+
+<!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
+<!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
+<a id="downloadLink" href="#" download="TcFrameReport.txt" style="visibility:hidden">Download Report</a>
+
+</td>
+</tr>
+</table>
+
+<!-- Define a table for the TC frame fields -->
 
 <table border="1" borderColor="Silver">
 <tr id="tr1">

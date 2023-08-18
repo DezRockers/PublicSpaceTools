@@ -2,9 +2,15 @@
 const pi = 3.1415926535897932384626433832795;
 
 // add white space between every 2 chars of a string
-function AddSpaces()
+function AddSpaces(name)
 {
-	var str = document.getElementById("inputString").value;
+	var inputString = "inputString";
+	if (name != undefined)
+	{
+		inputString = name;
+	}
+	
+	var str = document.getElementById(inputString).value;
 
 	// first remove any white space
 	str = str.replace(/\s/g, '');
@@ -19,7 +25,7 @@ function AddSpaces()
 
 	// then add space every 2 characters
 	var result = str.replace(/.{1,2}(?=(.{2})+$)/g, '$& ');
-	document.getElementById("inputString").value = result;
+	document.getElementById(inputString).value = result;
 }
 
 // remove multiple, leading or trailing spaces
