@@ -2,6 +2,8 @@
 <html>
 <head>
 
+<link rel="stylesheet" href="styles.css">
+
 <!-- include generic.js for some quaternion functions -->
 <script src="generic.js"></script>
 
@@ -1160,9 +1162,9 @@ Quaternion In<br />
 <input type="text" id="q2" size=21/>q<sub>2</sub><br />
 <input type="text" id="q3" size=21/>q<sub>3</sub><br />
 </form>
-<button type="button" onclick="ComputeMatrix()">Compute All</button><br />
-<button type="button" onclick="ClearAll()">Clear All</button><br />
-<button type="button" onclick="window.open('rotation.html', '_blank');">Help</button><br />
+<button class="button button1" onclick="ComputeMatrix()">Compute All</button><br />
+<button class="button button1" onclick="ClearAll()">Clear All</button><br />
+<button class="button button1" onclick="window.open('rotation.html', '_blank');">Help</button><br />
 </td>
 
 <td style="vertical-align:top;">
@@ -1190,8 +1192,8 @@ Rotation Matrix for frame rotation&emsp;<br />
 <input type="text" id="t32" maxLength=10 size=7  />
 <input type="text" id="t33" maxLength=10 size=7  />
 </form>
-<button type="button" onclick="ComputeEulerAngles()">Compute All</button>
-<button type="button" onclick="NormalizeInputMatrix()">Normalize Matrix</button>
+<button class="button button1" onclick="ComputeEulerAngles()">Compute All</button>
+<button class="button button1" onclick="NormalizeInputMatrix()">Normalize Matrix</button>
 </td>
 
 <td style="vertical-align:top;">
@@ -1201,7 +1203,7 @@ Rotation Matrix for frame rotation&emsp;<br />
 <input type="text" id="theta" size=21/>&theta; (degs)<br />
 <input type="text" id="phi" size=21/>&phi; (degs)<br />
 </form>
-<br /><button type="button" onclick="ComputeQuaternion()">Compute All</button><br />
+<br /><button class="button button1" onclick="ComputeQuaternion()">Compute All</button><br />
 </td>
 
 <td style="vertical-align:top;"><form id = "quaternionOut" style="color:Silver;">
@@ -1220,10 +1222,10 @@ Vector In<br />
 <input type="text" id="v1" size=21/>v<sub>1</sub><br />
 <input type="text" id="v2" size=21/>v<sub>2</sub><br />
 </form>
-<button type="button" onclick="VectorRotationByQuaternion()">Rotate Vector by Quaternion Out</button><br />
-<button type="button" onclick="VectorRotationByMatrix()">Rotate Vector by Attitude Matrix</button><br />
-<button type="button" onclick="VectorRotationBy313EulerAngles()">Rotate Vector by 313 Euler Angles</button><br />
-<button type="button" onclick="Help()">Help</button><br />
+<button class="button button1" onclick="VectorRotationByQuaternion()">Rotate Vector by Quaternion Out</button><br />
+<button class="button button1" onclick="VectorRotationByMatrix()">Rotate Vector by Attitude Matrix</button><br />
+<button class="button button1" onclick="VectorRotationBy313EulerAngles()">Rotate Vector by 313 Euler Angles</button><br />
+<button class="button button1" onclick="Help()">Help</button><br />
 </td>
 
 <td style="vertical-align:top;">
@@ -1233,8 +1235,8 @@ Rotated Vector<br />
 <input type="text" id="v1_out" size=21/>v<sub>1</sub><br />
 <input type="text" id="v2_out" size=21/>v<sub>2</sub><br />
 </form>
-<button type="button" id="VisRotation" style="visibility:hidden" onclick="window.open('ShowRotation.html', '_blank');">Visualise Vector Rotation</button><br />
-<button type="button" id="FrameRotation" style="visibility:hidden" onclick="window.open('FrameRotation.html', '_blank');">Visualise Frame Rotation</button><br />
+<button class="button button1" id="VisRotation" style="visibility:hidden" onclick="window.open('ShowRotation.html', '_blank');">Visualise Vector Rotation</button><br />
+<button class="button button1" id="FrameRotation" style="visibility:hidden" onclick="window.open('FrameRotation.html', '_blank');">Visualise Frame Rotation</button><br />
 </td>
 
 </tr>
@@ -1273,8 +1275,8 @@ Quaternion 2 (input)<br />
 Quaternion Result = q<sub>1</sub>xq<sub>2</sub><br />
 <input type="text" id="q0_result" size=21/>q<sub>0</sub> (scalar)<br />
 <input type="text" id="q1_result" size=21/>q<sub>1</sub><br />
-<input type="text" id="q2_result" size=21/>q<sub>2</sub><button type="button" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
-<input type="text" id="q3_result" size=21/>q<sub>3</sub><button type="button" onclick="ClearAllTable2()">Clear All</button>
+<input type="text" id="q2_result" size=21/>q<sub>2</sub><button class="button button1" onclick="MultiplyQuaternions()">Multiply Quaternions</button><br />
+<input type="text" id="q3_result" size=21/>q<sub>3</sub><button class="button button1" onclick="ClearAllTable2()">Clear All</button>
 </form>
 
 </td>
@@ -1318,7 +1320,7 @@ Matrix 2<br />
 Matrix Result= M<sub>1</sub> x M<sub>2</sub><br />
 <input type="text" id="a11_result" maxLength=10 size=7  />
 <input type="text" id="a12_result" maxLength=10 size=7  />
-<input type="text" id="a13_result" maxLength=10 size=7  /><button type="button" onclick="MultiplyMatrices()">Multiply Matrices</button><br />
+<input type="text" id="a13_result" maxLength=10 size=7  /><button class="button button1" onclick="MultiplyMatrices()">Multiply Matrices</button><br />
 <input type="text" id="a21_result" maxLength=10 size=7  />
 <input type="text" id="a22_result" maxLength=10 size=7  />
 <input type="text" id="a23_result" maxLength=10 size=7  /><br />

@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html>
 <head>
+<link rel="stylesheet" href="styles.css">
+
 <script type="text/javascript">
 
 /// Determins if the passed in bit is set or not
@@ -239,9 +241,9 @@ Integer Representation (hex format)<br />
 </select>
 <label for="bitLength">Input the bit length (32 or 64)</label>
 </form>
-<button type="button" onclick="GetIeeeFloatFromInteger()">Convert to IEEE Float</button><br />
-<button type="button" onclick="ClearAll()">Clear All</button><br />
-<button type="button" onclick="Help()">Help</button><br />
+<button class="button button1" onclick="GetIeeeFloatFromInteger()">Convert to IEEE Float</button><br />
+<button class="button button1" onclick="ClearAll()">Clear All</button><br />
+<button class="button button1" onclick="Help()">Help</button><br />
 </td>
 
 <td style="vertical-align:top;">
@@ -250,7 +252,7 @@ Floating Point Representation<br />
 <input type="text" id="floatingPoint" maxLength=21 size=21  />float<br />
 <br />
 <br />
-<button type="button" onclick="GetIeeeIntegerFromFloat()">Convert to IEEE Integer</button><br />
+<button class="button button1" onclick="GetIeeeIntegerFromFloat()">Convert to IEEE Integer</button><br />
 </form>
 </td>
 </tr>

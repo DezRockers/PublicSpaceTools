@@ -487,11 +487,11 @@ or space delimited hexadecimal bytes e.g. 23 3F 04 13 00 C2 18 60 C0 00 00 05 19
 <input type="text" id="inputString" maxLength=1000 size=200/><br />
 </form>
 
-<button type="button" onclick="AddSpaces()">Add Spaces to TC String</button>
-<button type="button" onclick="DisplayTcFields()">Display TC Fields</button>
-<button type="button" onclick="ConvertToCltu()">Convert TC Frame to CLTU</button>
-<button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button>
+<button class="button button1" onclick="AddSpaces()">Add Spaces to TC String</button>
+<button class="button button1" onclick="DisplayTcFields()">Display TC Fields</button>
+<button class="button button1" onclick="ConvertToCltu()">Convert TC Frame to CLTU</button>
+<button class="button button1" onclick="ClearFields()">Clear Fields</button>
+<button class="button button1" onclick="DisplayHelp()">Help</button>
 
 <!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
 <!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
@@ -512,8 +512,8 @@ TC frame encoded as a CLTU using the BCH 63,56 encoding method<br />
 <input type="text" id="inputCltu" maxLength=1000 size=200/><br />
 </form>
 
-<button type="button" onclick="AddSpaces('inputCltu')">Add Spaces to CLTU</button>
-<button type="button" onclick="ConvertCltuTo()">Convert CLTU to TC Frame</button>
+<button class="button button1" onclick="AddSpaces('inputCltu')">Add Spaces to CLTU</button>
+<button class="button button1" onclick="ConvertCltuTo()">Convert CLTU to TC Frame</button>
 
 <!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
 <!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
@@ -545,7 +545,7 @@ TC Frame Fields<br />
 <input type="text" id="mapId" maxLength=10 size=10/>MAP Id<br />
 <input type="text" id="tcPacket" maxLength=1000 size=100/>TC Packet<br />
 <input type="text" id="frameCrc" maxLength=10 size=10/>TC Frame CRC (Frame Error Control Field)<br />
-<button type="button" onclick="ConvertFieldsToTcFrame()">Convert Fields to TC Frame</button>
+<button class="button button1" onclick="ConvertFieldsToTcFrame()">Convert Fields to TC Frame</button>
 </form>
 </td>
 

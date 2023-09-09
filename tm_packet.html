@@ -239,10 +239,10 @@ Input the TM string as either non-delimited hexadecimal bytes and then click 'Ad
 <input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is mission specific. Default is 0.
 </form>
 
-<button type="button" onclick="AddSpaces()">Add Spaces to TM String</button>
-<button type="button" onclick="DisplayTmFields()">Display TM Fields</button>
-<button type="button" onclick="ClearFields()">Clear Fields</button>
-<button type="button" onclick="DisplayHelp()">Help</button>
+<button class="button button1" onclick="AddSpaces()">Add Spaces to TM String</button>
+<button class="button button1" onclick="DisplayTmFields()">Display TM Fields</button>
+<button class="button button1" onclick="ClearFields()">Clear Fields</button>
+<button class="button button1" onclick="DisplayHelp()">Help</button>
 <!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
 <!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
 <a id="downloadLink" href="#" download="TmPacketReport.txt" style="visibility:hidden">Download Report</a>
