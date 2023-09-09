@@ -1,6 +1,7 @@
-<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
 
 <link rel="stylesheet" href="styles.css">
 
@@ -374,7 +375,7 @@ function DisplayHelp()
 }
 
 //ConvertFieldsToTcFrame() converts the TC fields to the TC frame.
-function ConvertFieldsToTcFrame( )
+function ConvertFieldsToTcFrame()
 {
 
 	var version_number = parseInt(document.getElementById("versionNumber").value,16);
@@ -405,10 +406,10 @@ function ConvertFieldsToTcFrame( )
 	var byte1 = spacecraft_id & 0xFF;
 	var byte2 = (virtual_channel_id << 2) |
 				((frame_length >> 8) & 0x03);
-	byte3 = frame_length & 0xFF;
-	byte4 = Frame_sequence_number & 0xFF;
-	byte5 = (sequence_flags & 0x03) << 6 |
-			(map_id & 0x3F);
+	var byte3 = frame_length & 0xFF;
+	var byte4 = Frame_sequence_number & 0xFF;
+	var byte5 = (sequence_flags & 0x03) << 6 |
+				(map_id & 0x3F);
 
 // Checks the interpretation of the values of the bypass flag and control/command flag i.e AD, BD, BC etc.
 
@@ -545,8 +546,8 @@ TC Frame Fields<br />
 <input type="text" id="mapId" maxLength=10 size=10/>MAP Id<br />
 <input type="text" id="tcPacket" maxLength=1000 size=100/>TC Packet<br />
 <input type="text" id="frameCrc" maxLength=10 size=10/>TC Frame CRC (Frame Error Control Field)<br />
-<button class="button button1" onclick="ConvertFieldsToTcFrame()">Convert Fields to TC Frame</button>
 </form>
+<button class="button button1" onclick="ConvertFieldsToTcFrame()">Convert Fields to TC Frame</button>
 </td>
 
 <td style="vertical-align:top;">
