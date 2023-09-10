@@ -68,7 +68,7 @@ function TC_packet( bytes )
 		packetStartByte = packetStartByte + 3;
 		var sourceId = "";
 		var spare = "";
-		switch (Number(document.getElementById("sourceIdLength").value))
+		switch (parseInt(document.getElementById("sourceIdLength").value, 10))
 		{
 			case 0:
 				break;
@@ -84,11 +84,11 @@ function TC_packet( bytes )
 				alert("Unrecognised source ID length field of " + document.getElementById("sourceIdLength").value + " bytes. Try again.");
 				break;
 		}
-		for (i = packetStartByte; i < packetStartByte + Number(document.getElementById("spareLength").value); i++)
+		for (i = packetStartByte; i < packetStartByte + parseInt(document.getElementById("spareLength").value, 10); i++)
 		{
 			spare = spare + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
 		}
-		packetStartByte = packetStartByte + Number(document.getElementById("spareLength").value);
+		packetStartByte = packetStartByte + parseInt(document.getElementById("spareLength").value, 10);
 
 		// display the fields
 		document.getElementById("pusVersionNumber").value = pusVersionNumber.toString(16).toUpperCase();
@@ -178,6 +178,134 @@ function SetDefaults()
 }
 
 
+//ConvertFieldsToTcPacket converts the TC fields to the TC packet.
+function ConvertFieldsToTcPacket()
+{
+	// primary header
+	var packetVersionNumber = parseInt(document.getElementById("packetVersionNumber").value,16);
+	var packetType = parseInt(document.getElementById("packetType").value,16);
+	var secondaryHeaderFlag = parseInt(document.getElementById("secondaryHeaderFlag").value,16);
+	var apid = parseInt(document.getElementById("apid").value,16);		
+	var sequenceFlags  = parseInt(document.getElementById("sequenceFlags").value,16);
+	var packetSequenceCount = parseInt(document.getElementById("packetSequenceCount").value,16);
+	var packetDataLength = parseInt(document.getElementById("packetDataLength").value,10);	// decimal input value
+
+	var byte0 = ((packetVersionNumber & 0x7) << 5) |
+				((packetType & 0x1) << 4) |
+				((secondaryHeaderFlag & 0x1) << 3) |
+				((apid >> 8) & 0x7);
+	var byte1 = apid & 0xFF;
+	var byte2 = ((sequenceFlags & 0x3) << 6) |
+				((packetSequenceCount >> 8) & 0x3F);
+	var byte3 = packetSequenceCount & 0xFF;
+	var byte4 = (packetDataLength >> 8) & 0xFF;
+	var byte5 = (packetDataLength >> 0) & 0xFF;
+	
+	var totalHeaderLength = 6;
+	
+	var outputString = 
+		byte0.toString(16).toUpperCase().padStart(2,'0') + " " + 
+		byte1.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte2.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte3.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte4.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte5.toString(16).toUpperCase().padStart(2,'0') + " ";
+		
+	// secondary header
+	var pusVersionNumber = parseInt(document.getElementById("pusVersionNumber").value,16);
+	var ackFlags = parseInt(document.getElementById("ackFlags").value,16);
+	var serviceType = parseInt(document.getElementById("serviceType").value,16);
+	var serviceSubtype = parseInt(document.getElementById("serviceSubtype").value,16);
+	var sourceId = parseInt(document.getElementById("sourceId").value,16);
+	var spare = parseInt(document.getElementById("spare").value,16);
+	
+	var sourceIdLength = parseInt(document.getElementById("sourceIdLength").value, 10);
+	var spareLength = parseInt(document.getElementById("spareLength").value, 10);
+
+	if (secondaryHeaderFlag == 1)
+	{
+		var byte6 = ((pusVersionNumber & 0xF) << 4) |
+				((ackFlags & 0xF) << 0);
+		var byte7 = serviceType & 0xFF;
+		var byte8 = serviceSubtype & 0xFF;
+		
+		outputString = outputString +
+			byte6.toString(16).toUpperCase().padStart(2,'0') + " " +
+			byte7.toString(16).toUpperCase().padStart(2,'0') + " " +
+			byte8.toString(16).toUpperCase().padStart(2,'0') + " ";
+
+		totalHeaderLength += 3;
+		
+		if (sourceIdLength > 0)
+		{
+			var str = document.getElementById("sourceId").value;
+			str = trim(str);
+			var bytes = new Array();
+			bytes = str.split(" ");
+			
+			if (bytes.length != sourceIdLength)
+			{
+				var txt = "There is an inconsistency in the sourceIdLength of " + sourceIdLength + "\n";
+				txt = txt + "and the number of source Id bytes " + bytes.length + ".\n";
+				txt = txt + "The output data will be inconsistent."; 
+				alert(txt);
+			}
+			
+			for (i = 0; i < bytes.length; i++)
+			{
+				outputString = outputString + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+			}
+			totalHeaderLength += sourceIdLength;
+		}
+
+		if (spareLength > 0)
+		{
+			var str = document.getElementById("spare").value;
+			str = trim(str);
+			var bytes = new Array();
+			bytes = str.split(" ");
+
+			if (bytes.length != spareLength)
+			{
+				var txt = "There is an inconsistency in the spareLength of " + spareLength + "\n";
+				txt = txt + "and the number of spare bytes " + bytes.length + ".\n";
+				txt = txt + "The output data will be inconsistent."; 
+				alert(txt);
+			}
+
+			for (i = 0; i < bytes.length; i++)
+			{
+				outputString = outputString + bytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+			}
+			totalHeaderLength += spareLength;
+			
+		}
+
+	}
+
+	// cargo
+	var tcPacket = document.getElementById("tcPacket").value;
+	var pec = document.getElementById("pec").value;
+
+	outputString = outputString +
+		tcPacket.toString(16).toUpperCase() + 
+		pec.toString(16).toUpperCase();
+
+
+	document.getElementById("inputString").value = outputString;
+	
+	AddSpaces('inputString');
+
+	// the total length is worked out by 2 chars plus 1 space = 3 chars per byte
+	// 1 is added to the inputString length to add a "space" at the end 
+	var totalFrameLength = (document.getElementById("inputString").value.length + 1) / 3;
+	document.getElementById("totalFrameLength").value = totalFrameLength;
+	document.getElementById("totalHeaderLength").value = totalHeaderLength;
+	document.getElementById("userDataLength").value = totalFrameLength - totalHeaderLength - 2;
+	document.getElementById("totalTrailerLength").value = 2;
+
+}
+
 
 </script>
 </head>
@@ -196,8 +324,8 @@ This tool displays the individual fields of the input TC CCSDS Space packet in h
 Input the TC string as either non-delimited hexadecimal bytes e.g. 1860C0000005191101004075 and then click 'Add Spaces to TC String' button<br />
 or space delimited hexadecimal bytes e.g. 18 60 C0 00 00 05 19 11 01 00 40 75 and then click 'Display TC Fields' button<br />
 <input type="text" id="inputString" maxLength=4000 size=200/><br />
-<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID field in bytes. This is mission specific and is usually 0, 1 or 2 bytes long. Default is 1.<br />
-<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in bytes. This is also mission specific. Default is 0.
+<input type="text" id="sourceIdLength" maxLength=10 size=10/>Input the length of the source ID field in (decimal) bytes. This is mission specific and is usually 0, 1 or 2 bytes long. Default is 1.<br />
+<input type="text" id="spareLength" maxLength=10 size=10/>Input the length of the spare field in (decimal) bytes. This is also mission specific. Default is 0.
 </form>
 
 <button class="button button1" onclick="AddSpaces()">Add Spaces to TC String</button>
@@ -236,8 +364,8 @@ TC Secondary Header Fields<br />
 <input type="text" id="ackFlags" maxLength=10 size=10/>Acknowledgement Flags (hex)<br />
 <input type="text" id="serviceType" maxLength=10 size=10/>Service Type ID (hex)<br />
 <input type="text" id="serviceSubtype" maxLength=10 size=10/>Service Subtype ID (hex)<br />
-<input type="text" id="sourceId" maxLength=10 size=10/>Source ID (hex)<br />
-<input type="text" id="spare" maxLength=10 size=10/>Spare Field (hex)<br />
+<input type="text" id="sourceId" maxLength=16 size=10/>Source ID (hex)<br />
+<input type="text" id="spare" maxLength=16 size=10/>Spare Field (hex)<br />
 </form>
 </td>
 
@@ -253,8 +381,8 @@ Other Useful Data<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
 <input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br /><br />
 
-
 </form>
+<button class="button button1" onclick="ConvertFieldsToTcPacket()">Convert TC Fields to TC packet</button>
 </td>
 
 </tr>
