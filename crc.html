@@ -71,7 +71,7 @@ function DisplayCrc()
 			alert("element " + i + " = " + bytes[i] + " needs length 2");
 		}
 		// convert each 2 character string to hexadecimal integer
-		bytes[i] = parseInt(bytes[i],16)
+		bytes[i] = parseInt(bytes[i],16);
 	}
 	var crc = CalculateCrc2(bytes);
 	var msb = (crc >> 8) & 0xff;

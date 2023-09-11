@@ -285,13 +285,17 @@ function ConvertFieldsToTcPacket()
 
 	// cargo
 	var tcPacket = document.getElementById("tcPacket").value;
-	var pec = document.getElementById("pec").value;
+	outputString = outputString +
+		tcPacket.toString(16).toUpperCase();
+	
+	// calculate the PEC (CRC)
+	var pec = CalculateCrc2(outputString);
+	document.getElementById("pec").value = pec;
 
 	outputString = outputString +
-		tcPacket.toString(16).toUpperCase() + 
 		pec.toString(16).toUpperCase();
 
-
+	// update the TC packet string
 	document.getElementById("inputString").value = outputString;
 	
 	AddSpaces('inputString');
@@ -306,6 +310,49 @@ function ConvertFieldsToTcPacket()
 
 }
 
+// Calculates the CRC based on the passed in bytes based on the generator polynomial x16 + x12 + x5 + 1
+function CalculateCrc2(inString)
+{
+
+	var str = trim(inString);
+	var bytes = new Array();
+	bytes = str.split(" ");
+	
+	var r = new Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	var len = bytes.length;
+
+	var crc = 0x0;
+	var i = 0;
+	var j = 0;
+
+	for (i = 0; i < 16; i++)
+	{
+		crc = crc + (r[i] << (15-i));
+	}
+	
+	for (i = 0; i < len; i++)
+	{
+		bytes[i] = parseInt(bytes[i],16);
+		for (j = 0; j < 8; j++)
+		{
+		if ((bytes[i] & 0x80) ^ ((crc & 0x8000) >> 8))
+		{
+			crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+		}
+		else
+		{
+			crc = (crc << 1) & 0xFFFF;
+		}
+			bytes[i] = bytes[i] << 1;
+		}
+	}
+	
+	var msb = (crc >> 8) & 0xff;
+	var lsb = crc & 0xff;
+	var crcString = msb.toString(16).toUpperCase().padStart(2,'0') + " " + lsb.toString(16).toUpperCase().padStart(2,'0');
+
+	return crcString;
+}
 
 </script>
 </head>
@@ -379,7 +426,7 @@ Other Useful Data<br />
 <input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Packet Length (decimal)<br />
 <input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
-<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br /><br />
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br />
 
 </form>
 <button class="button button1" onclick="ConvertFieldsToTcPacket()">Convert TC Fields to TC packet</button>
