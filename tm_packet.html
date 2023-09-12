@@ -157,7 +157,12 @@ function ClearFields()
 function DisplayHelp()
 {
 var txt = "This tool displays the individual fields of the input TM CCSDS Space packet in hexadecimal bytes.\n";
-txt = txt + "The information has been taken from ECSS-E-ST-70-41C 15 April 2016 section 7.4.";
+txt = txt + "The information has been taken from ECSS-E-ST-70-41C 15 April 2016 section 7.4.\n";
+txt = txt + "The example TM packet is for ELSA-d and the various variable length fields have been set accordingly:\n";
+txt = txt + "for ELSA-d the message type counter field is length 0\n";
+txt = txt + "for ELSA-d the destination id field is length 0\n";
+txt = txt + "for ELSA-d the time p-field is length 1\n";
+txt = txt + "for ELSA-d the time t-field is length 6\n";
 alert(txt);
 }
 
@@ -221,11 +226,20 @@ function ExampleTmPacket()
 	
 	// the following is an example ELSA-d Tm packet 
 	document.getElementById("inputString").value = "08 C1 C2 36 03 13 10 03 19 2E 00 00 04 59 F7 BF 04 00 00 00 04 5A 57 EA C4 9F F0 33 7F B9 02 00 2A 61 C0 00 B4 00 00 00 18 99 91 33 7B B9 00 00 F5 80 C0 80 00 00 00 00 60 80 00 33 7B B9 02 00 C2 72 C0 00 00 00 00 00 E0 80 00 33 7B B9 00 00 41 1A C0 00 0E 00 00 00 05 00 00 00 00 00 20 A1 00 00 3A 00 00 06 00 00 65 05 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 12 00 00 00 00 F0 00 00 00 00 00 00 00 FF 00 00 04 00 00 00 00 00 00 00 00 00 00 7E 00 00 00 BA 42 8E 00 02 00 02 00 38 00 24 00 00 00 00 00 00 00 B3 00 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 04 61 FF FF FF FF 00 01 00 00 FF FE FF FF 00 05 16 00 F0 00 F0 03 F3 FF 0F 00 FF FF FF FF FF FF FF FF 3F 33 33 FF 4F 4F 33 43 F4 F3 33 33 33 33 34 00 40 8D 00 00 00 00 00 00 00 00 00 EC 00 00 00 00 08 F9 00 00 00 00 01 08 C4 00 01 14 C4 00 00 19 3F 00 00 00 00 06 00 00 80 00 2E 00 00 4E 20 00 00 00 00 00 00 00 06 BE 08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 1D 00 1D 00 1D 00 1D 00 1D 00 1D 00 1D 00 1D 00 00 00 00 00 88 A0 88 A0 88 A0 88 A0 37 8C 00 59 02 00 00 00 00 F0 2C 80 00 01 00 00 00 13 3D 00 01 00 00 00 0E 01 00 00 00 00 00 00 F5 46 00 D0 00 DE 02 A3 01 A2 10 04 08 33 0B B8 0B 35 00 00 00 00 00 00 02 1C 00 00 00 00 00 C0 3F 00 00 50 00 50 00 50 00 50 FD 04 00 68 00 00 68 00 00 00 00 19 19 00 00 00 00 00 00 00 00 00 00 00 10 00 00 00 00 00 00 00 00 00 00 00 00 00 50 00 00 00 00 00 00 00 00 00 00 00 00 00 F8 3E 3E 3E 3E 00 00 00 00 00 00 FF FE CC FF FF 05 FF FF 29 7F 28 15 00 00 FA BF 44 4F 02 9F 00 55 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A0 5B 79 1D DD 9B DE 06 E2 00 00 00 00 77 80 00 00 00 00 00 00 00 2D 00 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 03 F8 FE 00 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF 10 00 00 F8 3E 3E 3E 3E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FA 72 45 CC FD E5 00 55 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 EC F0 20 00 00 00 00 00 00 00 00 00 00 15 E0 E0 FF FF 00 00 FF 00 FF FF FC 00 00 00 00 FF FF FF FF FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FC 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 6D 90";
-	
 	AddSpaces();
+	
+	// for ELSA-d the mesasage type counter field is length 0
+	document.getElementById("msgTypeCntrLength").value = 0; 
+
+	// for ELSA-d the destination id field is length 0
+	document.getElementById("destIdLength").value = 0; 
+
+	// for ELSA-d the time p-field field is length 1
+	document.getElementById("pFieldLength").value = 1; 
+
+	// for ELSA-d the time t-field field is length 6
+	document.getElementById("timeFieldLength").value = 6; 
 }
-
-
 
 </script>
 </head>
