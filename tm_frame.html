@@ -248,6 +248,16 @@ function GenerateReport()
 	DownloadFile('downloadLink', report);
 }
 
+// insert an example TM frame for testing purposes
+function ExampleTmFrame()
+{
+	ClearFields();
+	
+	// the following is an example ELSA-d Tm frame for spacecraft id = 277 decimal = 0x115 on VC0
+	document.getElementById("inputString").value = "11515fbe180008c1c23603131003192e00000459f7bf04000000045a57eac49ff0337fb902002a61c000b4000000189991337bb90000f580c08000000000608000337bb90200c272c00000000000e08000337bb90000411ac0000e00000005000000000020a100003a00000600006505000000000000000000000000000000000000001200000000f000000000000000ff000004000000000000000000007e000000ba428e000200020038002400000000000000b3000000000000000000000001000000000461ffffffff00010000fffeffff00051600f000f003f3ff0f00ffffffffffffffff3f3333ff4f4f3343f4f3333333333400408d000000000000000000ec0000000008f9000000000108c4000114c40000193f0000000006000080002e00004e200000000000000006be0800000000000000000000000000001d001d001d001d001d001d001d001d000000000088a088a088a088a0378c00590200000000f02c800001000000133d00010000000e01000000000000f54600d000de02a301a2100408330bb80b35000000000000021c0000000000c03f000050005000500050fd040068000068000000001919000000000000000000000010000000000000000000000000005000000000000000000000000000f83e3e3e3e000000000000fffeccffff05ffff297f28150000fabf444f029f00550000000000000000000000000000a8000000000000000000000000000000000000000000000000a05b791ddd9bde06e2000000007780000000000000002d0000000000000000000001000000000000000003f8fe00400000000000000000000000000000000000ffff100000f83e3e3e3e0000000000000000000000000000000000000000fa7245ccfde500550000000000000000000000000000a8000000000000000000000000000000000000000000000000ecf0200000000000000000000015e0e0ffff0000ff00fffffc00000000ffffffffffffffff0000000000000000000000ffffffff000000000000000000000000000000000000000000000000000000fc0000000000000000000000000000000000000000000000000000000000000000006d9007ffc000012e5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a0100c4000d8e";
+	
+	AddSpaces();
+}
 
 </script>
 </head>
@@ -271,6 +281,7 @@ Input the TM string as either non-delimited hexadecimal bytes and then click 'Ad
 <button class="button button1" onclick="AddSpaces()">Add Spaces to TM String</button>
 <button class="button button1" onclick="DisplayTmFields()">Display TM Fields</button>
 <button class="button button1" onclick="ClearFields()">Clear Fields</button>
+<button class="button button1" onclick="ExampleTmFrame()">Example TM Frame</button>
 <button class="button button1" onclick="DisplayHelp()">Help</button>
 <!-- Download link - defaults to # which means clicking it does nothing as no file download link has been assigned (yet) -->
 <!-- Note the use of the download attribute! It tells the browser to download the file, and what the default file name should be -->
@@ -317,17 +328,17 @@ TM Frame User Data<br />
 <input type="text" id="fecf" maxLength=10 size=10/>Frame Error Control Field (hex)<br /><br />
 
 Other Useful Data<br />
-<input type="text" id="numTmPackets" maxLength=10 size=10/>Number of Contained TM Packets
-<input type="text" id="tmPacketToDisplay" maxLength=10 size=10/>Select TM Packet to Display
-<button class="button button1" onclick="TmPacketToDisplay()">Display TM Packet</button><br />
-<input type="text" id="tmPacket" maxLength=4000 size=99/>
-<label id="tmPacketLabel" for="tmPacket">TM packet 1 (hex)</label><br />
 <input type="text" id="totalFrameLength" maxLength=10 size=10/>Total Frame Length (decimal)<br />
 <input type="text" id="totalHeaderLength" maxLength=10 size=10/>Total Header Length (decimal)<br />
 <input type="text" id="userDataLength" maxLength=10 size=10/>Total User Data Length (decimal)<br />
-<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br /><br />
+<input type="text" id="totalTrailerLength" maxLength=10 size=10/>Total Trailer Length (decimal)<br />
+<input type="text" id="numTmPackets" maxLength=10 size=10/>Number of Contained TM Packets
+<input type="text" id="tmPacketToDisplay" maxLength=10 size=10/>Select TM Packet to Display<br />
+<input type="text" id="tmPacket" maxLength=4000 size=99/>
+<label id="tmPacketLabel" for="tmPacket">TM packet 1 (hex)</label><br />
 
 </form>
+<button class="button button1" onclick="TmPacketToDisplay()">Display TM Packet</button>
 </td>
 
 </tr>
