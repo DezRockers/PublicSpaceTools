@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+<head>
+
+<link rel="stylesheet" href="styles.css">
+
+<script src="generic.js"></script>
+
+<script type="text/javascript">
+
+// the following code is based on information contained in TELECOMMAND PART 2 DATA ROUTING CCSDS 202.0-B-2 BLUE BOOK
+
+// first decode the CLCW into its constituent fields
+function Decode()
+{
+	// first decode the CLCW
+	var str = document.getElementById("clcw").value;
+	str = trim(str);
+	var bytes = new Array();
+	bytes = str.split(" ");
+	if (bytes.length != 4) 
+	{
+		alert("CLCW length should be 4 octets. Try again.");
+		return;
+	}
+
+	// check that length of each element is 2 characters (for a byte)
+	for (i = 0; i < bytes.length; i++)
+	{
+		if (bytes[i].length != 2)
+		{
+			alert("element " + i + " = " + bytes[i] + " needs length 2");
+		}
+		// convert each 2 character string to hexadecimal integer
+		bytes[i] = parseInt(bytes[i],16) & 0xff;
+	}
+
+	// control word type is bit 0 (leftmost bit) of byte 0
+	var clcwType = (bytes[0] >> 7) & 0x1;
+
+	// clcw version is next 2 bits of byte 0
+	var clcwVersion = (bytes[0] >> 5) & 0x3;
+
+	// status is next 3 bits of byte 0
+	var status = (bytes[0] >> 2) & 0x7;
+
+	// COP in effect is last 2 bits of byte 0
+	var copInEffect = (bytes[0] >> 0) & 0x3;
+	
+	// VC Id is left most 6 bits of byte 1
+	var vcId = (bytes[1] >> 2) & 0x3F;
+	
+	// spare2 is last 2 bits of byte 1
+	var spare2 = bytes[1] & 0x3;
+	
+	// No RF flag is left most bit of byte 2
+	var noRf = (bytes[2] >> 7) & 0x1;
+
+	// No bit lock flag is next bit of byte 2
+	var noBitLock = (bytes[2] >> 6) & 0x1;
+
+	// lockout flag is next bit of byte 2
+	var lockout = (bytes[2] >> 5) & 0x1;
+
+	// wait flag is next bit of byte 2
+	var wait = (bytes[2] >> 4) & 0x1;
+
+	// retransmit flag is next bit of byte 2
+	var retransmit = (bytes[2] >> 3) & 0x1;
+
+	// FARM B Counter is next 2 bits of byte 2
+	var farmBcounter = (bytes[2] >> 1) & 0x3;
+
+	// spare1 is last 2 bit of byte 2
+	var spare1 = bytes[2] & 0x1;
+	
+	// report value is last byte 3
+	var report = bytes[3];
+	
+	// update all the outputs
+	document.getElementById("clcwType").value = clcwType;
+	document.getElementById("clcwVersion").value = clcwVersion;
+	document.getElementById("status").value = status;
+	document.getElementById("copInEffect").value = copInEffect;
+	document.getElementById("vcId").value = vcId;
+	document.getElementById("spare2").value = spare2;
+	document.getElementById("noRf").value = noRf;
+	document.getElementById("noBitLock").value = noBitLock;
+	document.getElementById("lockout").value = lockout;
+	document.getElementById("wait").value = wait;
+	document.getElementById("retransmit").value = retransmit;
+	document.getElementById("farmBcounter").value = farmBcounter;
+	document.getElementById("spare1").value = spare1;
+	document.getElementById("report").value = report;
+	
+}
+
+
+// next encode the CLCW from its constituent fields
+function Encode()
+{
+	var byte0 = (document.getElementById("clcwType").value & 0x1) << 7 |
+		(document.getElementById("clcwVersion").value & 0x3) << 5 |
+		(document.getElementById("status").value & 0x7) << 2 |
+		(document.getElementById("copInEffect").value & 0x3);
+	
+	
+	var byte1 = (parseInt(document.getElementById("vcId").value,10) & 0x3F) << 2 |
+		(document.getElementById("spare2").value & 0x3);
+
+	var byte2 = (document.getElementById("noRf").value & 0x1) << 7 |	
+		(document.getElementById("noBitLock").value & 0x1) << 6 |
+		(document.getElementById("lockout").value & 0x1) << 5 |
+		(document.getElementById("wait").value & 0x1) << 4 |
+		(document.getElementById("retransmit").value & 0x1) << 3 |
+		(document.getElementById("farmBcounter").value & 0x3) << 1 |
+		(document.getElementById("spare1").value & 0x1);
+
+	var byte3 = parseInt(document.getElementById("report").value,10);	// decimal input value;
+
+
+	if (isNaN(byte3))
+	{
+		byte3 = 0;
+	}
+	
+	// update all the outputs
+	document.getElementById("clcw").value = 
+		byte0.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte1.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte2.toString(16).toUpperCase().padStart(2,'0') + " " +
+		byte3.toString(16).toUpperCase().padStart(2,'0');
+}
+
+function ClearAll()
+{
+	document.getElementById("CLCW").reset();
+	document.getElementById("Outputs").reset();
+}
+
+function Help()
+{
+	var txt = "This tool converts the input CLCW into individual bit fields.\n";
+	txt = txt + "The CLCW needs to be input as space delimited hex strings of 2 character bytes e.g. 01 00 C0 00.\n";
+	txt = txt + "See document TELECOMMAND PART 2 DATA ROUTING CCSDS 202.0-B-2 BLUE BOOK for details.";
+	alert(txt);
+}
+
+
+</script>
+</head>
+
+<body">
+<H3 style="color:Silver;">CCSDS CLCW</H3>
+<table border="1" borderColor="Silver">
+
+<tr id="tr1">
+<H4 style="color:Silver;">CLCW (space delimited hex strings of bytes)</H4>
+
+<td style="vertical-align:top;">
+<form id = "CLCW" style="color:Silver;">
+<input type="text" id="clcw" size=20/>
+<label style="padding-right:150px;">Input CLCW</label>
+</form>
+</td>
+
+</tr>
+
+
+<tr id="tr2">
+<td style="vertical-align:top;">
+<button class="button button1" onclick="Decode()">Decode CLCW</button>
+<button class="button button1" onclick="ClearAll()">Clear All</button>
+<button class="button button1" onclick="Help()">Help</button>
+</td>
+</tr>
+
+<tr id="tr3">
+
+<td style="vertical-align:top;">
+<form id = "Outputs" style="color:Silver;">
+Decoded CLCW<br>
+<input type="text" id="clcwType" size=15/>
+<label id="clcwTypeLabel" for="clcwType">Control Word Type (1 bit) (should be 0)</label><br />
+<input type="text" id="clcwVersion" size=15/>
+<label id="clcwVersionLabel" for="clcwVersion">CLCW Version (2 bits) (should be 0)</label><br />
+<input type="text" id="status" size=15/>
+<label id="statusLabel" for="status">Status (3 bits) (mission specific)</label><br />
+<input type="text" id="copInEffect" size=15/>
+<label id="copInEffectLabel" for="copInEffect">COP In Effect (2 bits) (should be 1)</label><br />
+<input type="text" id="vcId" size=15/>
+<label id="vcIdLabel" for="vcId">Virtual channel Id (6 bits) (decimal)</label><br />
+<input type="text" id="spare2" size=15/>
+<label id="spare2Label" for="spare2">Reserved Spare (2 bits) (should be 0)</label><br />
+<input type="text" id="noRf" size=15/>
+<label id="noRfLabel" for="noRf">No RF Available (1 bit)</label><br />
+<input type="text" id="noBitLock" size=15/>
+<label id="noBitLockLabel" for="noBitLock">No Bit Lock Available (1 bit)</label><br />
+<input type="text" id="lockout" size=15/>
+<label id="lockoutLabel" for="lockout">Lockout Flag (1 bit)</label><br />
+<input type="text" id="wait" size=15/>
+<label id="waitLabel" for="wait">Wait Flag (1 bit)</label><br />
+<input type="text" id="retransmit" size=15/>
+<label id="retransmitLabel" for="retransmit">Retransmit Flag (1 bit)</label><br />
+<input type="text" id="farmBcounter" size=15/>
+<label id="farmBcounterLabel" for="farmBcounter">FARM B Counter (2 bits)</label><br />
+<input type="text" id="spare1" size=15/>
+<label id="spare1Label" for="spare1">Reserved Spare (1 bits) (should be 0)</label><br />
+<input type="text" id="report" size=15/>
+<label id="reportLabel" for="report">Report Value V(R) (8 bits) (decimal)</label><br />
+</form>
+<button class="button button1" onclick="Encode()">Convert CLCW Fields to CLCW</button>
+</td>
+
+</tr>
+
+</table>
+
+</body>
+</html>
+
