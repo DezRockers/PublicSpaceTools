@@ -104,8 +104,14 @@ function Encode()
 		(document.getElementById("status").value & 0x7) << 2 |
 		(document.getElementById("copInEffect").value & 0x3);
 	
+	var vcId = parseInt(document.getElementById("vcId").value,10);
+	if ((vcId > 63) || (0 > vcId))
+	{
+		alert("Virtual Channel Id must be between 0 and 63 decimal but is " + vcId + ". Try again.");
+		return;
+	}
 	
-	var byte1 = (parseInt(document.getElementById("vcId").value,10) & 0x3F) << 2 |
+	var byte1 = ( vcId & 0x3F) << 2 |
 		(document.getElementById("spare2").value & 0x3);
 
 	var byte2 = (document.getElementById("noRf").value & 0x1) << 7 |	
@@ -117,11 +123,14 @@ function Encode()
 		(document.getElementById("spare1").value & 0x1);
 
 	var byte3 = parseInt(document.getElementById("report").value,10);	// decimal input value;
-
-
 	if (isNaN(byte3))
 	{
 		byte3 = 0;
+	}
+	if ((byte3 > 255) || (0 > byte3))
+	{
+		alert("Report value must be between 0 and 255 decimal but is " + byte3 + ". Try again.");
+		return;
 	}
 	
 	// update all the outputs
