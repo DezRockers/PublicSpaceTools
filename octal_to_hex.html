@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="styles.css">
+
+<script src="generic.js"></script>
+
+<script type="text/javascript">
+
+function ConvertOctalStringToHexString()
+{
+	var str = document.getElementById("octalString").value;
+	str = trim(str);
+	var octalString = new Array();
+	var hexBytes = new Array();
+    var hexString = "";
+    
+    if (str.substr(0,1) != "\\")
+    {
+	    alert("First octal character must be a \\");
+	    return;
+	}
+	
+	octalString = str.split("\\");
+
+	// check that length of each element is 3 characters (for an octal)
+	var hexCounter = 0;
+	for (i = 0; i < octalString.length; i++)
+	{
+		if ((octalString[i] == "\\") || (octalString[i].length == 0))
+		{
+			// ignore
+		}
+		else if (octalString[i].length == 3)
+		{
+			// convert each 3 character string to hexadecimal integer
+			octalString[i] = parseInt(octalString[i],8) & 0xff;
+			hexBytes[hexCounter] = octalString[i].toString(16).toUpperCase().padStart(2,'0');
+			hexCounter++;
+		}
+		else if (octalString[i].length > 3)
+		{
+			// convert first 3 character string to hexadecimal integer
+			var firstThree = parseInt(octalString[i].substr(0,3),8) & 0xff;
+
+			// assign first 3 characters
+			hexBytes[hexCounter] = firstThree.toString(16).toUpperCase().padStart(2,'0');
+			hexCounter++;
+
+			// the fourth character onwards seems to be an ASCII character
+			for (j = 3; j < octalString[i].length; j++)
+			{
+				var fourthPlus = octalString[i].charCodeAt(j);
+				// assign fourthPlus character
+				hexBytes[hexCounter] = fourthPlus.toString(16).toUpperCase().padStart(2,'0');
+				hexCounter++;
+			}
+		}
+		else
+		{
+			alert(" i = " + i + " string = " + octalString[i]);
+		}
+	}
+
+	for (i = 0; i < hexBytes.length; i++)
+	{
+		hexString = hexString + hexBytes[i].toString(16).toUpperCase().padStart(2,'0') + " ";
+	}
+
+	document.getElementById("hexString").value = hexString.toString(16).toUpperCase();
+
+}
+
+
+function ClearFields()
+{
+	document.getElementById("getOctalString").reset();
+	document.getElementById("getHexString").reset();
+}
+
+// function to display help message
+function DisplayHelp()
+{
+	var txt = "This tool converts an octal string into a string of space delimited hexadecimal bytes\n";
+	alert(txt);
+}
+
+</script>
+</head>
+
+<body>
+<H3 style="color:Silver;">Octal String to Hex String</H3>
+<p style="color:Silver;">
+This tool converts an octal string into a string of space delimited hexadecimal bytes.
+</p>
+
+<!-- Define a table for the Input octal string -->
+
+<table border="1" borderColor="Silver">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
+<form id = "getOctalString" style="color:Silver;">
+<label class="form-control-label" for="octalString">Input the octal string as '\' delimited octals e.g. "\032\317\374\035$\017\001\001\237\376\003\000\000\000Z" and then click 'Convert Octal to Hex' button</label>
+<textarea class="form-control" name="commentText" id="octalString" rows="5" cols="200"></textarea>
+</form>
+
+<button class="button button1" onclick="ConvertOctalStringToHexString()">Convert Octal to Hex</button>
+<button class="button button1" onclick="ClearFields()">Clear Fields</button>
+<button class="button button1" onclick="DisplayHelp()">Help</button>
+
+</td>
+</tr>
+</table>
+
+<!-- Define a table for the output hex string -->
+
+<table border="1" borderColor="Silver">
+<tr id="tr1">
+
+<td style="vertical-align:top;">
+<form id = "getHexString" style="color:Silver;">
+<label class="form-control-label" for="hexString">String of space delimted hexadecimal bytes</label>
+<textarea class="form-control" name="commentText" id="hexString" rows="5" cols="200"></textarea>
+</form>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
